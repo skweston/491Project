@@ -24,6 +24,7 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceWidth = this.ctx.canvas.width;
     this.surfaceHeight = this.ctx.canvas.height;
     this.timer = new Timer();
+    this.startInput();
     console.log('game initialized');
 }
 
@@ -38,15 +39,11 @@ GameEngine.prototype.start = function () {
 
 GameEngine.prototype.startInput = function () {
     console.log('Starting input');
+    var that = this;
 
     var getXandY = function (e) {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
-
-        if (x < 1024) {
-            x = Math.floor(x / 32);
-            y = Math.floor(y / 32);
-        }
 
         return { x: x, y: y };
     }
@@ -66,6 +63,28 @@ GameEngine.prototype.startInput = function () {
         console.log(e);
         console.log("Right Click Event - X,Y " + e.clientX + ", " + e.clientY);
         e.preventDefault();
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousedown", function (e) {
+        that.click = getXandY(e);
+        console.log(e);
+        if (e.which === 1) {
+            console.log("Left Mouse Down - X,Y " + e.clientX + ", " + e.clientY);
+        }
+        if (e.which === 3) {
+            console.log("Right Mouse Down - X,Y " + e.clientX + ", " + e.clientY);
+        }
+    }, false);
+
+    this.ctx.canvas.addEventListener("mouseup", function (e) {
+        that.click = getXandY(e);
+        console.log(e);
+        if (e.which === 1) {
+            console.log("Left Mouse Up - X,Y " + e.clientX + ", " + e.clientY);
+        }
+        if (e.which === 3) {
+            console.log("Right Mouse Up - X,Y " + e.clientX + ", " + e.clientY);
+        }
     }, false);
 
     this.ctx.canvas.addEventListener("mousemove", function (e) {
