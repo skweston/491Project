@@ -32,3 +32,24 @@ from initial state
    
    when done hit "esc"
    then ":wq" to save and exit
+
+
+
+
+//To push code to master
+ // modify personal local branch
+    //leave these changes here
+    
+   git checkout master
+   
+   //bring your local master up to date with online repo
+   git pull
+  
+    //when master is up to date 
+    git merge branchname
+      //this will bring your local master up to date with your local personal branch
+      
+    when this is done
+    git push
+      //will publish code to online repo
+  
