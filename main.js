@@ -65,6 +65,7 @@ function Boss1(game, spritesheet){
   this.angle = 0;
   this.game = game;
   this.ctx = game.ctx;
+  this.removeFromWorld = false;
 }
 Boss1.prototype = new Entity();
 Boss1.prototype.constructor = Boss1;
@@ -90,6 +91,7 @@ function BossTurret(game, spritesheet, x, y){
   this.angle = 0;
   this.game = game;
   this.ctx = game.ctx;
+  this.removeFromWorld = false;
 }
 BossTurret.prototype = new Entity();
 BossTurret.prototype.constructor = Boss1;
@@ -123,10 +125,12 @@ BossTurret.prototype.draw = function () {
 function LaserBlast(game, spritesheet){
   this.animation = new Animation(spritesheet, 32, 32, 128, 0.15, 4, true, 1);
   this.game = game;
-  this.speed = 1;
+  this.speed = 100;
   this.ctx = game.ctx;
-  this.x = this.game.mousex;
+  this.x = this.game.mousex - 22;
   this.y = this.game.mousey;
+  this.lifetime = 600;
+  this.removeFromWorld = false;
 }
 LaserBlast.prototype = new Entity();
 LaserBlast.prototype.constructor = LaserBlast;
@@ -137,6 +141,11 @@ LaserBlast.prototype.update = function () {
 
     if (this.x > 800) this.x = -230;
     if (this.y > 800) this.y = -230;
+    this.lifetime = this.lifetime - 5;
+    if (this.lifetime < 0){
+      this.removeFromWorld = true;
+    }
+
     Entity.prototype.update.call(this);
 }
 

@@ -142,11 +142,6 @@ GameEngine.prototype.draw = function () {
     this.ctx.restore();
 }
 
-GameEngine.prototype.addEntity = function (entity) {
-    console.log('added entity');
-    this.entities.push(entity);
-}
-
 GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
     this.ctx.save();
@@ -161,8 +156,13 @@ GameEngine.prototype.update = function () {
 
     for (var i = 0; i < entitiesCount; i++) {
         var entity = this.entities[i];
-
+        if(entity.removeFromWorld){
+            this.entities.splice(i,1);
+            entitiesCount--;
+            i--;
+      } else {
         entity.update();
+      }
     }
 }
 
