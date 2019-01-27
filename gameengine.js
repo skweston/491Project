@@ -13,7 +13,11 @@ function GameEngine() {
     this.entities = [];
     this.player = [];
     this.enemies = [];
-    this.projectiles = [];
+    this.enemyProjectiles = [];
+    this.playerProjectiles = [];
+    this.wasclicked = false;
+    this.mousex = 0;
+    this.mousey = 0;
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
@@ -54,6 +58,7 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("click", function (e) {
         that.click = getXandY(e);
+        that.wasclicked = true;
         console.log(e);
         console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
     }, false);
@@ -90,6 +95,9 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("mousemove", function (e) {
         //console.log(e);
         that.mouse = getXandY(e);
+        that.mousex = e.x;
+        that.mousey = e.y;
+        //console.log("Current mouse x: " + that.mousex + " current mouse y: " + that.mousey );
     }, false);
 
     this.ctx.canvas.addEventListener("mousewheel", function (e) {
@@ -122,7 +130,14 @@ GameEngine.prototype.addEntity = function (entity) {
     console.log('added entity');
     this.entities.push(entity);
 }
-
+GameEngine.prototype.addPlayerProjectile = function (entity) {
+    console.log('added projectile');
+    this.projectiles.push(entity);
+}
+GameEngine.prototype.addEnemyProjectile = function (entity) {
+    console.log('added enemy projectile');
+    this.enemyProjectiles.push(entity);
+}
 GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
     this.ctx.save();
@@ -130,11 +145,6 @@ GameEngine.prototype.draw = function () {
         this.entities[i].draw(this.ctx);
     }
     this.ctx.restore();
-}
-
-GameEngine.prototype.addEntity = function (entity) {
-    console.log('added entity');
-    this.entities.push(entity);
 }
 
 GameEngine.prototype.draw = function () {
@@ -151,9 +161,15 @@ GameEngine.prototype.update = function () {
 
     for (var i = 0; i < entitiesCount; i++) {
         var entity = this.entities[i];
-
+        if(entity.removeFromWorld){
+            this.entities.splice(i,1);
+            entitiesCount--;
+            i--;
+      } else {
         entity.update();
+      }
     }
+    this.wasclicked = false;
 }
 
 GameEngine.prototype.loop = function () {
