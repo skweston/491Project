@@ -87,6 +87,9 @@ function BossTurret(game, spritesheet, x, y){
   this.animation = new Animation(spritesheet, 32, 32, 672, 0.2, 21, true, 1.5);
   this.x = x;
   this.y = y;
+  this.hitcenterX = this.x + 16;
+  this.hitcenterY = this.y + 16;
+  this.hitRadius = 16;
   this.speed = 0;
   this.angle = 0;
   this.game = game;
