@@ -129,7 +129,7 @@ function LaserBlast(game, spritesheet, xIn, yIn, dx, dy){
   this.speedX = 1;
   this.speedY = 1;
   this.dx = dx/this.speedX;
-  this.dy = dy/this.speedY;
+  this.dy = -dy/this.speedY;
   this.ctx = game.ctx;
   this.x = xIn; //this.game.mousex - 22;
   this.y = yIn; //this.game.mousey;
