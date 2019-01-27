@@ -51,7 +51,9 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
-// no inheritance
+/* ========================================================================================================== */
+// Background
+/* ========================================================================================================== */
 function Background(game, spritesheet) {
     this.x = 0;
     this.y = 0;
@@ -67,7 +69,10 @@ Background.prototype.draw = function () {
 
 Background.prototype.update = function () {
 };
-//function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale)
+
+/* ========================================================================================================== */
+// Boss 1
+/* ========================================================================================================== */
 function Boss1(game, spritesheet){
   this.animation = new Animation(spritesheet, 200, 450, 1200, 0.175, 6, true, 1);
   this.x = 300;
@@ -172,7 +177,9 @@ LaserBlast.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 }
 
-
+/* ========================================================================================================== */
+// The Ship
+/* ========================================================================================================== */
 function TheShip(game) {
     var width = 128;
     var height = 128;
@@ -194,6 +201,7 @@ TheShip.prototype.draw = function (ctx) {
     Entity.prototype.draw.call(this);
 }
 
+/* ========================================================================================================== */
 var AM = new AssetManager();
 // AM.queueDownload("./img/background.jpg");
 AM.queueDownload("./img/theship.png");
