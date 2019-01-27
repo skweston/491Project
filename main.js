@@ -68,19 +68,46 @@ Background.prototype.draw = function () {
 Background.prototype.update = function () {
 };
 
+function TheShip(game) {
+    var width = 128;
+    var height = 128;
+    this.idleAnimation = new Animation(AM.getAsset("./img/theship.png"), 0, 0, width, height, 0.03, 2, true);
+    var x = 400 - (width / 2);
+    var y = 400 - (height / 2);
+    Entity.call(this, game, x, y);
+}
+
+TheShip.prototype = new Entity();
+TheShip.prototype.constructor = TheShip;
+
+TheShip.prototype.update = function () {
+    Entity.prototype.update.call(this);
+}
+
+TheShip.prototype.draw = function (ctx) {
+    this.idleAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
+
+    Entity.prototype.draw.call(this);
+}
+
 var AM = new AssetManager();
 
 // AM.queueDownload("./img/background.jpg");
+AM.queueDownload("./img/theship.png");
 
 AM.downloadAll(function () {
+    console.log("starting up da sheild");
     var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
 
     var gameEngine = new GameEngine();
+    var theShip = new TheShip(gameEngine);
+
+    gameEngine.addEntity(theShip);
+    // gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/background.jpg")));
+
     gameEngine.init(ctx);
     gameEngine.start();
-
-    // gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/background.jpg")));
 
     console.log("All Done!");
 });
