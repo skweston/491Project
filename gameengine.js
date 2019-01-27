@@ -13,7 +13,8 @@ function GameEngine() {
     this.entities = [];
     this.player = [];
     this.enemies = [];
-    this.projectiles = [];
+    this.enemyProjectiles = [];
+    this.playerProjectiles = [];
     this.wasclicked = false;
     this.mousex = 0;
     this.mousey = 0;
@@ -129,9 +130,13 @@ GameEngine.prototype.addEntity = function (entity) {
     console.log('added entity');
     this.entities.push(entity);
 }
-GameEngine.prototype.addProjectile = function (entity) {
-    console.log('added entity');
+GameEngine.prototype.addPlayerProjectile = function (entity) {
+    console.log('added projectile');
     this.projectiles.push(entity);
+}
+GameEngine.prototype.addEnemyProjectile = function (entity) {
+    console.log('added enemy projectile');
+    this.enemyProjectiles.push(entity);
 }
 GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
@@ -164,6 +169,7 @@ GameEngine.prototype.update = function () {
         entity.update();
       }
     }
+    this.wasclicked = false;
 }
 
 GameEngine.prototype.loop = function () {

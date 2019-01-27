@@ -97,20 +97,21 @@ BossTurret.prototype = new Entity();
 BossTurret.prototype.constructor = Boss1;
 
 BossTurret.prototype.update = function () {
-    this.x += this.game.clockTick * this.speed;
-    if (this.x > 800) this.x = -230;
+    that = this;
+    //this.x += this.game.clockTick * this.speed;
+    //if (this.x > 800) this.x = -230;
     var dx = this.game.mousex - this.x;
     var dy = this.y - this.game.mousey;
     // this should be the angle in radians
     this.angle = Math.atan2(dy,dx);
     //if we want it in degrees
     //this.angle *= 180 / Math.PI;
-
+    //console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
 
     if (this.game.wasclicked){
 
-      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png")));
-      this.game.wasclicked = false;
+      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png")), that.x, that.y, dx, dy);
+
     }
 
 
@@ -122,7 +123,7 @@ BossTurret.prototype.draw = function () {
 
     Entity.prototype.draw.call(this);
 }
-function LaserBlast(game, spritesheet){
+function LaserBlast(game, spritesheet, xIn, yIn, dx, dy){
   this.animation = new Animation(spritesheet, 32, 32, 128, 0.15, 4, true, 1);
   this.game = game;
   this.speed = 100;
@@ -136,12 +137,12 @@ LaserBlast.prototype = new Entity();
 LaserBlast.prototype.constructor = LaserBlast;
 
 LaserBlast.prototype.update = function () {
-    this.x += this.game.clockTick * this.speed;
+    //this.x += this.game.clockTick * this.speed;
     this.y += this.game.clockTick * this.speed;
 
     if (this.x > 800) this.x = -230;
     if (this.y > 800) this.y = -230;
-    this.lifetime = this.lifetime - 5;
+    this.lifetime = this.lifetime - 1;
     if (this.lifetime < 0){
       this.removeFromWorld = true;
     }
