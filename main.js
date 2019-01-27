@@ -97,7 +97,7 @@ BossTurret.prototype = new Entity();
 BossTurret.prototype.constructor = Boss1;
 
 BossTurret.prototype.update = function () {
-    that = this;
+
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
     var dx = this.game.mousex - this.x;
@@ -106,11 +106,11 @@ BossTurret.prototype.update = function () {
     this.angle = Math.atan2(dy,dx);
     //if we want it in degrees
     //this.angle *= 180 / Math.PI;
-    //console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
+
 
     if (this.game.wasclicked){
-
-      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png")), that.x, that.y, dx, dy);
+      console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
+      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png"), this.x, this.y, dx, dy));
 
     }
 
@@ -126,10 +126,13 @@ BossTurret.prototype.draw = function () {
 function LaserBlast(game, spritesheet, xIn, yIn, dx, dy){
   this.animation = new Animation(spritesheet, 32, 32, 128, 0.15, 4, true, 1);
   this.game = game;
-  this.speed = 100;
+  this.speedX = 1;
+  this.speedY = 1;
+  this.dx = dx/this.speedX;
+  this.dy = dy/this.speedY;
   this.ctx = game.ctx;
-  this.x = this.game.mousex - 22;
-  this.y = this.game.mousey;
+  this.x = xIn; //this.game.mousex - 22;
+  this.y = yIn; //this.game.mousey;
   this.lifetime = 600;
   this.removeFromWorld = false;
 }
@@ -137,8 +140,8 @@ LaserBlast.prototype = new Entity();
 LaserBlast.prototype.constructor = LaserBlast;
 
 LaserBlast.prototype.update = function () {
-    //this.x += this.game.clockTick * this.speed;
-    this.y += this.game.clockTick * this.speed;
+    this.x += this.game.clockTick * this.dx;
+    this.y += this.game.clockTick * this.dy;
 
     if (this.x > 800) this.x = -230;
     if (this.y > 800) this.y = -230;
@@ -247,7 +250,7 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
-    gameEngine.addEntity(new LaserBlast(gameEngine, AM.getAsset("./img/LaserBlast.png")));
+    //gameEngine.addEntity(new LaserBlast(gameEngine, AM.getAsset("./img/LaserBlast.png")));
 
     console.log("All Done!");
 });
