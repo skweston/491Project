@@ -1,5 +1,3 @@
-var AM = new AssetManager();
-
 function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale) {
     this.spriteSheet = spriteSheet;
     this.frameWidth = frameWidth;
@@ -40,7 +38,9 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
-// no inheritance
+/* ========================================================================================================== */
+// Background
+/* ========================================================================================================== */
 function Background(game, spritesheet) {
     this.x = 0;
     this.y = 0;
@@ -56,7 +56,10 @@ Background.prototype.draw = function () {
 
 Background.prototype.update = function () {
 };
-//function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale)
+
+/* ========================================================================================================== */
+// Boss 1
+/* ========================================================================================================== */
 function Boss1(game, spritesheet){
   this.animation = new Animation(spritesheet, 200, 450, 1200, 0.175, 6, true, 1);
   this.x = 300;
@@ -161,14 +164,68 @@ LaserBlast.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 }
 
+<<<<<<< HEAD
 
 
+=======
+/* ========================================================================================================== */
+// The Ship
+/* ========================================================================================================== */
+function TheShip(game, spritesheet) {
+    this.animation = new Animation(spritesheet, 128, 128, 256, 0.03, 2, true, 1);
+    this.speed = 0;
+    this.x = 0;
+    this.y = 0;
+    this.game = game;
+    this.ctx = game.ctx;
+    this.removeFromWorld = false;
+    Entity.call(this, game, this.x, this.y);
+}
+
+TheShip.prototype = new Entity();
+TheShip.prototype.constructor = TheShip;
+
+TheShip.prototype.update = function () {
+	if (this.game.moveUp) {
+		this.y -= 10;
+	}
+
+	if (this.game.moveLeft) {
+		this.x -= 10;
+	}
+
+	if (this.game.moveDown) {
+		this.y += 10;
+	}
+
+	if (this.game.moveRight) {
+		this.x += 10;
+	}
+    Entity.prototype.update.call(this);
+}
+
+TheShip.prototype.draw = function () {
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    Entity.prototype.draw.call(this);
+}
+
+/* ========================================================================================================== */
+// Asset Manager
+/* ========================================================================================================== */
+var AM = new AssetManager();
+// AM.queueDownload("./img/background.jpg");
+AM.queueDownload("./img/shipIdle.png");
+>>>>>>> master
 AM.queueDownload("./img/Boss1.png");
-AM.queueDownload("./img/LaserBlast.png");
 AM.queueDownload("./img/BossTurret.png");
+<<<<<<< HEAD
 //AM.queueDownload("./img/background.jpg");
+=======
+AM.queueDownload("./img/LaserBlast.png");
+>>>>>>> master
 
 AM.downloadAll(function () {
+    console.log("starting up da sheild");
     var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
 
@@ -176,16 +233,13 @@ AM.downloadAll(function () {
     gameEngine.init(ctx);
     gameEngine.start();
 
-    // gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/background.jpg")));
-    // gameEngine.addEntity(new MushroomDude(gameEngine, AM.getAsset("./img/mushroomdude.png")));
-    // gameEngine.addEntity(new Cheetah(gameEngine, AM.getAsset("./img/runningcat.png")));
-    // gameEngine.addEntity(new Guy(gameEngine, AM.getAsset("./img/guy.jpg")));
+    gameEngine.addEntity(new TheShip(gameEngine, AM.getAsset("./img/shipIdle.png")));
+    gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png"), 0, 0));
     gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png")));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 380));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
-    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
-    //gameEngine.addEntity(new LaserBlast(gameEngine, AM.getAsset("./img/LaserBlast.png")));
+    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));    
 
     console.log("All Done!");
 });
