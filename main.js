@@ -41,21 +41,54 @@ Animation.prototype.isDone = function () {
 }
 
 // no inheritance
+// Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale)
 function Background(game, spritesheet) {
-    this.x = 0;
-    this.y = 0;
+ 
     this.spritesheet = spritesheet;
     this.game = game;
-    this.ctx = game.ctx;
+    this.ctx = game.ctx;	
+
+    // Where the frame starts for the background. Divide image in half then subract the half the canvas,
+    // for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
+    this.sx = spritesheet.naturalWidth / 2 - this.ctx.canvas.width / 2;
+    this.sy = spritesheet.naturalHeight / 2 - this.ctx.canvas.height / 2;
+
+    // This is the location to draw the background
+    this.dx = 0;
+    this.dy = 0;
+    
+    // This is the current canvas snapshot of the level
+    this.frameWidth = this.ctx.canvas.width;
+    this.frameHeight = this.ctx.canvas.height;
+
+    if (spritesheet.width - this.sx < this.frameWidth) {
+	this.frameWidth = this.spritesheet.width - this.sx;
+    }
+    if (spritesheet.height - this.sy < this.frameHeight) {
+	this.frameHeight = this.spritesheet.height - this.sy;
+    }
+    
+    this.dWidth = this.frameWidth;
+    this.dHeight = this.frameHeight;
+    
+
 };
 
 Background.prototype.draw = function () {
     this.ctx.drawImage(this.spritesheet,
-                   this.x, this.y);
+	    	   this.sx, this.sy,
+	    	   this.frameWidth, this.frameHeight,
+                   this.dx, this.dy,
+    		   this.dWidth, this.dHeight);
 };
 
 Background.prototype.update = function () {
+   
+
+
 };
+
+
 
 function MushroomDude(game, spritesheet) {
     this.animation = new Animation(spritesheet, 189, 230, 5, 0.10, 14, true, 1);
@@ -81,6 +114,8 @@ MushroomDude.prototype.update = function () {
 function Cheetah(game, spritesheet) {
     this.animation = new Animation(spritesheet, 512, 256, 2, 0.05, 8, true, 0.5);
     this.speed = 350;
+    this.animation = new Animation(spritesheet, 32, 32, 9, 0.05, 9, true, 2);
+    this.speed = 600;
     this.ctx = game.ctx;
     Entity.call(this, game, 0, 250);
 }
@@ -122,11 +157,8 @@ Guy.prototype.draw = function () {
 }
 
 
-AM.queueDownload("./img/RobotUnicorn.png");
-AM.queueDownload("./img/guy.jpg");
-AM.queueDownload("./img/mushroomdude.png");
-AM.queueDownload("./img/runningcat.png");
-AM.queueDownload("./img/background.jpg");
+AM.queueDownload("./img/smartBomb.png");
+AM.queueDownload("./img/space1-1.png");
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
@@ -136,10 +168,7 @@ AM.downloadAll(function () {
     gameEngine.init(ctx);
     gameEngine.start();
 
-    gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/background.jpg")));
-    gameEngine.addEntity(new MushroomDude(gameEngine, AM.getAsset("./img/mushroomdude.png")));
-    gameEngine.addEntity(new Cheetah(gameEngine, AM.getAsset("./img/runningcat.png")));
-    gameEngine.addEntity(new Guy(gameEngine, AM.getAsset("./img/guy.jpg")));
+    gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/space1-1.png")));
 
     console.log("All Done!");
 });
