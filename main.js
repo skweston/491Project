@@ -37,15 +37,9 @@ Animation.prototype.currentFrame = function () {
 Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
-
-<<<<<<< HEAD
-// no inheritance
-// Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale)
-=======
 /* ========================================================================================================== */
 // Background
 /* ========================================================================================================== */
->>>>>>> master
 function Background(game, spritesheet) {function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale) {
     this.spriteSheet = spriteSheet;
     this.frameWidth = frameWidth;
@@ -90,10 +84,10 @@ Animation.prototype.isDone = function () {
 // Background
 /* ========================================================================================================== */
 function Background(game, spritesheet) {
- 
+
     this.spritesheet = spritesheet;
     this.game = game;
-    this.ctx = game.ctx;	
+    this.ctx = game.ctx;
 
     // Where the frame starts for the background. Divide image in half then subract the half the canvas,
     // for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
@@ -103,7 +97,7 @@ function Background(game, spritesheet) {
     // This is the location to draw the background
     this.dx = 0;
     this.dy = 0;
-    
+
     // This is the current canvas snapshot of the level
     this.frameWidth = this.ctx.canvas.width;
     this.frameHeight = this.ctx.canvas.height;
@@ -114,10 +108,10 @@ function Background(game, spritesheet) {
     if (spritesheet.height - this.sy < this.frameHeight) {
 	this.frameHeight = this.spritesheet.height - this.sy;
     }
-    
+
     this.dWidth = this.frameWidth;
     this.dHeight = this.frameHeight;
-    
+
 
 };
 
@@ -130,7 +124,7 @@ Background.prototype.draw = function () {
 };
 
 Background.prototype.update = function () {
-   
+
 
 
 };
@@ -311,14 +305,14 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 380));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
-    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));    
+    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
 
     console.log("All Done!");
 });
- 
+
     this.spritesheet = spritesheet;
     this.game = game;
-    this.ctx = game.ctx;	
+    this.ctx = game.ctx;
 
     // Where the frame starts for the background. Divide image in half then subract the half the canvas,
     // for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
@@ -328,7 +322,7 @@ AM.downloadAll(function () {
     // This is the location to draw the background
     this.dx = 0;
     this.dy = 0;
-    
+
     // This is the current canvas snapshot of the level
     this.frameWidth = this.ctx.canvas.width;
     this.frameHeight = this.ctx.canvas.height;
@@ -339,10 +333,10 @@ AM.downloadAll(function () {
     if (spritesheet.height - this.sy < this.frameHeight) {
 	this.frameHeight = this.spritesheet.height - this.sy;
     }
-    
+
     this.dWidth = this.frameWidth;
     this.dHeight = this.frameHeight;
-    
+
 
 };
 
@@ -355,12 +349,10 @@ Background.prototype.draw = function () {
 };
 
 Background.prototype.update = function () {
-   
+
 
 
 };
-
-<<<<<<< HEAD
 
 
 function MushroomDude(game, spritesheet) {
@@ -370,7 +362,7 @@ function MushroomDude(game, spritesheet) {
     this.speed = 100;
     this.game = game;
     this.ctx = game.ctx;
-=======
+
 /* ========================================================================================================== */
 // Boss 1
 /* ========================================================================================================== */
@@ -383,7 +375,6 @@ function Boss1(game, spritesheet){
   this.game = game;
   this.ctx = game.ctx;
   this.removeFromWorld = false;
->>>>>>> master
 }
 Boss1.prototype = new Entity();
 Boss1.prototype.constructor = Boss1;
@@ -419,8 +410,8 @@ BossTurret.prototype.constructor = Boss1;
 
 BossTurret.prototype.update = function () {
 
-<<<<<<< HEAD
-// inheritance 
+
+// inheritance
 function Cheetah(game, spritesheet) {
     this.animation = new Animation(spritesheet, 512, 256, 2, 0.05, 8, true, 0.5);
     this.speed = 350;
@@ -428,7 +419,7 @@ function Cheetah(game, spritesheet) {
     this.speed = 600;
     this.ctx = game.ctx;
     Entity.call(this, game, 0, 250);
-=======
+
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
     var dx = this.game.mousex - this.x;
@@ -447,7 +438,7 @@ function Cheetah(game, spritesheet) {
 
 
     Entity.prototype.update.call(this);
->>>>>>> master
+
 }
 
 BossTurret.prototype.draw = function () {
@@ -531,21 +522,18 @@ TheShip.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 }
 
-<<<<<<< HEAD
 
-AM.queueDownload("./img/smartBomb.png");
-AM.queueDownload("./img/space1-1.png");
-=======
 /* ========================================================================================================== */
 // Asset Manager
 /* ========================================================================================================== */
 var AM = new AssetManager();
-// AM.queueDownload("./img/background.jpg");
+AM.queueDownload("./img/smartBomb.png");
+AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/shipIdle.png");
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
->>>>>>> master
+
 
 AM.downloadAll(function () {
     console.log("starting up da sheild");
@@ -556,17 +544,16 @@ AM.downloadAll(function () {
     gameEngine.init(ctx);
     gameEngine.start();
 
-<<<<<<< HEAD
+
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/space1-1.png")));
-=======
     gameEngine.addEntity(new TheShip(gameEngine, AM.getAsset("./img/shipIdle.png")));
     gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png"), 0, 0));
     gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png")));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 380));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
-    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));    
->>>>>>> master
+    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
+
 
     console.log("All Done!");
 });
