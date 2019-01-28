@@ -38,14 +38,10 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
-<<<<<<< HEAD
-// no inheritance
-// Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale)
 =======
 /* ========================================================================================================== */
 // Background
 /* ========================================================================================================== */
->>>>>>> master
 function Background(game, spritesheet) {
  
     this.spritesheet = spritesheet;
@@ -92,17 +88,7 @@ Background.prototype.update = function () {
 
 };
 
-<<<<<<< HEAD
 
-
-function MushroomDude(game, spritesheet) {
-    this.animation = new Animation(spritesheet, 189, 230, 5, 0.10, 14, true, 1);
-    this.x = 0;
-    this.y = 0;
-    this.speed = 100;
-    this.game = game;
-    this.ctx = game.ctx;
-=======
 /* ========================================================================================================== */
 // Boss 1
 /* ========================================================================================================== */
@@ -115,7 +101,6 @@ function Boss1(game, spritesheet){
   this.game = game;
   this.ctx = game.ctx;
   this.removeFromWorld = false;
->>>>>>> master
 }
 Boss1.prototype = new Entity();
 Boss1.prototype.constructor = Boss1;
@@ -151,16 +136,6 @@ BossTurret.prototype.constructor = Boss1;
 
 BossTurret.prototype.update = function () {
 
-<<<<<<< HEAD
-// inheritance 
-function Cheetah(game, spritesheet) {
-    this.animation = new Animation(spritesheet, 512, 256, 2, 0.05, 8, true, 0.5);
-    this.speed = 350;
-    this.animation = new Animation(spritesheet, 32, 32, 9, 0.05, 9, true, 2);
-    this.speed = 600;
-    this.ctx = game.ctx;
-    Entity.call(this, game, 0, 250);
-=======
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
     var dx = this.game.mousex - this.x;
@@ -179,7 +154,6 @@ function Cheetah(game, spritesheet) {
 
 
     Entity.prototype.update.call(this);
->>>>>>> master
 }
 
 BossTurret.prototype.draw = function () {
@@ -263,21 +237,16 @@ TheShip.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 }
 
-<<<<<<< HEAD
-
-AM.queueDownload("./img/smartBomb.png");
-AM.queueDownload("./img/space1-1.png");
-=======
 /* ========================================================================================================== */
 // Asset Manager
 /* ========================================================================================================== */
 var AM = new AssetManager();
-// AM.queueDownload("./img/background.jpg");
+AM.queueDownload("./img/smartBomb.png");
+AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/shipIdle.png");
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
->>>>>>> master
 
 AM.downloadAll(function () {
     console.log("starting up da sheild");
@@ -288,9 +257,7 @@ AM.downloadAll(function () {
     gameEngine.init(ctx);
     gameEngine.start();
 
-<<<<<<< HEAD
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/space1-1.png")));
-=======
     gameEngine.addEntity(new TheShip(gameEngine, AM.getAsset("./img/shipIdle.png")));
     gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png"), 0, 0));
     gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png")));
@@ -298,7 +265,6 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));    
->>>>>>> master
 
     console.log("All Done!");
 });
