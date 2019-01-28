@@ -182,6 +182,21 @@ TheShip.prototype = new Entity();
 TheShip.prototype.constructor = TheShip;
 
 TheShip.prototype.update = function () {
+	if (this.game.moveUp) {
+		this.y -= 10;
+	}
+
+	if (this.game.moveLeft) {
+		this.x -= 10;
+	}
+
+	if (this.game.moveDown) {
+		this.y += 10;
+	}
+
+	if (this.game.moveRight) {
+		this.x += 10;
+	}
     Entity.prototype.update.call(this);
 }
 

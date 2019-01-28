@@ -31,9 +31,16 @@ function GameEngine() {
     this.enemies = [];
     this.enemyProjectiles = [];
     this.playerProjectiles = [];
+
+    // player input
     this.wasclicked = false;
     this.mousex = 0;
     this.mousey = 0;
+    this.moveUp = false;
+    this.moveLeft = false;
+    this.moveDown = false;
+    this.moveRight = false;
+
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
@@ -149,8 +156,22 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("keyup", function (e) {
-        console.log(e);
-        console.log("Key Up Event - Char " + e.code + " Code " + e.keyCode);
+        e.preventDefault();
+        if (e.code === "KeyW") {
+            that.moveUp = false;
+        }
+
+        if (e.code === "KeyA") {
+            that.moveLeft = false;
+        }
+
+        if (e.code === "KeyS") {
+            that.moveDown = false;
+        }
+
+        if (e.code === "KeyD") {
+            that.moveRight = false;
+        }
     }, false);
 
     console.log('Input started');
@@ -197,11 +218,6 @@ GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
     this.update();
     this.draw();
-
-    this.moveUp = null;
-    this.moveLeft = null;
-    this.moveDown = null;
-    this.moveRight = null;
 }
 
 function Entity(game, x, y) {
