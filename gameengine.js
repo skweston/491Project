@@ -187,7 +187,7 @@ GameEngine.prototype.update = function () {
             entitiesCount--;
             i--;
       } else {
-        entity.update();
+        //entity.update();
       }
     }
     this.wasclicked = false;
