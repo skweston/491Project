@@ -168,7 +168,7 @@ LaserBlast.prototype.draw = function () {
 // The Ship
 /* ========================================================================================================== */
 function TheShip(game, spritesheet) {
-    this.animation = new Animation(spritesheet, 128, 128, 0.03, 2, true, 1);
+    this.animation = new Animation(spritesheet, 128, 128, 256, 0.03, 2, true, 1);
     this.speed = 0;
     this.x = 0;
     this.y = 0;
@@ -210,6 +210,7 @@ AM.downloadAll(function () {
     gameEngine.start();
 
     gameEngine.addEntity(new TheShip(gameEngine, AM.getAsset("./img/shipIdle.png")));
+    gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png"), 0, 0));
     gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png")));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 380));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
