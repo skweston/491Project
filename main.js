@@ -156,11 +156,17 @@ function BossTurret(game, spritesheet, x, y){
   this.game = game;
   this.ctx = game.ctx;
   this.removeFromWorld = false;
+  this.health = 200;
+
 }
 BossTurret.prototype = new Entity();
 BossTurret.prototype.constructor = Boss1;
 
 BossTurret.prototype.update = function () {
+
+    if(this.health < 1){
+      this.removeFromWorld = true;
+    }
 
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
@@ -222,10 +228,6 @@ LaserBlast.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 }
 
-
-
-
-
 /* ========================================================================================================== */
 // The Ship
 /* ========================================================================================================== */
@@ -274,14 +276,9 @@ var AM = new AssetManager();
 AM.queueDownload("./img/smartBomb.png");
 AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/shipIdle.png");
-
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
-
-//AM.queueDownload("./img/background.jpg");
-
 AM.queueDownload("./img/LaserBlast.png");
-
 
 AM.downloadAll(function () {
     console.log("starting up da sheild");
