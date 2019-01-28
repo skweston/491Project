@@ -164,10 +164,10 @@ LaserBlast.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 }
 
-<<<<<<< HEAD
 
 
-=======
+
+
 /* ========================================================================================================== */
 // The Ship
 /* ========================================================================================================== */
@@ -215,14 +215,14 @@ TheShip.prototype.draw = function () {
 var AM = new AssetManager();
 // AM.queueDownload("./img/background.jpg");
 AM.queueDownload("./img/shipIdle.png");
->>>>>>> master
+
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
-<<<<<<< HEAD
+
 //AM.queueDownload("./img/background.jpg");
-=======
+
 AM.queueDownload("./img/LaserBlast.png");
->>>>>>> master
+
 
 AM.downloadAll(function () {
     console.log("starting up da sheild");
@@ -239,7 +239,7 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 380));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
-    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));    
+    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
 
     console.log("All Done!");
 });
