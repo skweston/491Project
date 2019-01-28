@@ -117,7 +117,6 @@ BossTurret.prototype.update = function () {
 
     }
 
-
     Entity.prototype.update.call(this);
 }
 
@@ -161,80 +160,50 @@ LaserBlast.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 }
 
-
-function MushroomDude(game, spritesheet) {
-    this.animation = new Animation(spritesheet, 189, 230, 5, 0.10, 14, true, 1);
-    this.x = 0;
-    this.y = 0;
-    this.speed = 100;
-    this.game = game;
-    this.ctx = game.ctx;
+//spriteSheet, frameWidth, frameHeight, sheetWidth,  frameDuration, frames, loop, scale
+function SpaceExplosion(game, spritesheet, shipX, shipY) {
+  this.animation = new Animation(spritesheet, 324, 169, 2,  0.15, 6, true, 1);
+  this.game = game;
+  this.ctx = game.ctx;
+  this.x = shipX;
+  this.y = shipY;
 }
 
-MushroomDude.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+SpaceExplosion.prototype.draw = function () {
+  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  Entity.prototype.draw.call(this);
 }
 
-MushroomDude.prototype.update = function () {
-    if (this.animation.elapsedTime < this.animation.totalTime * 8 / 14)
-        this.x += this.game.clockTick * this.speed;
-    if (this.x > 800) this.x = -230;
-}
-
-
-// inheritance
-function Cheetah(game, spritesheet) {
-    this.animation = new Animation(spritesheet, 512, 256, 2, 0.05, 8, true, 0.5);
-    this.speed = 350;
-    this.ctx = game.ctx;
-    Entity.call(this, game, 0, 250);
-}
-
-Cheetah.prototype = new Entity();
-Cheetah.prototype.constructor = Cheetah;
-
-Cheetah.prototype.update = function () {
+SpaceExplosion.prototype.update = function () {
+  /*if (this.animation.elapsedTime < this.animation.totalTime)
     this.x += this.game.clockTick * this.speed;
-    if (this.x > 800) this.x = -230;
-    Entity.prototype.update.call(this);
-}
-
-Cheetah.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-    Entity.prototype.draw.call(this);
-}
-
-// inheritance
-function Guy(game, spritesheet) {
-    this.animation = new Animation(spritesheet, 154, 215, 4, 0.15, 8, true, 0.5);
-    this.speed = 100;
-    this.ctx = game.ctx;
-    Entity.call(this, game, 0, 450);
-}
-
-Guy.prototype = new Entity();
-Guy.prototype.constructor = Guy;
-
-Guy.prototype.update = function () {
-    this.x += this.game.clockTick * this.speed;
-    if (this.x > 800) this.x = -230;
-    Entity.prototype.update.call(this);
-}
-
-Guy.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
-    Entity.prototype.draw.call(this);
+  if (this.x > 800) this.x = -230;*/
 }
 
 
-AM.queueDownload("./img/RobotUnicorn.png");
-AM.queueDownload("./img/guy.jpg");
-AM.queueDownload("./img/mushroomdude.png");
-AM.queueDownload("./img/runningcat.png");
+function GroundExplosion(game, spritesheet, shipX, shipY) {
+  this.animation = new Animation(spritesheet, 32, 32, 2, 0.15, 6, true, 1);
+  this.game = game;
+  this.ctx = game.ctx;
+  this.x = shipX;
+  this.y = shipY;
+}
+
+GroundExplosion.prototype.draw = function () {
+  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  Entity.prototype.draw.call(this);
+}
+
+GroundExplosion.prototype.update = function () {
+
+}
+
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/LaserBlast.png");
 AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/background.jpg");
+AM.queueDownload("./img/SpaceExplosion.png");
+AM.queueDownload("./img/Explosion1.png");
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
@@ -254,6 +223,9 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
     //gameEngine.addEntity(new LaserBlast(gameEngine, AM.getAsset("./img/LaserBlast.png")));
+
+    gameEngine.addEntity(new SpaceExplosion(gameEngine, AM.getAsset("./img/SpaceExplosion.png"), 0, 0));
+   gameEngine.addEntity(new GroundExplosion(gameEngine, AM.getAsset("./img/Explosion1.png"), 100, 100));
 
     console.log("All Done!");
 });
