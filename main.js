@@ -418,6 +418,44 @@ Background.prototype.update = function () {
 
 };
 
+/* =========== General Effects ========= */
+function SpaceExplosion(game, spritesheet, shipX, shipY) {
+  this.animation = new Animation(spritesheet, 324, 169, 2,  0.15, 6, true, 1);
+  this.game = game;
+  this.ctx = game.ctx;
+  this.x = shipX;
+  this.y = shipY;
+}
+
+SpaceExplosion.prototype.draw = function () {
+  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  Entity.prototype.draw.call(this);
+}
+
+SpaceExplosion.prototype.update = function () {
+  /*if (this.animation.elapsedTime < this.animation.totalTime)
+    this.x += this.game.clockTick * this.speed;
+  if (this.x > 800) this.x = -230;*/
+}
+
+function GroundExplosion(game, spritesheet, shipX, shipY) {
+  this.animation = new Animation(spritesheet, 32, 32, 2, 0.15, 6, true, 1);
+  this.game = game;
+  this.ctx = game.ctx;
+  this.x = shipX;
+  this.y = shipY;
+}
+
+GroundExplosion.prototype.draw = function () {
+  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  Entity.prototype.draw.call(this);
+}
+
+GroundExplosion.prototype.update = function () {
+
+}
+
+
 
 /* ========================================================================================================== */
 // Boss 1
@@ -584,6 +622,10 @@ AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
 
+AM.queueDownload("./img/SpaceExplosion.png");
+AM.queueDownload("./img/Explosion1.png");
+
+
 AM.downloadAll(function () {
     console.log("starting up da sheild");
     var canvas = document.getElementById("gameWorld");
@@ -602,7 +644,8 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
 
-
+    gameEngine.addEntity(new SpaceExplosion(gameEngine, AM.getAsset("./img/SpaceExplosion.png"), 0, 0));
+    gameEngine.addEntity(new GroundExplosion(gameEngine, AM.getAsset("./img/Explosion1.png"), 100, 100));
 
     console.log("All Done!");
 });
