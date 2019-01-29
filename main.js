@@ -268,14 +268,20 @@ Scourge.prototype.draw = function () {
 /* ========================================================================================================== */
 // The Ship
 /* ========================================================================================================== */
-function TheShip(game, spritesheet) {
+function TheShip(game) {
 	this.pWidth = 128;
 	this.pHeight = 128;
 	this.scale = 0.5;
-    this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
-    this.speed = 1;
-    this.x = 0;
-    this.y = 0;
+    this.idleAnimation = new Animation(AM.getAsset("./img/shipIdle.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
+    this.boostAnimation = new Animation(AM.getAsset("./img/shipBoost.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
+    this.rollAnimation = new Animation(AM.getAsset("./img/shipRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+    this.boostRollAnimation = new Animation(AM.getAsset("./img/shipBoostRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+    this.speed = 0.5;
+    this.boosting = false;
+    this.cancelBoost = false;
+    this.rolling = false;
+    this.x = 100;
+    this.y = 100;
     this.hitRadius = 28;
     this.game = game;
     this.ctx = game.ctx;
@@ -287,26 +293,78 @@ TheShip.prototype = new Entity();
 TheShip.prototype.constructor = TheShip;
 
 TheShip.prototype.update = function () {
+	// movement
 	if (this.game.moveUp) {
 		this.y -= 10 * this.speed;
 	}
-
 	if (this.game.moveLeft) {
 		this.x -= 10 * this.speed;
 	}
-
 	if (this.game.moveDown) {
 		this.y += 10 * this.speed;
 	}
-
 	if (this.game.moveRight) {
 		this.x += 10 * this.speed;
 	}
+
+	// rolling
+	if (this.game.roll) {
+		this.rolling = true;
+	}
+	if (this.rolling) {
+		if (this.rollAnimation.isDone()) {
+			this.rollAnimation.elapsedTime = 0;
+			this.rolling = false;
+		}
+		else if (this.boostRollAnimation.isDone()) {
+			this.boostRollAnimation.elapsedTime = 0;
+			this.rolling = false;
+			if (this.cancelBoost) {
+				this.cancelBoost = false;
+				this.boosting = false;
+			}
+		}
+	}
+
+	// boosting
+	if (this.game.boost && !this.rolling) {
+		this.cancelBoost = false;
+		this.boosting = true;
+		this.speed = 1;
+	}
+	if (!this.game.boost && !this.rolling) {
+		this.boosting = false;
+		this.speed = 0.5;
+	}
+
+	// boost input buffer during rolls
+	if (this.game.boost && this.rolling) {
+		this.cancelBoost = false;
+	}
+	if (!this.game.boost && this.rolling) {
+		this.cancelBoost = true;
+	}
+
     Entity.prototype.update.call(this);
 }
 
 TheShip.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	if (this.rolling) {
+		if (this.boosting) {
+			this.boostRollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		}
+		else {
+			this.rollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		}
+	}
+	else {
+		if (this.boosting) {
+			this.boostAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		}
+		else {
+			this.idleAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		}
+	}
 
     if (SHOW_HITBOX) {
     	this.ctx.beginPath();
@@ -328,6 +386,9 @@ var AM = new AssetManager();
 AM.queueDownload("./img/smartBomb.png");
 AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/shipIdle.png");
+AM.queueDownload("./img/shipBoost.png");
+AM.queueDownload("./img/shipRoll.png");
+AM.queueDownload("./img/shipBoostRoll.png");
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
@@ -345,7 +406,7 @@ AM.downloadAll(function () {
     // always load background first
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/space1-1.png")));
 
-    gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png"), 0, 0));
+    // load the environment assets next
     gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png")));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 380));
     gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
@@ -354,7 +415,7 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png")));
 
     // the ship is always loaded last
-    gameEngine.addEntity(new TheShip(gameEngine, AM.getAsset("./img/shipIdle.png")));
+    gameEngine.addEntity(new TheShip(gameEngine));
 
     console.log("All Done!");
 });
