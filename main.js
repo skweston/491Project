@@ -230,7 +230,7 @@ LaserBlast.prototype.draw = function () {
 function Scourge(game, spritesheet) {
 	this.pWidth = 128;
 	this.pHeight = 128;
-	this.scale = 0.35;
+	this.scale = 1;
 	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
 	this.speed = 0;
 	this.x = 700;
@@ -282,6 +282,8 @@ function TheShip(game) {
     this.rolling = false;
     this.x = 100;
     this.y = 100;
+    this.xMid = this.x + this.pWidth * this.scale / 2;
+    this.yMid = this.y + this.pHeight * this.scale / 2;
     this.hitRadius = 28;
     this.game = game;
     this.ctx = game.ctx;
@@ -295,17 +297,28 @@ TheShip.prototype.constructor = TheShip;
 TheShip.prototype.update = function () {
 	// movement
 	if (this.game.moveUp) {
-		this.y -= 10 * this.speed;
+		if (this.yMid - this.hitRadius > 0) {
+			this.y -= 10 * this.speed;
+		}
 	}
 	if (this.game.moveLeft) {
-		this.x -= 10 * this.speed;
+		if (this.xMid - this.hitRadius > 0) {
+			this.x -= 10 * this.speed;
+		}
 	}
 	if (this.game.moveDown) {
-		this.y += 10 * this.speed;
+		if (this.yMid + this.hitRadius < 700) {
+			this.y += 10 * this.speed;
+		}
 	}
 	if (this.game.moveRight) {
-		this.x += 10 * this.speed;
+		if (this.xMid + this.hitRadius < 800) {
+			this.x += 10 * this.speed;
+		}
 	}
+
+	this.xMid = this.x + this.pWidth * this.scale / 2;
+    this.yMid = this.y + this.pHeight * this.scale / 2;
 
 	// rolling
 	if (this.game.roll) {
@@ -370,8 +383,7 @@ TheShip.prototype.draw = function () {
     	this.ctx.beginPath();
     	this.ctx.strokeStyle = "Red";
     	this.ctx.lineWidth = 2;
-    	this.ctx.arc(this.x + this.pWidth * this.scale / 2, this.y + this.pHeight * this.scale / 2,
-    				 this.hitRadius * this.scale, 0, Math.PI * 2, false);
+    	this.ctx.arc(this.xMid, this.yMid, this.hitRadius * this.scale, 0, Math.PI * 2, false);
     	this.ctx.stroke();
     	this.ctx.closePath();
     }
