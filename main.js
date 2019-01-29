@@ -11,7 +11,7 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
     this.scale = scale;
 }
 
-Animation.prototype.drawFrame = function (tick, ctx, x, y) {
+Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
     this.elapsedTime += tick;
     if (this.isDone()) {
         if (this.loop) this.elapsedTime = 0;
@@ -22,12 +22,33 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y) {
     xindex = frame % this.sheetWidth;
     yindex = Math.floor(frame / this.sheetWidth);
 
-    ctx.drawImage(this.spriteSheet,
+    var offscreenCanvas = document.createElement('canvas');
+    var size = Math.max(this.frameWidth, this.frameHeight);
+    offscreenCanvas.width = size;
+    offscreenCanvas.height = size;
+    var offscreenCtx = offscreenCanvas.getContext('2d');
+
+    var thirdCanvas = document.createElement('canvas');
+    thirdCanvas.width = size;
+    thirdCanvas.height = size;
+    var thirdCtx = thirdCanvas.getContext('2d');
+
+    thirdCtx.drawImage(this.spriteSheet,
                  xindex * this.frameWidth, yindex * this.frameHeight,  // source from sheet
                  this.frameWidth, this.frameHeight,
-                 x, y,
+                 0, 0,
                  this.frameWidth * this.scale,
                  this.frameHeight * this.scale);
+    offscreenCtx.save();
+    offscreenCtx.translate(size / 2, size / 2);
+    offscreenCtx.rotate(angle);
+    offscreenCtx.translate(0, 0);
+    offscreenCtx.drawImage(thirdCanvas, -(this.frameWidth / 2), -(this.frameHeight / 2));
+    offscreenCtx.restore();
+    thirdCtx.clearRect(0,0, thirdCtx.width, thirdCtx.height);
+    ctx.drawImage(offscreenCanvas, x, y);
+
+
 }
 
 Animation.prototype.currentFrame = function () {
