@@ -143,8 +143,9 @@ function BossTurret(game, spritesheet, x, y){
   this.animation = new Animation(spritesheet, 32, 32, 672, 0.2, 21, true, 1.5);
   this.x = x;
   this.y = y;
-  this.hitcenterX = ;
-  this.hitcenterY = ;
+
+  this.xMid = this.x + 32 / 2;
+  this.yMid = this.y + 32 / 2;
   this.hitRadius = 16;
   this.speed = 0;
   this.angle = 0;
@@ -165,8 +166,8 @@ BossTurret.prototype.update = function () {
 
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
-    var dx = this.game.mousex - this.x;
-    var dy = (this.y - this.game.mousey);
+    var dx = this.game.mousex - this.xMid;
+    var dy = (this.yMid - this.game.mousey);
     // this should be the angle in radians
     this.angle = -Math.atan2(dy,dx);
     //if we want it in degrees
@@ -175,7 +176,8 @@ BossTurret.prototype.update = function () {
 
     if (this.game.wasclicked){
       console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
-      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png"), this.x, this.y, dx, dy, this.angle));
+      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png"),
+                          this.xMid, this.yMid, dx, dy, this.angle - Math.PI/2));
 
     }
 
@@ -184,7 +186,7 @@ BossTurret.prototype.update = function () {
 }
 
 BossTurret.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.xMid, this.yMid, this.angle);
 
     Entity.prototype.draw.call(this);
 }
