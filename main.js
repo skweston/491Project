@@ -27,12 +27,13 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
     var size = Math.max(this.frameWidth * this.scale, this.frameHeight * this.scale);
     var xOffset = 0;
     var yOffset = 0;
-    if (this.frameWidth * this.scale > this.frameHeight * this.scale){
-      console.log("wider than tall")
-      xOffset = (this.frameWidth * this.scale) - (this.frameHeight * this.scale);
-    } else if (this.frameWidth*this.scale > this.frameHeight * this.scale) {
-      yOffset = (this.frameHeight * this.scale) - (this.frameWidth * this.scale);
+
+    if ((this.frameWidth * this.scale) > (this.frameHeight * this.scale)){
+      yOffset = (this.frameWidth * this.scale) - (this.frameHeight * this.scale);
+    } else if ((this.frameWidth*this.scale) < (this.frameHeight * this.scale)) {
+      xOffset = (this.frameHeight * this.scale) - (this.frameWidth * this.scale);
     }
+
     offscreenCanvas.width = size;
     offscreenCanvas.height = size;
     var offscreenCtx = offscreenCanvas.getContext('2d');
@@ -55,7 +56,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
     offscreenCtx.drawImage(thirdCanvas, -(this.frameWidth*this.scale / 2), -(this.frameHeight*this.scale / 2));
     offscreenCtx.restore();
     thirdCtx.clearRect(0,0, size, size);
-    ctx.drawImage(offscreenCanvas, x, y);
+    ctx.drawImage(offscreenCanvas, x-(xOffset/2), y- (yOffset/2));
 
 
 }
@@ -137,7 +138,7 @@ Boss1.prototype.constructor = Boss1;
 Boss1.prototype.update = function () {
     this.x += this.game.clockTick * this.speed;
     if (this.x > 800) this.x = -230;
-    // this.angle += .005
+    //this.angle += .005
 
     Entity.prototype.update.call(this);
 }
