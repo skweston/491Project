@@ -352,6 +352,7 @@ function TheShip(game) {
     this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
     this.radius = 31;
     this.angle = 0;
+    this.primaryCooldown = 0;
 
     this.game = game;
     this.ctx = game.ctx;
@@ -435,8 +436,11 @@ TheShip.prototype.update = function () {
 	// console.log(this.game.firePrimary);
 
 	// shooting
-	if (this.game.firePrimary) {
-		//this.primaryCoolDown = 1;
+	if (this.primaryCooldown > 0) {
+		this.primaryCooldown -= 1;
+	}
+	if (this.game.firePrimary && this.primaryCooldown === 0) {
+		this.primaryCooldown = 20;
 		var projectile = new ShipPrimary(this.game);
 		var target = {x: this.game.mouseX - (projectile.pWidth * projectile.scale),
 					  y: this.game.mouseY - (projectile.pHeight * projectile.scale)};
@@ -532,7 +536,7 @@ ShipPrimary.prototype.update = function () {
         this.velocity.y *= ratio;
     }
 
-    this.lifetime = this.lifetime - 1;
+    this.lifetime -= 1;
     if (this.lifetime < 0) {
       this.removeFromWorld = true;
     }
