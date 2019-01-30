@@ -19,14 +19,14 @@ function direction(a, b) {
 function distance(a, b) {
     var dx = a.xMid - b.xMid;
     var dy = a.yMid - b.yMid;
-    console.log("a: " + a.xMid + ", " + a.yMid);
-    console.log("b: " + b.xMid + ", " + b.yMid);
-    console.log("distance: " + (dx * dx + dy * dy));
+    //console.log("a: " + a.xMid + ", " + a.yMid);
+    //console.log("b: " + b.xMid + ", " + b.yMid);
+    //console.log("distance: " + (dx * dx + dy * dy));
     return Math.sqrt(dx * dx + dy * dy);
 }
 
 function Collide(a, b) {
-    console.log("checking collision");
+    //console.log("checking collision");
     return distance(a, b) < a.radius + b.radius;
 }
 
@@ -304,6 +304,7 @@ function Scourge(game, spritesheet) {
   this.ctx = game.ctx;
   this.removeFromWorld = false;
   this.health = 10;
+  console.log("starting health: " + this.health);
   Entity.call(this, game, this.x, this.y);
 }
 
@@ -317,11 +318,24 @@ Scourge.prototype.update = function () {
 
   for(var i = 0; i < this.game.entities.length; i++) {
     var ent = this.game.entities[i];
+    var found = false;
     if(ent.name === "ShipProjectile") {
-      console.log("Projectile");
+      //console.log("Projectile");
       if(Collide(this, ent)) {
-        console.log("I've been hit!");
-        this.health--;
+        for(var j = 0; j < ent.victims.length; j++) {
+          if(this === ent.victims[j]) {
+            found = true;
+          }
+        }
+
+        if(!found) {
+          console.log("I've been hit!");
+          this.health--;
+          console.log("new health: " + this.health);
+          ent.victims.push(this);
+        }
+
+
 
         if(this.health < 1) {
           this.removeFromWorld = true;
@@ -529,6 +543,8 @@ function ShipPrimary(game) {
   this.lifetime = 50;
   this.maxSpeed = 1500;
   this.velocity = {x: 0, y: 0};
+
+  this.victims = [];
 
   this.game = game;
   this.ctx = game.ctx;
