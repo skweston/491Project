@@ -53,7 +53,7 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
     this.scale = scale;
 }
 
-Animation.prototype.drawFrame = function (tick, ctx, x, y) {
+Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
     this.elapsedTime += tick;
     if (this.isDone()) {
         if (this.loop) this.elapsedTime = 0;
@@ -64,12 +64,42 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y) {
     xindex = frame % this.sheetWidth;
     yindex = Math.floor(frame / this.sheetWidth);
 
-    ctx.drawImage(this.spriteSheet,
+    var offscreenCanvas = document.createElement('canvas');
+    var size = Math.max(this.frameWidth * this.scale, this.frameHeight * this.scale);
+    var xOffset = 0;
+    var yOffset = 0;
+
+    if ((this.frameWidth * this.scale) > (this.frameHeight * this.scale)){
+      yOffset = (this.frameWidth * this.scale) - (this.frameHeight * this.scale);
+    } else if ((this.frameWidth*this.scale) < (this.frameHeight * this.scale)) {
+      xOffset = (this.frameHeight * this.scale) - (this.frameWidth * this.scale);
+    }
+
+    offscreenCanvas.width = size;
+    offscreenCanvas.height = size;
+    var offscreenCtx = offscreenCanvas.getContext('2d');
+
+    var thirdCanvas = document.createElement('canvas');
+    thirdCanvas.width = size;
+    thirdCanvas.height = size;
+    var thirdCtx = thirdCanvas.getContext('2d');
+
+    thirdCtx.drawImage(this.spriteSheet,
                  xindex * this.frameWidth, yindex * this.frameHeight,  // source from sheet
                  this.frameWidth, this.frameHeight,
-                 x, y,
+                 0, 0,
                  this.frameWidth * this.scale,
                  this.frameHeight * this.scale);
+    offscreenCtx.save();
+    offscreenCtx.translate(size / 2, size / 2);
+    offscreenCtx.rotate(angle);
+    offscreenCtx.translate(0, 0);
+    offscreenCtx.drawImage(thirdCanvas, -(this.frameWidth*this.scale / 2), -(this.frameHeight*this.scale / 2));
+    offscreenCtx.restore();
+    thirdCtx.clearRect(0,0, size, size);
+    ctx.drawImage(offscreenCanvas, x-(xOffset/2), y- (yOffset/2));
+
+
 }
 
 Animation.prototype.currentFrame = function () {
@@ -138,6 +168,7 @@ function Boss1(game, spritesheet){
   this.name = "Enemy";
   this.x = 300;
   this.y = 175;
+  this.angle = 0;
   this.speed = 0;
   this.angle = 0;
   this.game = game;
@@ -150,48 +181,58 @@ Boss1.prototype.constructor = Boss1;
 Boss1.prototype.update = function () {
     this.x += this.game.clockTick * this.speed;
     if (this.x > 800) this.x = -230;
-    this.angle += 5;
+
 
     Entity.prototype.update.call(this);
 }
 
 Boss1.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
     Entity.prototype.draw.call(this);
 }
 
 function BossTurret(game, spritesheet, x, y){
-  this.animation = new Animation(spritesheet, 32, 32, 672, 0.2, 21, true, 1.5);
+  this.pWidth = 32;
+  this.pHeight = 32;
+  this.scale = 1.5;
+
+  this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 675, 0.2, 21, true, this.scale);
   this.name = "Enemy";
   this.x = x;
   this.y = y;
-  this.hitcenterX = this.x + 16;
-  this.hitcenterY = this.y + 16;
+  this.xMid = this.x + (this.pWidth * this.scale) / 2;
+  this.yMid = this.y + (this.pHeight * this.scale) / 2;
   this.radius = 16;
   this.speed = 0;
   this.angle = 0;
   this.game = game;
   this.ctx = game.ctx;
   this.removeFromWorld = false;
+  this.health = 200;
 }
 BossTurret.prototype = new Entity();
 BossTurret.prototype.constructor = Boss1;
 
 BossTurret.prototype.update = function () {
 
+    if(this.health < 1){
+      this.removeFromWorld = true;
+    }
+
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
-    var dx = this.game.mouseX - this.x;
-    var dy = this.y - this.game.mouseY;
+    var dx = this.game.mouseX - this.xMid-1;
+    var dy = (this.yMid - this.game.mouseY)-1;
     // this should be the angle in radians
-    this.angle = Math.atan2(dy,dx);
+    this.angle = -Math.atan2(dy,dx);
     //if we want it in degrees
     //this.angle *= 180 / Math.PI;
 
 
     if (this.game.wasclicked){
-      console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
-      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png"), this.x, this.y, dx, dy));
+    //  console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
+      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png"),
+                          this.xMid-(this.pWidth/2), this.yMid- (this.pHeight)/2, dx, dy, this.angle - Math.PI/2));
 
     }
 
@@ -200,13 +241,15 @@ BossTurret.prototype.update = function () {
 }
 
 BossTurret.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
-    Entity.prototype.draw.call(this);
+    //Entity.prototype.draw.call(this);
 }
-function LaserBlast(game, spritesheet, xIn, yIn, dx, dy){
+function LaserBlast(game, spritesheet, xIn, yIn, dx, dy, angle){
   this.animation = new Animation(spritesheet, 32, 32, 128, 0.15, 4, true, 1);
   this.name = "EnemyProjectile";
+  this.angle = 0;
+
   this.game = game;
   this.speedX = 1;
   this.speedY = 1;
@@ -248,7 +291,7 @@ function Scourge(game, spritesheet) {
 	this.pHeight = 128;
 	this.scale = 1;
 	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
-
+  this.angle = 0;
 	this.name = "Enemy";
 	this.speed = 0;
 	this.x = 700;
@@ -449,7 +492,7 @@ function ShipPrimary(game) {
 	this.x = 0;
 	this.y = 0;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-    this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 	this.radius = 10;
 	this.lifetime = 50;
 	this.maxSpeed = 1500;
