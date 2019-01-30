@@ -1,11 +1,12 @@
 // useful global things here
 var SHOW_HITBOX = false;
 
+/*
 function distance(a, b) {
     var dx = a.x - b.x;
     var dy = a.y - b.y;
     return Math.sqrt(dx * dx + dy * dy);
-}
+}*/
 
 function direction(a, b) {
     var dx = a.x - b.x;
@@ -14,6 +15,20 @@ function direction(a, b) {
     if(dist > 0) return { x: dx / dist, y: dy / dist }; else return {x:0,y:0};
 }
 
+//collision - objects must have xMid, yMid and a radius defined.
+function distance(a, b) {
+    var dx = a.xMid - b.xMid;
+    var dy = a.yMid - b.yMid;
+    //console.log("a: " + a.xMid + ", " + a.yMid);
+    //console.log("b: " + b.xMid + ", " + b.yMid);
+    //console.log("distance: " + (dx * dx + dy * dy));
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function Collide(a, b) {
+    //console.log("checking collision");
+    return distance(a, b) < a.radius + b.radius;
+}
 /* ========================================================================================================== */
 // Entity Template
 /* ========================================================================================================== */
@@ -162,6 +177,55 @@ Background.prototype.update = function () {
 
 };
 
+/* =========== General Effects ========= */
+function SpaceExplosion(game, shipXMid, shipYMid) {
+  this.pWidth = 324;
+  this.pHeight = 169;
+  this.scale = 1;
+  //this.animation = new Animation(AM.getAsset("./img/SpaceExplosion.png"), 324, 169, 2,  0.15, 6, true, this.scale);
+  this.animation = new Animation(AM.getAsset("./img/SpaceExplosion.png"),
+                                 this.pWidth, this.pHeight,
+                                 2,  0.15, 6, false, this.scale);
+  this.game = game;
+  this.ctx = game.ctx;
+  this.xMid = shipXMid;
+  this.yMid = shipYMid;
+  //console.log("middle explosion: " + this.xMid + ", " + this.yMid);
+  this.x = this.xMid - ((this.pWidth * this.scale) / 2);
+  this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+  this.removeFromWorld = false; //need to remove from world when animation finishes.
+}
+
+SpaceExplosion.prototype.draw = function () {
+  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  //console.log("explosion: " + this.x + ", " + this.y);
+  Entity.prototype.draw.call(this);
+}
+
+SpaceExplosion.prototype.update = function () {
+  /*if (this.animation.elapsedTime < this.animation.totalTime)
+    this.x += this.game.clockTick * this.speed;
+  if (this.x > 800) this.x = -230;*/
+}
+
+function GroundExplosion(game, spritesheet, shipX, shipY) {
+  this.animation = new Animation(spritesheet, 32, 32, 2, 0.15, 6, true, 1);
+  this.game = game;
+  this.ctx = game.ctx;
+  this.x = shipX;
+  this.y = shipY;
+}
+
+GroundExplosion.prototype.draw = function () {
+  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  Entity.prototype.draw.call(this);
+}
+
+GroundExplosion.prototype.update = function () {
+
+}
+
+
 
 /* ========================================================================================================== */
 // Boss 1
@@ -211,7 +275,7 @@ function BossTurret(game, spritesheet, x, y){
   this.game = game;
   this.ctx = game.ctx;
   this.removeFromWorld = false;
-  this.health = 200;
+  this.health = 20;
 }
 BossTurret.prototype = new Entity();
 BossTurret.prototype.constructor = Boss1;
@@ -288,44 +352,84 @@ LaserBlast.prototype.draw = function () {
 // Scourge - Enemy
 /* ========================================================================================================== */
 function Scourge(game, spritesheet) {
+
 	this.pWidth = 128;
 	this.pHeight = 128;
-	this.scale = 1;
+	this.scale = .5;
 	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
-	this.angle = 0;
+  this.angle = 0;
 	this.name = "Enemy";
 	this.speed = 0;
 	this.x = 700;
 	this.y = 50;
-    this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-    this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 41;
-	this.game = game;
-	this.ctx = game.ctx;
-	this.removeFromWorld = false;
-	Entity.call(this, game, this.x, this.y);
+  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+  this.radius = 41 * this.scale;
+  this.game = game;
+  this.ctx = game.ctx;
+  this.removeFromWorld = false;
+  this.health = 10;
+  console.log("starting health: " + this.health);
+  Entity.call(this, game, this.x, this.y);
 }
 
 Scourge.prototype = new Entity();
 Scourge.prototype.constructor = Scourge;
 
+//function SpaceExplosion(game, spritesheet, shipX, shipY) {
 Scourge.prototype.update = function () {
-	Entity.prototype.update.call(this);
+  //console.log("Scourge: " + this.xMid + ", " + this.yMid);
+  Entity.prototype.update.call(this);
+
+  for(var i = 0; i < this.game.entities.length; i++) {
+    var ent = this.game.entities[i];
+    ent.victims = [];
+    var found = false;
+    if(ent.name === "ShipProjectile") {
+      //console.log("Projectile");
+      if(Collide(this, ent)) {
+        for(var j = 0; j < ent.victims.length; j++) {
+          if(this === ent.victims[j]) {
+            found = true;
+          }
+        }
+
+        if(!found) {
+          console.log("I've been hit!");
+          this.health--;
+          console.log("new health: " + this.health);
+          ent.victims.push(this);
+          //should be an if statement to check for persistent weapon
+          if(!ent.persistent) {
+            ent.removeFromWorld = true;
+          }
+
+        }
+
+        if(this.health < 1) {
+          this.removeFromWorld = true;
+
+          var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+          this.game.addEntity(explosion);
+        }
+      }
+    }
+  }
 }
 
 Scourge.prototype.draw = function () {
-	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
 
-	if (SHOW_HITBOX) {
-    	this.ctx.beginPath();
-    	this.ctx.strokeStyle = "Red";
-    	this.ctx.lineWidth = 1;
-    	this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
-    	this.ctx.stroke();
-    	this.ctx.closePath();
+  if (SHOW_HITBOX) {
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = "Red";
+      this.ctx.lineWidth = 1;
+      this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+      this.ctx.stroke();
+      this.ctx.closePath();
     }
 
-	Entity.prototype.draw.call(this);
+  Entity.prototype.draw.call(this);
 }
 
 /* ========================================================================================================== */
@@ -577,6 +681,10 @@ AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
 AM.queueDownload("./img/scourge.png");
+
+
+AM.queueDownload("./img/SpaceExplosion.png");
+AM.queueDownload("./img/Explosion1.png");
 
 AM.downloadAll(function () {
     console.log("starting up da sheild");
