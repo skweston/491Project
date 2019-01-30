@@ -67,7 +67,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
                  xindex * this.frameWidth, yindex * this.frameHeight,  // source from sheet
                  this.frameWidth, this.frameHeight,
                  0, 0,
-                 this.frameWidth * this.scale,
+                 this.frameWidth * this.scale,a
                  this.frameHeight * this.scale);
     offscreenCtx.save();
     offscreenCtx.translate(size / 2, size / 2);
@@ -369,6 +369,15 @@ TheShip.prototype.update = function () {
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
     this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
+    //this.x += this.game.clockTick * this.speed;
+    //if (this.x > 800) this.x = -230;
+    var dx = this.game.mouseX - this.xMid-1;
+    var dy = (this.yMid - this.game.mouseY)-1;
+    // this should be the angle in radians
+    this.angle = -Math.atan2(dy,dx);
+    //if we want it in degrees
+    //this.angle *= 180 / Math.PI;
+
 	// rolling
 	if (this.game.roll) {
 		this.rolling = true;
@@ -410,7 +419,7 @@ TheShip.prototype.update = function () {
 	// shooting
 	if (this.game.wasclicked) {
 		//this.primaryCoolDown = 1;
-		var projectile = new ShipPrimary(this.game);
+		var projectile = new ShipPrimary(this.game, this.angle);
 		var target = {x: this.game.mouseX - (projectile.pWidth * projectile.scale),
 					  y: this.game.mouseY - (projectile.pHeight * projectile.scale)};
         var dir = direction(target, this);
@@ -428,24 +437,24 @@ TheShip.prototype.update = function () {
 TheShip.prototype.draw = function () {
 	if (this.rolling) {
 		if (this.boosting) {
-			this.boostRollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+			this.boostRollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 		}
 		else {
-			this.rollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+			this.rollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 		}
 	}
 	else {
 		if (this.boosting) {
-			this.boostAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+			this.boostAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 		}
 		else {
-			this.idleAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+			this.idleAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 		}
 	}
 
     this.reticleAnimation.drawFrame(this.game.clockTick, this.ctx,
     							   (this.game.mouseX - (this.pWidth * 0.25 / 2) - 1),
-    							   (this.game.mouseY - (this.pHeight * 0.25 / 2) - 1)); // - (this.pHeight * 0.25 / 2));
+    							   (this.game.mouseY - (this.pHeight * 0.25 / 2) - 1), 0); // - (this.pHeight * 0.25 / 2));
 
     if (SHOW_HITBOX) {
     	this.ctx.beginPath();
@@ -463,12 +472,12 @@ TheShip.prototype.draw = function () {
 // Ship Weapons
 /* ========================================================================================================== */
 
-function ShipPrimary(game) {
+function ShipPrimary(game, angle) {
 	this.pWidth = 128;
 	this.pHeight = 128;
 	this.scale = 0.25;
 	this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
-
+  this.angle = angle;
 	this.name = "ShipProjectile";
 	this.x = 0;
 	this.y = 0;
@@ -508,7 +517,7 @@ ShipPrimary.prototype.update = function () {
 }
 
 ShipPrimary.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
     if (SHOW_HITBOX) {
     	this.ctx.beginPath();
