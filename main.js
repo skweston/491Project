@@ -120,8 +120,6 @@ Background.prototype.draw = function () {
 
 Background.prototype.update = function () {
 
-
-
 };
 
 /* =========== General Effects ========= */
@@ -169,8 +167,6 @@ GroundExplosion.prototype.draw = function () {
 GroundExplosion.prototype.update = function () {
 
 }
-
-
 
 /* ========================================================================================================== */
 // Boss 1
@@ -331,9 +327,12 @@ Scourge.prototype.update = function () {
           this.health--;
           console.log("new health: " + this.health);
           ent.victims.push(this);
+          //should be an if statement to check for persistent weapon
+          if(!ent.persistent) {
+            ent.removeFromWorld = true;
+          }
+          
         }
-
-
 
         if(this.health < 1) {
           this.removeFromWorld = true;
@@ -534,6 +533,7 @@ function ShipPrimary(game) {
   this.velocity = {x: 0, y: 0};
 
   this.victims = [];
+  this.persistent = false;
 
   this.game = game;
   this.ctx = game.ctx;
