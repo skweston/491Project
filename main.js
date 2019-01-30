@@ -1,3 +1,4 @@
+
 function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale) {
     this.spriteSheet = spriteSheet;
     this.frameWidth = frameWidth;
@@ -49,33 +50,6 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
     ctx.drawImage(offscreenCanvas, x, y);
 
 
-}
-
-Animation.prototype.currentFrame = function () {
-    return Math.floor(this.elapsedTime / this.frameDuration);
-}
-
-Animation.prototype.isDone = function () {
-    return (this.elapsedTime >= this.totalTime);
-}
-
-Animation.prototype.drawFrame = function (tick, ctx, x, y) {
-    this.elapsedTime += tick;
-    if (this.isDone()) {
-        if (this.loop) this.elapsedTime = 0;
-    }
-    var frame = this.currentFrame();
-    var xindex = 0;
-    var yindex = 0;
-    xindex = frame % this.sheetWidth;
-    yindex = Math.floor(frame / this.sheetWidth);
-
-    ctx.drawImage(this.spriteSheet,
-                 xindex * this.frameWidth, yindex * this.frameHeight,  // source from sheet
-                 this.frameWidth, this.frameHeight,
-                 x, y,
-                 this.frameWidth * this.scale,
-                 this.frameHeight * this.scale);
 }
 
 Animation.prototype.currentFrame = function () {
@@ -155,13 +129,13 @@ Boss1.prototype.constructor = Boss1;
 Boss1.prototype.update = function () {
     this.x += this.game.clockTick * this.speed;
     if (this.x > 800) this.x = -230;
-    this.angle += 5;
+    this.angle += .005;
 
     Entity.prototype.update.call(this);
 }
 
 Boss1.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
     Entity.prototype.draw.call(this);
 }
 
@@ -169,8 +143,8 @@ function BossTurret(game, spritesheet, x, y){
   this.animation = new Animation(spritesheet, 32, 32, 672, 0.2, 21, true, 1.5);
   this.x = x;
   this.y = y;
-  this.hitcenterX = this.x + 16;
-  this.hitcenterY = this.y + 16;
+  this.hitcenterX = ;
+  this.hitcenterY = ;
   this.hitRadius = 16;
   this.speed = 0;
   this.angle = 0;
@@ -192,16 +166,16 @@ BossTurret.prototype.update = function () {
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
     var dx = this.game.mousex - this.x;
-    var dy = this.y - this.game.mousey;
+    var dy = (this.y - this.game.mousey);
     // this should be the angle in radians
-    this.angle = Math.atan2(dy,dx);
+    this.angle = -Math.atan2(dy,dx);
     //if we want it in degrees
     //this.angle *= 180 / Math.PI;
 
 
     if (this.game.wasclicked){
       console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
-      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png"), this.x, this.y, dx, dy));
+      this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png"), this.x, this.y, dx, dy, this.angle));
 
     }
 
@@ -210,11 +184,11 @@ BossTurret.prototype.update = function () {
 }
 
 BossTurret.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
     Entity.prototype.draw.call(this);
 }
-function LaserBlast(game, spritesheet, xIn, yIn, dx, dy){
+function LaserBlast(game, spritesheet, xIn, yIn, dx, dy, angle){
   this.animation = new Animation(spritesheet, 32, 32, 128, 0.15, 4, true, 1);
   this.game = game;
   this.speedX = 1;
@@ -226,6 +200,7 @@ function LaserBlast(game, spritesheet, xIn, yIn, dx, dy){
   this.y = yIn; //this.game.mousey;
   this.lifetime = 600;
   this.removeFromWorld = false;
+  this.angle = angle;
 }
 LaserBlast.prototype = new Entity();
 LaserBlast.prototype.constructor = LaserBlast;
@@ -245,7 +220,7 @@ LaserBlast.prototype.update = function () {
 }
 
 LaserBlast.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
     Entity.prototype.draw.call(this);
 }
 
