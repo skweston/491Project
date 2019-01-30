@@ -235,7 +235,9 @@ function Scourge(game, spritesheet) {
 	this.speed = 0;
 	this.x = 700;
 	this.y = 50;
-	this.hitRadius = 40;
+    this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+    this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.hitRadius = 41;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -255,9 +257,8 @@ Scourge.prototype.draw = function () {
 	if (SHOW_HITBOX) {
     	this.ctx.beginPath();
     	this.ctx.strokeStyle = "Red";
-    	this.ctx.lineWidth = 2;
-    	this.ctx.arc(this.x + this.pWidth * this.scale / 2, this.y + this.pHeight * this.scale / 2,
-    				 this.hitRadius * this.scale, 0, Math.PI * 2, false);
+    	this.ctx.lineWidth = 1;
+    	this.ctx.arc(this.xMid, this.yMid, this.hitRadius * this.scale, 0, Math.PI * 2, false);
     	this.ctx.stroke();
     	this.ctx.closePath();
     }
@@ -276,15 +277,16 @@ function TheShip(game) {
     this.boostAnimation = new Animation(AM.getAsset("./img/shipBoost.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
     this.rollAnimation = new Animation(AM.getAsset("./img/shipRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
     this.boostRollAnimation = new Animation(AM.getAsset("./img/shipBoostRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+    this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, 0.25);
     this.speed = 0.5;
     this.boosting = false;
     this.cancelBoost = false;
     this.rolling = false;
     this.x = 100;
     this.y = 100;
-    this.xMid = this.x + this.pWidth * this.scale / 2;
-    this.yMid = this.y + this.pHeight * this.scale / 2;
-    this.hitRadius = 28;
+    this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+    this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+    this.hitRadius = 31;
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
@@ -317,8 +319,9 @@ TheShip.prototype.update = function () {
 		}
 	}
 
-	this.xMid = this.x + this.pWidth * this.scale / 2;
-    this.yMid = this.y + this.pHeight * this.scale / 2;
+	// update center hitbox
+    this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+    this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	// rolling
 	if (this.game.roll) {
@@ -382,11 +385,15 @@ TheShip.prototype.draw = function () {
     if (SHOW_HITBOX) {
     	this.ctx.beginPath();
     	this.ctx.strokeStyle = "Red";
-    	this.ctx.lineWidth = 2;
+    	this.ctx.lineWidth = 1;
     	this.ctx.arc(this.xMid, this.yMid, this.hitRadius * this.scale, 0, Math.PI * 2, false);
     	this.ctx.stroke();
     	this.ctx.closePath();
     }
+
+    this.reticleAnimation.drawFrame(this.game.clockTick, this.ctx,
+    								(this.game.mousex - (this.pWidth * 0.25 / 2) - 1),
+    								(this.game.mousey - (this.pHeight * 0.25 / 2) - 1)); // - (this.pHeight * 0.25 / 2));
 
     Entity.prototype.draw.call(this);
 }
@@ -401,6 +408,7 @@ AM.queueDownload("./img/shipIdle.png");
 AM.queueDownload("./img/shipBoost.png");
 AM.queueDownload("./img/shipRoll.png");
 AM.queueDownload("./img/shipBoostRoll.png");
+AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
