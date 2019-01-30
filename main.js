@@ -15,6 +15,31 @@ function direction(a, b) {
 }
 
 /* ========================================================================================================== */
+// Entity Template
+/* ========================================================================================================== */
+/*
+
+Every entity must have the following variables:
+this.pWidth
+this.pHeight
+this.scale
+this.animation
+
+this.name = "EntityType";
+this.x = 0;
+this.y = 0;
+this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+this.speed = 0;
+this.angle = 0;
+this.radius
+this.weaponCooldown
+
+a list of powerups, things like multishot and such
+
+*/
+
+/* ========================================================================================================== */
 // Animation
 /* ========================================================================================================== */
 
@@ -30,7 +55,6 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
     this.loop = loop;
     this.scale = scale;
 }
-
 
 Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
     this.elapsedTime += tick;
@@ -247,10 +271,8 @@ LaserBlast.prototype.constructor = LaserBlast;
 LaserBlast.prototype.update = function () {
     this.x += this.game.clockTick * this.dx;
     this.y += this.game.clockTick * this.dy;
-
-    if (this.x > 800) this.x = -230;
-    if (this.y > 800) this.y = -230;
     this.lifetime = this.lifetime - 1;
+
     if (this.lifetime < 0){
       this.removeFromWorld = true;
     }
@@ -271,7 +293,7 @@ function Scourge(game, spritesheet) {
 	this.pHeight = 128;
 	this.scale = 1;
 	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
-  this.angle = 0;
+	this.angle = 0;
 	this.name = "Enemy";
 	this.speed = 0;
 	this.x = 700;
@@ -332,7 +354,6 @@ function TheShip(game) {
     this.radius = 31;
     this.angle = 0;
 
-
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
@@ -369,6 +390,7 @@ TheShip.prototype.update = function () {
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
     this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
+<<<<<<< HEAD
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
     var dx = this.game.mouseX - this.xMid-1;
@@ -377,6 +399,12 @@ TheShip.prototype.update = function () {
     this.angle = -Math.atan2(dy,dx);
     //if we want it in degrees
     //this.angle *= 180 / Math.PI;
+=======
+    // update angle
+    var dx = this.game.mouseX - this.xMid;
+    var dy = this.yMid - this.game.mouseY;
+    this.angle = -Math.atan2(dy,dx);
+>>>>>>> master
 
 	// rolling
 	if (this.game.roll) {
@@ -416,8 +444,10 @@ TheShip.prototype.update = function () {
 		this.cancelBoost = true;
 	}
 
+	// console.log(this.game.firePrimary);
+
 	// shooting
-	if (this.game.wasclicked) {
+	if (this.game.firePrimary) {
 		//this.primaryCoolDown = 1;
 		var projectile = new ShipPrimary(this.game, this.angle);
 		var target = {x: this.game.mouseX - (projectile.pWidth * projectile.scale),
@@ -428,6 +458,8 @@ TheShip.prototype.update = function () {
         projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2);
         projectile.velocity.x = dir.x * projectile.maxSpeed;
         projectile.velocity.y = dir.y * projectile.maxSpeed;
+        projectile.angle = this.angle;
+
 		this.game.addEntity(projectile);
 	}
 
@@ -482,9 +514,11 @@ function ShipPrimary(game, angle) {
 	this.x = 0;
 	this.y = 0;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 	this.radius = 10;
-	this.lifetime = 50;
+	this.angle = 0;
+
+	this.lifetime = 500;
 	this.maxSpeed = 1500;
 	this.velocity = {x: 0, y: 0};
 
@@ -492,8 +526,9 @@ function ShipPrimary(game, angle) {
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
 }
+
 ShipPrimary.prototype = new Entity();
-ShipPrimary.prototype.constructor = LaserBlast;
+ShipPrimary.prototype.constructor = ShipPrimary;
 
 ShipPrimary.prototype.update = function () {
 	this.x += this.velocity.x * this.game.clockTick;
@@ -508,8 +543,9 @@ ShipPrimary.prototype.update = function () {
         this.velocity.x *= ratio;
         this.velocity.y *= ratio;
     }
+
     this.lifetime = this.lifetime - 1;
-    if (this.lifetime < 0){
+    if (this.lifetime < 0) {
       this.removeFromWorld = true;
     }
 

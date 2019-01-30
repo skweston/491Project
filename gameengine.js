@@ -27,6 +27,7 @@ Timer.prototype.tick = function () {
 
 function GameEngine() {
     this.entities = [];
+    this.background = [];
     this.player = [];
     this.enemies = [];
     this.playerProjectiles = [];
@@ -36,6 +37,9 @@ function GameEngine() {
     this.wasclicked = false;
     this.mouseX = 0;
     this.mouseY = 0;
+    this.firePrimary = false;
+    this.fireSecondary = false;
+    this.bomb = false;
     this.moveUp = false;
     this.moveLeft = false;
     this.moveDown = false;
@@ -99,10 +103,12 @@ GameEngine.prototype.startInput = function () {
         that.click = getXandY(e);
         console.log(e);
         if (e.which === 1) {
-            console.log("Left Mouse Down - X,Y " + e.clientX + ", " + e.clientY);
+            that.firePrimary = true;
+            // console.log("Left Mouse Down - X,Y " + e.clientX + ", " + e.clientY);
         }
         if (e.which === 3) {
-            console.log("Right Mouse Down - X,Y " + e.clientX + ", " + e.clientY);
+            that.fireSecondary = true;
+            // console.log("Right Mouse Down - X,Y " + e.clientX + ", " + e.clientY);
         }
     }, false);
 
@@ -110,10 +116,12 @@ GameEngine.prototype.startInput = function () {
         that.click = getXandY(e);
         console.log(e);
         if (e.which === 1) {
-            console.log("Left Mouse Up - X,Y " + e.clientX + ", " + e.clientY);
+            that.firePrimary = false;
+            // console.log("Left Mouse Up - X,Y " + e.clientX + ", " + e.clientY);
         }
         if (e.which === 3) {
-            console.log("Right Mouse Up - X,Y " + e.clientX + ", " + e.clientY);
+            that.fireSecondary = false;
+            // console.log("Right Mouse Up - X,Y " + e.clientX + ", " + e.clientY);
         }
     }, false);
 
@@ -190,6 +198,9 @@ GameEngine.prototype.startInput = function () {
 GameEngine.prototype.addEntity = function (entity) {
     console.log('added entity');
     this.entities.push(entity);
+    if (entity.name === "Background") {
+        this.background.push(entity);
+    }
     if (entity.name === "Player") {
         this.player.push(entity);
     }
@@ -210,6 +221,21 @@ GameEngine.prototype.draw = function () {
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.ctx);
     }
+    // for (var i = 0; i < this.background.length; i++) {
+    //     this.background[i].draw(this.ctx);
+    // }
+    // for (var i = 0; i < this.playerProjectiles.length; i++) {
+    //     this.playerProjectiles[i].draw(this.ctx);
+    // }
+    // for (var i = 0; i < this.enemyProjectiles.length; i++) {
+    //     this.enemyProjectiles[i].draw(this.ctx);
+    // }
+    // for (var i = 0; i < this.enemies.length; i++) {
+    //     this.enemies[i].draw(this.ctx);
+    // }
+    // for (var i = 0; i < this.player.length; i++) {
+    //     this.player[i].draw(this.ctx);
+    // }
     this.ctx.restore();
 }
 
@@ -228,6 +254,7 @@ GameEngine.prototype.update = function () {
     }
     this.wasclicked = false;
     this.roll = false;
+    this.bomb = false;
 }
 
 GameEngine.prototype.loop = function () {
