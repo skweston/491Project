@@ -15,6 +15,28 @@ function direction(a, b) {
 }
 
 /* ========================================================================================================== */
+// Entity Template
+/* ========================================================================================================== */
+/*
+
+Every entity must have the following variables:
+this.pWidth
+this.pHeight
+this.scale
+this.animation
+
+this.name = "EntityType";
+this.x = 0;
+this.y = 0;
+this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+this.speed = 0;
+this.angle = 0;
+this.radius
+
+*/
+
+/* ========================================================================================================== */
 // Animation
 /* ========================================================================================================== */
 
@@ -32,7 +54,6 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
 }
 
 Animation.prototype.drawFrame = function (tick, ctx, x, y) {
-	console.log("Am I here?");
     this.elapsedTime += tick;
     if (this.isDone()) {
         if (this.loop) this.elapsedTime = 0;
@@ -286,6 +307,7 @@ function TheShip(game) {
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
     this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
     this.radius = 31;
+    this.angle = 0;
 
     this.game = game;
     this.ctx = game.ctx;
@@ -437,6 +459,7 @@ function ShipPrimary(game) {
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
 }
+
 ShipPrimary.prototype = new Entity();
 ShipPrimary.prototype.constructor = LaserBlast;
 
@@ -453,8 +476,9 @@ ShipPrimary.prototype.update = function () {
         this.velocity.x *= ratio;
         this.velocity.y *= ratio;
     }
+
     this.lifetime = this.lifetime - 1;
-    if (this.lifetime < 0){
+    if (this.lifetime < 0) {
       this.removeFromWorld = true;
     }
 
@@ -508,12 +532,12 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/space1-1.png")));
 
     // load the environment assets next
-    gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png")));
-    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 380));
-    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
-    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
-    gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
-    gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png")));
+    // gameEngine.addEntity(new Boss1(gameEngine, AM.getAsset("./img/Boss1.png")));
+    // gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 380));
+    // gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
+    // gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
+    // gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
+    // gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png")));
 
     // the ship is always loaded last
     gameEngine.addEntity(new TheShip(gameEngine));
