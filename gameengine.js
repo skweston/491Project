@@ -71,10 +71,10 @@ GameEngine.prototype.startInput = function () {
     var that = this;
 
     var getXandY = function (e) {
-        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
-        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left + 100;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top + 100;
 
-        return { x: x, y: y };
+        return { x: x, y: y};
     }
 
     var that = this;
@@ -120,8 +120,8 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("mousemove", function (e) {
         //console.log(e);
         that.mouse = getXandY(e);
-        that.mouseX = e.x;
-        that.mouseY = e.y;
+        that.mouseX = (e.x - 7);
+        that.mouseY = (e.y - 7);
         //console.log("Current mouse x: " + that.mousex + " current mouse y: " + that.mousey );
     }, false);
 
