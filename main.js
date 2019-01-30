@@ -25,6 +25,13 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
 
     var offscreenCanvas = document.createElement('canvas');
     var size = Math.max(this.frameWidth * this.scale, this.frameHeight * this.scale);
+    var xOffset = 0;
+    var yOffset = 0;
+    if (this.frameWidth*this.scale > this.frameHeight * this.scale){
+      xOffset = (this.frameWidth * this.scale) - (this.frameHeight * this.scale);
+    } else if (this.frameWidth*this.scale > this.frameHeight * this.scale) {
+      yOffset = (this.frameHeight * this.scale) - (this.frameWidth * this.scale);
+    }
     offscreenCanvas.width = size;
     offscreenCanvas.height = size;
     var offscreenCtx = offscreenCanvas.getContext('2d');
@@ -47,7 +54,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
     offscreenCtx.drawImage(thirdCanvas, -(this.frameWidth*this.scale / 2), -(this.frameHeight*this.scale / 2));
     offscreenCtx.restore();
     thirdCtx.clearRect(0,0, size, size);
-    ctx.drawImage(offscreenCanvas, x, y);
+    ctx.drawImage(offscreenCanvas, x + xOffset, y + yOffset);
 
 
 }
