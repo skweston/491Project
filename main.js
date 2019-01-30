@@ -1,17 +1,33 @@
 // useful global things here
 var SHOW_HITBOX = true;
 
+/*
 function distance(a, b) {
     var dx = a.x - b.x;
     var dy = a.y - b.y;
     return Math.sqrt(dx * dx + dy * dy);
-}
+}*/
 
 function direction(a, b) {
     var dx = a.x - b.x;
     var dy = a.y - b.y;
     var dist = Math.sqrt(dx * dx + dy * dy);
     if(dist > 0) return { x: dx / dist, y: dy / dist }; else return {x:0,y:0};
+}
+
+//collision
+function distance(a, b) {
+    var dx = a.xMid - b.xMid;
+    var dy = a.yMid - b.yMid;
+    console.log("a: " + a.xMid + ", " + a.yMid);
+    console.log("b: " + b.xMid + ", " + b.yMid);
+    console.log("distance: " + (dx * dx + dy * dy));
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function Collide(a, b) {
+    console.log("checking collision");
+    return distance(a, b) < a.radius + b.radius;
 }
 
 /* ========================================================================================================== */
@@ -124,6 +140,7 @@ function SpaceExplosion(game, shipXMid, shipYMid) {
   //console.log("middle explosion: " + this.xMid + ", " + this.yMid);
   this.x = this.xMid - ((this.pWidth * this.scale) / 2);
   this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+  this.removeFromWorld = false; //need to remove from world when animation finishes.
 }
 
 SpaceExplosion.prototype.draw = function () {
@@ -302,7 +319,7 @@ Scourge.prototype.update = function () {
     var ent = this.game.entities[i];
     if(ent.name === "ShipProjectile") {
       console.log("Projectile");
-      if(this.collide(ent)) {
+      if(Collide(this, ent)) {
         console.log("I've been hit!");
         this.health--;
 
@@ -333,21 +350,14 @@ Scourge.prototype.draw = function () {
 }
 
 
-//collision
-function distance(a, b) {
-    var dx = a.xMid - b.xMid;
-    var dy = a.yMid - b.yMid;
-    console.log("a: " + a.xMid + ", " + a.yMid);
-    console.log("b: " + b.xMid + ", " + b.yMid);
-    console.log("distance: " + (dx * dx + dy * dy));
-    return Math.sqrt(dx * dx + dy * dy);
-}
 
+
+/*
 //this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
 Scourge.prototype.collide = function (other) {
   console.log("checking collision");
     return distance(this, other) < this.radius + other.radius;
-}
+}*/
 /********************************************/
 
 /* ========================================================================================================== */
