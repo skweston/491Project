@@ -24,7 +24,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
     yindex = Math.floor(frame / this.sheetWidth);
 
     var offscreenCanvas = document.createElement('canvas');
-    var size = Math.max(this.frameWidth, this.frameHeight);
+    var size = Math.max(this.frameWidth * this.scale, this.frameHeight * this.scale);
     offscreenCanvas.width = size;
     offscreenCanvas.height = size;
     var offscreenCtx = offscreenCanvas.getContext('2d');
@@ -44,9 +44,9 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
     offscreenCtx.translate(size / 2, size / 2);
     offscreenCtx.rotate(angle);
     offscreenCtx.translate(0, 0);
-    offscreenCtx.drawImage(thirdCanvas, -(this.frameWidth / 2), -(this.frameHeight / 2));
+    offscreenCtx.drawImage(thirdCanvas, -(this.frameWidth*this.scale / 2), -(this.frameHeight*this.scale / 2));
     offscreenCtx.restore();
-    thirdCtx.clearRect(0,0, thirdCtx.width, thirdCtx.height);
+    thirdCtx.clearRect(0,0, size, size);
     ctx.drawImage(offscreenCanvas, x, y);
 
 
@@ -100,7 +100,7 @@ Background.prototype.draw = function () {
 	    	   this.sx, this.sy,
 	    	   this.frameWidth, this.frameHeight,
                    this.dx, this.dy,
-    		   this.dWidth, this.dHeight);
+    		   this.dWidth, this.dHeight, 0);
 };
 
 Background.prototype.update = function () {
@@ -129,23 +129,27 @@ Boss1.prototype.constructor = Boss1;
 Boss1.prototype.update = function () {
     this.x += this.game.clockTick * this.speed;
     if (this.x > 800) this.x = -230;
-    this.angle += .005;
+    // this.angle += .005
 
     Entity.prototype.update.call(this);
 }
 
 Boss1.prototype.draw = function () {
     this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-    Entity.prototype.draw.call(this);
+    //Entity.prototype.draw.call(this);
 }
 
 function BossTurret(game, spritesheet, x, y){
-  this.animation = new Animation(spritesheet, 32, 32, 672, 0.2, 21, true, 1.5);
+  this.pWidth = 32;
+  this.pHeight = 32;
+  this.scale = 2;
+
+  this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 675, 0.2, 21, true, this.scale);
   this.x = x;
   this.y = y;
 
-  this.xMid = this.x + 32 / 2;
-  this.yMid = this.y + 32 / 2;
+  this.xMid = this.x + (this.pWidth * this.scale) / 2;
+  this.yMid = this.y + (this.pHeight * this.scale) / 2;
   this.hitRadius = 16;
   this.speed = 0;
   this.angle = 0;
@@ -166,8 +170,8 @@ BossTurret.prototype.update = function () {
 
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
-    var dx = this.game.mousex - this.xMid;
-    var dy = (this.yMid - this.game.mousey);
+    var dx = this.game.mousex - this.xMid-1;
+    var dy = (this.yMid - this.game.mousey)-1;
     // this should be the angle in radians
     this.angle = -Math.atan2(dy,dx);
     //if we want it in degrees
@@ -175,9 +179,9 @@ BossTurret.prototype.update = function () {
 
 
     if (this.game.wasclicked){
-      console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
+    //  console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
       this.game.addEntity(new LaserBlast(this.game, AM.getAsset("./img/LaserBlast.png"),
-                          this.xMid, this.yMid, dx, dy, this.angle - Math.PI/2));
+                          this.xMid-(this.pWidth/2), this.yMid- (this.pHeight)/2, dx, dy, this.angle - Math.PI/2));
 
     }
 
@@ -186,9 +190,9 @@ BossTurret.prototype.update = function () {
 }
 
 BossTurret.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.xMid, this.yMid, this.angle);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
-    Entity.prototype.draw.call(this);
+    //Entity.prototype.draw.call(this);
 }
 function LaserBlast(game, spritesheet, xIn, yIn, dx, dy, angle){
   this.animation = new Animation(spritesheet, 32, 32, 128, 0.15, 4, true, 1);
