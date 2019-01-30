@@ -248,7 +248,7 @@ BossTurret.prototype.draw = function () {
 function LaserBlast(game, spritesheet, xIn, yIn, dx, dy, angle){
   this.animation = new Animation(spritesheet, 32, 32, 128, 0.15, 4, true, 1);
   this.name = "EnemyProjectile";
-  this.angle = 0;
+  this.angle = angle;
 
   this.game = game;
   this.speedX = 1;
@@ -279,7 +279,7 @@ LaserBlast.prototype.update = function () {
 }
 
 LaserBlast.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
     Entity.prototype.draw.call(this);
 }
 
