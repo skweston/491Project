@@ -88,20 +88,20 @@ GameEngine.prototype.startInput = function () {
     this.ctx.canvas.addEventListener("click", function (e) {
         that.click = getXandY(e);
         that.wasclicked = true;
-        console.log(e);
-        console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
+        // console.log(e);
+        // console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
     }, false);
 
     this.ctx.canvas.addEventListener("contextmenu", function (e) {
         that.click = getXandY(e);
-        console.log(e);
-        console.log("Right Click Event - X,Y " + e.clientX + ", " + e.clientY);
+        // console.log(e);
+        // console.log("Right Click Event - X,Y " + e.clientX + ", " + e.clientY);
         e.preventDefault();
     }, false);
 
     this.ctx.canvas.addEventListener("mousedown", function (e) {
         that.click = getXandY(e);
-        console.log(e);
+        // console.log(e);
         if (e.which === 1) {
             that.firePrimary = true;
             // console.log("Left Mouse Down - X,Y " + e.clientX + ", " + e.clientY);
@@ -114,7 +114,7 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("mouseup", function (e) {
         that.click = getXandY(e);
-        console.log(e);
+        // console.log(e);
         if (e.which === 1) {
             that.firePrimary = false;
             // console.log("Left Mouse Up - X,Y " + e.clientX + ", " + e.clientY);
@@ -134,9 +134,9 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.ctx.canvas.addEventListener("mousewheel", function (e) {
-        console.log(e);
+        // console.log(e);
         that.wheel = e;
-        console.log("Click Event - X,Y " + e.clientX + ", " + e.clientY + " Delta " + e.deltaY);
+        // console.log("Click Event - X,Y " + e.clientX + ", " + e.clientY + " Delta " + e.deltaY);
     }, false);
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
@@ -196,7 +196,7 @@ GameEngine.prototype.startInput = function () {
 }
 
 GameEngine.prototype.addEntity = function (entity) {
-    console.log('added entity');
+    // console.log('added entity');
     this.entities.push(entity);
     if (entity.name === "Background") {
         this.background.push(entity);
