@@ -15,7 +15,7 @@ function direction(a, b) {
     if(dist > 0) return { x: dx / dist, y: dy / dist }; else return {x:0,y:0};
 }
 
-//collision
+//collision - objects must have xMid, yMid and a radius defined.
 function distance(a, b) {
     var dx = a.xMid - b.xMid;
     var dy = a.yMid - b.yMid;
