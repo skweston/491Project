@@ -1,5 +1,5 @@
 // useful global things here
-var SHOW_HITBOX = true;
+var SHOW_HITBOX = false;
 
 /*
 function distance(a, b) {
@@ -124,9 +124,7 @@ Background.prototype.update = function () {
 
 };
 
-//  this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 /* =========== General Effects ========= */
-//(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale)
 function SpaceExplosion(game, shipXMid, shipYMid) {
   this.pWidth = 324;
   this.pHeight = 169;
@@ -363,15 +361,6 @@ Scourge.prototype.draw = function () {
   Entity.prototype.draw.call(this);
 }
 
-
-
-
-/*
-//this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
-Scourge.prototype.collide = function (other) {
-  console.log("checking collision");
-    return distance(this, other) < this.radius + other.radius;
-}*/
 /********************************************/
 
 /* ========================================================================================================== */
