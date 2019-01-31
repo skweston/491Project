@@ -183,8 +183,8 @@ Camera.prototype.draw = function () {
 };
 
 Camera.prototype.update = function () {
-    this.x = this.ship.x - this.ctx.canvas.width  / 2;
-    this.y = this.ship.y - this.ctx.canvas.height / 2;
+    this.x = this.ship.xMid - this.ctx.canvas.width  / 2;
+    this.y = this.ship.yMid - this.ctx.canvas.height / 2;
 
     Entity.prototype.update.call(this);
 };
@@ -509,12 +509,12 @@ TheShip.prototype.update = function () {
 		}
 	}
 	if (this.game.moveDown) {
-		if (this.yMid + this.radius < 700) {
+		if (this.yMid + this.radius < 7000) {
 			this.y += 10 * this.speed;
 		}
 	}
 	if (this.game.moveRight) {
-		if (this.xMid + this.radius < 800) {
+		if (this.xMid + this.radius < 8000) {
 			this.x += 10 * this.speed;
 		}
 	}
@@ -897,7 +897,7 @@ AM.downloadAll(function () {
     // the ship is always loaded last
     gameEngine.addEntity(ship);
     gameEngine.addEntity(camera);//5
-    
+
     gameEngine.start();
     console.log("All Done!");
 });
