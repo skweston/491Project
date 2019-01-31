@@ -462,6 +462,7 @@ function TheShip(game) {
     this.boosting = false;
     this.cancelBoost = false;
     this.rolling = false;
+    this.rollCooldown = 0;
     this.x = 100;
     this.y = 100;
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -516,8 +517,12 @@ TheShip.prototype.update = function () {
     this.angle = -Math.atan2(dy,dx);
 
 	// rolling
-	if (this.game.roll) {
+	if (this.game.roll && this.rollCooldown === 0) {
+		this.rollCooldown = 100;
 		this.rolling = true;
+	}
+	if (this.rollCooldown > 0) {
+		this.rollCooldown -= 1;
 	}
 	if (this.rolling) {
 		if (this.rollAnimation.isDone()) {
