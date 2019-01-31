@@ -514,7 +514,6 @@ TheShip.prototype.update = function () {
     var dx = this.game.mouseX - this.xMid;
     var dy = this.yMid - this.game.mouseY;
     this.angle = -Math.atan2(dy,dx);
-    console.log(this.angle);
 
 	// rolling
 	if (this.game.roll) {
@@ -561,6 +560,9 @@ TheShip.prototype.update = function () {
 	if (this.secondaryCooldown > 0) {
 		this.secondaryCooldown -= 1;
 	}
+	if (this.spreader > 0) {
+		this.spreader -= 1;
+	}
 	if (this.game.firePrimary && this.primaryCooldown === 0) {
 		this.primaryCooldown = this.primaryCooldownMax;
 		for (var i = 0; i < 2; i++) {
@@ -577,9 +579,39 @@ TheShip.prototype.update = function () {
        		projectile.velocity.x = dir.x * projectile.maxSpeed;
        		projectile.velocity.y = dir.y * projectile.maxSpeed;
        		projectile.angle = this.angle;
-       		
         	this.game.addEntity(projectile);
         }
+
+        // if (this.spreader > 0) {
+        // 	var angle = this.angle;
+        // 	var dist = distance({x: this.xMid, y: this.yMid}, {x: this.game.mouseX, y: this.game.mouseY});
+        // 	angle += 
+        // }
+        // if (this.spreader > 0) {
+        // 	this.spreader -= 1;
+        // 	var dist = distance({x: this.xMid, y: this.yMid}, {x: this.game.mouseX, y: this.game.mouseY});
+        // 	for (var i = 0; i < 2; i++) {
+        // 		var angle = this.angle;
+        // 		angle += (Math.pow(-1, i) * Math.PI / 16);
+        // 		var target = {x: Math.cos(angle) * dist + this.xMid,
+        // 					  y: Math.sin(angle) * dist + this.yMid};
+        // 		var dir = direction(target, this);
+
+
+
+
+
+        // 		projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+        // 					   ((this.radius + projectile.pWidth * projectile.scale / 2) * Math.cos(angle));
+        // 		projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
+        // 					   ((this.radius + projectile.pHeight * projectile.scale / 2) * Math.sin(angle));
+        // 		projectile.velocity.x = dir.x * projectile.maxSpeed;
+        // 		projectile.velocity.y = dir.y * projectile.maxSpeed;
+        // 		projectile.angle = angle;
+
+        // 		this.game.addEntity(projectile);
+        // 	}
+        // }
 	}
 	if (this.game.fireSecondary && this.secondaryCooldown === 0) {
 		this.secondaryCooldown = this.secondaryCooldownMax;
@@ -591,7 +623,7 @@ TheShip.prototype.update = function () {
         projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
         			   ((this.radius + projectile.pWidth * projectile.scale / 2) * Math.cos(this.angle));
         projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-        			   ((this.radius + projectile.pHeight * projectile.scale / 2)* Math.sin(this.angle));
+        			   ((this.radius + projectile.pHeight * projectile.scale / 2) * Math.sin(this.angle));
         projectile.velocity.x = dir.x * projectile.maxSpeed;
         projectile.velocity.y = dir.y * projectile.maxSpeed;
         projectile.angle = this.angle;
@@ -801,7 +833,7 @@ Spreader.prototype.update = function () {
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.player[0])) {
-		this.game.player[0].spreader = 30000;
+		this.game.player[0].spreader = 3000;
 		this.removeFromWorld = true;
 	}
 
