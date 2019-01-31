@@ -106,7 +106,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
                  xindex * this.frameWidth, yindex * this.frameHeight,  // source from sheet
                  this.frameWidth, this.frameHeight,
                  0, 0,
-                 this.frameWidth * this.scale,a
+                 this.frameWidth * this.scale,
                  this.frameHeight * this.scale);
     offscreenCtx.save();
     offscreenCtx.translate(size / 2, size / 2);
@@ -136,6 +136,7 @@ function Background(game, spritesheet) {
     this.spritesheet = spritesheet;
     this.game = game;
     this.ctx = game.ctx;
+    this.spawntimer = 100;
 
     // Where the frame starts for the background. Divide image in half then subract the half the canvas,
     // for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
@@ -238,6 +239,7 @@ function Boss1(game, spritesheet){
   this.angle = 0;
   this.speed = 0;
   this.angle = 0;
+  this.spawntimer = 10;
   this.game = game;
   this.ctx = game.ctx;
   this.removeFromWorld = false;
@@ -246,10 +248,12 @@ Boss1.prototype = new Entity();
 Boss1.prototype.constructor = Boss1;
 
 Boss1.prototype.update = function () {
-    this.x += this.game.clockTick * this.speed;
-    if (this.x > 800) this.x = -230;
-
-
+  if (this.spawntimer < 0){
+    this.spawntimer = 100;
+    gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png")));
+  } else {
+    this.spawntime--;
+  }
     Entity.prototype.update.call(this);
 }
 
