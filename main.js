@@ -1,5 +1,5 @@
 // useful global things here
-var SHOW_HITBOX = true;
+var SHOW_HITBOX = false;
 
 /*
 function distance(a, b) {
@@ -514,7 +514,6 @@ TheShip.prototype.update = function () {
     var dx = this.game.mouseX - this.xMid;
     var dy = this.yMid - this.game.mouseY;
     this.angle = -Math.atan2(dy,dx);
-    console.log(this.angle);
 
 	// rolling
 	if (this.game.roll) {
@@ -561,45 +560,54 @@ TheShip.prototype.update = function () {
 	if (this.secondaryCooldown > 0) {
 		this.secondaryCooldown -= 1;
 	}
+	if (this.spreader > 0) {
+		this.spreader -= 1;
+	}
 	if (this.game.firePrimary && this.primaryCooldown === 0) {
 		this.primaryCooldown = this.primaryCooldownMax;
 		for (var i = 0; i < 2; i++) {
-       		var projectile = new ShipPrimary(this.game);
-       		var target = {x: this.game.mouseX - (projectile.pHeight / 4),
-       					  y: this.game.mouseY - (projectile.pWidth / 4)};
-       		var dir = direction(target, this);
-       		projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-       					   ((this.radius + projectile.pWidth * projectile.scale / 2) *
-       					   Math.cos(this.angle + (Math.PI / 24 * Math.pow(-1, i))));
-       		projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-       					   ((this.radius + projectile.pHeight * projectile.scale / 2) *
-       					   Math.sin(this.angle + (Math.PI / 24 * Math.pow(-1, i))));
-       		projectile.velocity.x = dir.x * projectile.maxSpeed;
-       		projectile.velocity.y = dir.y * projectile.maxSpeed;
-       		projectile.angle = this.angle;
-       		
-        	this.game.addEntity(projectile);
+			var offset = (Math.PI / 24 * Math.pow(-1, i));
+			this.createProjectile("Primary", offset, 0);
+        }
+        if (this.spreader > 0) {
+        	for (var i = 0; i < 2; i++) {
+        		this.createProjectile("Primary", 0, ((Math.PI / 6) * Math.pow(-1, i)));
+        	}
         }
 	}
 	if (this.game.fireSecondary && this.secondaryCooldown === 0) {
 		this.secondaryCooldown = this.secondaryCooldownMax;
-		var projectile = new ShipSecondary(this.game);
-		var target = {x: this.game.mouseX - (projectile.pWidth / 4),
-					  y: this.game.mouseY - (projectile.pHeight / 4)};
-        var dir = direction(target, this);
-
-        projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-        			   ((this.radius + projectile.pWidth * projectile.scale / 2) * Math.cos(this.angle));
-        projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-        			   ((this.radius + projectile.pHeight * projectile.scale / 2)* Math.sin(this.angle));
-        projectile.velocity.x = dir.x * projectile.maxSpeed;
-        projectile.velocity.y = dir.y * projectile.maxSpeed;
-        projectile.angle = this.angle;
-
-		this.game.addEntity(projectile);
+		this.createProjectile("Secondary", 0, 0);
 	}
 
     Entity.prototype.update.call(this);
+}
+
+TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+       						   {xMid: this.game.mouseX, yMid: this.game.mouseY});
+	var angle = this.angle + adjustAngle;
+	if (type === "Primary") {
+		var projectile = new ShipPrimary(this.game);
+	}
+	if (type === "Secondary") {
+		var projectile = new ShipSecondary(this.game);
+	}
+    var target = {x: Math.cos(angle) * dist + this.xMid,
+       			  y: Math.sin(angle) * dist + this.yMid};
+    var dir = direction(target, this);
+
+    projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+       			   ((this.radius + projectile.pWidth * projectile.scale / 2) *
+       			   Math.cos(angle + offset));
+    projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
+       			   ((this.radius + projectile.pHeight * projectile.scale / 2) *
+       			   Math.sin(angle + offset));
+    projectile.velocity.x = dir.x * projectile.maxSpeed;
+    projectile.velocity.y = dir.y * projectile.maxSpeed;
+    projectile.angle = angle;
+
+	this.game.addEntity(projectile);
 }
 
 TheShip.prototype.draw = function () {
@@ -801,7 +809,7 @@ Spreader.prototype.update = function () {
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.player[0])) {
-		this.game.player[0].spreader = 30000;
+		this.game.player[0].spreader = 1000;
 		this.removeFromWorld = true;
 	}
 
