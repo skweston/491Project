@@ -1,5 +1,5 @@
 // useful global things here
-var SHOW_HITBOX = false;
+var SHOW_HITBOX = true;
 
 /*
 function distance(a, b) {
@@ -368,7 +368,7 @@ function Scourge(game, spritesheet) {
   this.game = game;
   this.ctx = game.ctx;
   this.removeFromWorld = false;
-  this.health = 20;
+  this.health = 1;
   console.log("starting health: " + this.health);
   Entity.call(this, game, this.x, this.y);
 }
@@ -417,6 +417,12 @@ Scourge.prototype.update = function () {
 
           var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
           this.game.addEntity(explosion);
+
+          // drop a powerup!, this will change to Math.random type thing later, maybe 5% chance?
+          var spreader = new Spreader(this.game);
+          spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+          spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+          this.game.addEntity(spreader);
         }
       }
     }
@@ -460,12 +466,13 @@ function TheShip(game) {
     this.y = 100;
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
     this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-    this.radius = this.scale * 31;
+    this.radius = this.scale * 64;
     this.angle = 0;
     this.primaryCooldownMax = 20;
     this.primaryCooldown = 0;
     this.secondaryCooldownMax = 50;
     this.secondaryCooldown = 0;
+    this.spreader = 0;
 
     this.game = game;
     this.ctx = game.ctx;
@@ -507,6 +514,7 @@ TheShip.prototype.update = function () {
     var dx = this.game.mouseX - this.xMid;
     var dy = this.yMid - this.game.mouseY;
     this.angle = -Math.atan2(dy,dx);
+    console.log(this.angle);
 
 	// rolling
 	if (this.game.roll) {
@@ -555,20 +563,23 @@ TheShip.prototype.update = function () {
 	}
 	if (this.game.firePrimary && this.primaryCooldown === 0) {
 		this.primaryCooldown = this.primaryCooldownMax;
-		var projectile = new ShipPrimary(this.game);
-		var target = {x: this.game.mouseX - (projectile.pHeight / 4),
-					  y: this.game.mouseY - (projectile.pWidth / 4)};
-        var dir = direction(target, this);
-
-        projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-        			   ((this.radius + projectile.pWidth * projectile.scale / 2) * Math.cos(this.angle));
-        projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-        			   ((this.radius + projectile.pHeight * projectile.scale / 2)* Math.sin(this.angle));
-        projectile.velocity.x = dir.x * projectile.maxSpeed;
-        projectile.velocity.y = dir.y * projectile.maxSpeed;
-        projectile.angle = this.angle;
-
-		this.game.addEntity(projectile);
+		for (var i = 0; i < 2; i++) {
+       		var projectile = new ShipPrimary(this.game);
+       		var target = {x: this.game.mouseX - (projectile.pHeight / 4),
+       					  y: this.game.mouseY - (projectile.pWidth / 4)};
+       		var dir = direction(target, this);
+       		projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+       					   ((this.radius + projectile.pWidth * projectile.scale / 2) *
+       					   Math.cos(this.angle + (Math.PI / 24 * Math.pow(-1, i))));
+       		projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
+       					   ((this.radius + projectile.pHeight * projectile.scale / 2) *
+       					   Math.sin(this.angle + (Math.PI / 24 * Math.pow(-1, i))));
+       		projectile.velocity.x = dir.x * projectile.maxSpeed;
+       		projectile.velocity.y = dir.y * projectile.maxSpeed;
+       		projectile.angle = this.angle;
+       		
+        	this.game.addEntity(projectile);
+        }
 	}
 	if (this.game.fireSecondary && this.secondaryCooldown === 0) {
 		this.secondaryCooldown = this.secondaryCooldownMax;
@@ -758,6 +769,66 @@ ShipSecondary.prototype.draw = function () {
 }
 
 /* ========================================================================================================== */
+// Power Ups
+/* ========================================================================================================== */
+
+function Spreader(game) {
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.75;
+	this.animation = new Animation(AM.getAsset("./img/spreader.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
+
+	this.name = "PowerUp";
+	this.x = 0;
+	this.y = 0;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.radius = this.scale * 42;
+	this.angle = 0;
+
+	this.lifetime = 1500;
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+}
+
+Spreader.prototype = new Entity();
+Spreader.prototype.constructor = Spreader;
+
+Spreader.prototype.update = function () {
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	if (Collide(this, this.game.player[0])) {
+		this.game.player[0].spreader = 30000;
+		this.removeFromWorld = true;
+	}
+
+	this.lifetime -= 1;
+	if (this.lifetime < 0) {
+		this.removeFromWorld = true;
+	}
+
+    Entity.prototype.update.call(this);
+}
+
+Spreader.prototype.draw = function () {
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+
+    if (SHOW_HITBOX) {
+    	this.ctx.beginPath();
+    	this.ctx.strokeStyle = "Red";
+    	this.ctx.lineWidth = 1;
+    	this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+    	this.ctx.stroke();
+    	this.ctx.closePath();
+    }
+
+    Entity.prototype.draw.call(this);
+}
+
+/* ========================================================================================================== */
 // Asset Manager aka Main
 /* ========================================================================================================== */
 var AM = new AssetManager();
@@ -771,6 +842,8 @@ AM.queueDownload("./img/shipBoostRoll.png");
 AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary1.png");
 AM.queueDownload("./img/shipSecondary1.png");
+
+AM.queueDownload("./img/spreader.png");
 
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
