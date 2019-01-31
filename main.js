@@ -165,6 +165,7 @@ function Camera(game) {
     this.game = game;
     this.ctx = game.ctx;
     this.ship = game.ship;
+    this.speed = this.ship.speed;
     console.log ("canvase width: " + this.ctx.canvas.width);
     this.x = 0; //this.ship.xMid - this.ctx.canvas.width  / 2;
     this.y = 0; //this.ship.yMid - this.ctx.canvas.height / 2;
@@ -184,8 +185,30 @@ Camera.prototype.draw = function () {
 };
 
 Camera.prototype.update = function () {
-    this.x = -this.ship.xMid + this.ctx.canvas.width  / 2;
-    this.y = -this.ship.yMid + this.ctx.canvas.height / 2;
+    this.speed = this.game.ship.speed;
+    // this.x = -this.ship.xMid + this.ctx.canvas.width  / 2;
+    // this.y = -this.ship.yMid + this.ctx.canvas.height / 2;
+    // movement
+    if (this.game.moveUp) {
+
+    		this.y += 10 * this.speed;
+
+    }
+    if (this.game.moveLeft) {
+
+    		this.x += 10 * this.speed;
+
+    }
+    if (this.game.moveDown) {
+
+    		this.y -= 10 * this.speed;
+
+    }
+    if (this.game.moveRight) {
+
+    		this.x -= 10 * this.speed;
+
+    }
 
     Entity.prototype.update.call(this);
 };
@@ -476,8 +499,8 @@ function TheShip(game) {
     this.boosting = false;
     this.cancelBoost = false;
     this.rolling = false;
-    this.x = 1000;
-    this.y = 1000;
+    this.x = 400 - (this.pWidth * this.scale /2)+1;
+    this.y = 400 - (this.pHeight * this.scale / 2) + 1;
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
     this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
     this.radius = this.scale * 64;
@@ -499,30 +522,30 @@ TheShip.prototype.constructor = TheShip;
 
 TheShip.prototype.update = function () {
 	// movement
-	if (this.game.moveUp) {
-		if (this.yMid - this.radius > 400) {
-			this.y -= 10 * this.speed;
-		}
-	}
-	if (this.game.moveLeft) {
-		if (this.xMid - this.radius > 400) {
-			this.x -= 10 * this.speed;
-		}
-	}
-	if (this.game.moveDown) {
-		if (this.yMid + this.radius < 7000) {
-			this.y += 10 * this.speed;
-		}
-	}
-	if (this.game.moveRight) {
-		if (this.xMid + this.radius < 8000) {
-			this.x += 10 * this.speed;
-		}
-	}
+	// if (this.game.moveUp) {
+	// 	if (this.yMid - this.radius > 400) {
+	// 		this.y -= 10 * this.speed;
+	// 	}
+	// }
+	// if (this.game.moveLeft) {
+	// 	if (this.xMid - this.radius > 400) {
+	// 		this.x -= 10 * this.speed;
+	// 	}
+	// }
+	// if (this.game.moveDown) {
+	// 	if (this.yMid + this.radius < 7000) {
+	// 		this.y += 10 * this.speed;
+	// 	}
+	// }
+	// if (this.game.moveRight) {
+	// 	if (this.xMid + this.radius < 8000) {
+	// 		this.x += 10 * this.speed;
+	// 	}
+	// }
 
 	// update center hitbox
-    this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-    this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+    this.xMid = 400; //(this.x + (this.pWidth * this.scale / 2)) - 1;
+    this.yMid = 400; //(this.y + (this.pHeight * this.scale / 2)) - 1;
 
     // update angle
     var dx = this.game.mouseX - this.xMid;
