@@ -183,8 +183,8 @@ Camera.prototype.draw = function () {
 };
 
 Camera.prototype.update = function () {
-    this.x = this.ship.xMid - this.ctx.canvas.width  / 2;
-    this.y = this.ship.yMid - this.ctx.canvas.height / 2;
+    this.x = this.ship.xMid;// - this.ctx.canvas.width  / 2;
+    this.y = this.ship.yMid;// - this.ctx.canvas.height / 2;
 
     Entity.prototype.update.call(this);
 };
