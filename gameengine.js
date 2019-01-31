@@ -32,6 +32,7 @@ function GameEngine() {
     this.enemies = [];
     this.playerProjectiles = [];
     this.enemyProjectiles = [];
+    this.powerUps = [];
 
     // player input
     this.wasclicked = false;
@@ -212,6 +213,9 @@ GameEngine.prototype.addEntity = function (entity) {
     }
     if (entity.name === "EnemyProjectile") {
         this.enemyProjectiles.push(entity);
+    }
+    if (entity.name === "PowerUp") {
+        this.powerUps.push(entity);
     }
 }
 
