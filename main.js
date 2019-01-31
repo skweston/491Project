@@ -147,7 +147,7 @@ Background.prototype = new Entity();
 Background.prototype.constructor = Background;
 
 Background.prototype.draw = function () {
-    this.ctx.drawImage(this.spritesheet, this.x - this.game.camera.x, this.y - this.game.camera.y);
+    this.ctx.drawImage(this.spritesheet, this.game.camera.x , this.game.camera.y);
     this.ctx.fillStyle = 'white';
     this.ctx.fillRect(0, 0, 100, 20);
     this.ctx.fillStyle = 'black';
@@ -165,8 +165,9 @@ function Camera(game) {
     this.game = game;
     this.ctx = game.ctx;
     this.ship = game.ship;
-    this.x = this.ship.x - this.ctx.canvas.width  / 2;
-    this.y = this.ship.y - this.ctx.canvas.height / 2;
+    console.log ("canvase width: " + this.ctx.canvas.width);
+    this.x = 0; //this.ship.xMid - this.ctx.canvas.width  / 2;
+    this.y = 0; //this.ship.yMid - this.ctx.canvas.height / 2;
 
 }
 
@@ -183,8 +184,8 @@ Camera.prototype.draw = function () {
 };
 
 Camera.prototype.update = function () {
-    this.x = this.ship.x - this.ctx.canvas.width  / 2;
-    this.y = this.ship.y - this.ctx.canvas.height / 2;
+    this.x = -this.ship.xMid + this.ctx.canvas.width  / 2;
+    this.y = -this.ship.yMid + this.ctx.canvas.height / 2;
 
     Entity.prototype.update.call(this);
 };
@@ -475,8 +476,8 @@ function TheShip(game) {
     this.boosting = false;
     this.cancelBoost = false;
     this.rolling = false;
-    this.x = 100;
-    this.y = 100;
+    this.x = 1000;
+    this.y = 1000;
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
     this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
     this.radius = this.scale * 64;
@@ -499,22 +500,22 @@ TheShip.prototype.constructor = TheShip;
 TheShip.prototype.update = function () {
 	// movement
 	if (this.game.moveUp) {
-		if (this.yMid - this.radius > 0) {
+		if (this.yMid - this.radius > 400) {
 			this.y -= 10 * this.speed;
 		}
 	}
 	if (this.game.moveLeft) {
-		if (this.xMid - this.radius > 0) {
+		if (this.xMid - this.radius > 400) {
 			this.x -= 10 * this.speed;
 		}
 	}
 	if (this.game.moveDown) {
-		if (this.yMid + this.radius < 700) {
+		if (this.yMid + this.radius < 7000) {
 			this.y += 10 * this.speed;
 		}
 	}
 	if (this.game.moveRight) {
-		if (this.xMid + this.radius < 800) {
+		if (this.xMid + this.radius < 8000) {
 			this.x += 10 * this.speed;
 		}
 	}
@@ -527,7 +528,7 @@ TheShip.prototype.update = function () {
     var dx = this.game.mouseX - this.xMid;
     var dy = this.yMid - this.game.mouseY;
     this.angle = -Math.atan2(dy,dx);
-    console.log(this.angle);
+    //console.log(this.angle);
 
 	// rolling
 	if (this.game.roll) {
@@ -897,7 +898,7 @@ AM.downloadAll(function () {
     // the ship is always loaded last
     gameEngine.addEntity(ship);
     gameEngine.addEntity(camera);//5
-    
+
     gameEngine.start();
     console.log("All Done!");
 });
