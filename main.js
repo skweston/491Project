@@ -147,7 +147,7 @@ Background.prototype = new Entity();
 Background.prototype.constructor = Background;
 
 Background.prototype.draw = function () {
-    this.ctx.drawImage(this.spritesheet, this.x - this.game.camera.x, this.y - this.game.camera.y);
+    this.ctx.drawImage(this.spritesheet, -this.game.ship.xMid, -this.game.ship.yMid );
     this.ctx.fillStyle = 'white';
     this.ctx.fillRect(0, 0, 100, 20);
     this.ctx.fillStyle = 'black';
@@ -165,8 +165,8 @@ function Camera(game) {
     this.game = game;
     this.ctx = game.ctx;
     this.ship = game.ship;
-    this.x = this.ship.x - this.ctx.canvas.width  / 2;
-    this.y = this.ship.y - this.ctx.canvas.height / 2;
+    this.x = this.ship.xMid - this.ctx.canvas.width  / 2;
+    this.y = this.ship.yMid - this.ctx.canvas.height / 2;
 
 }
 
