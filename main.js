@@ -572,6 +572,9 @@ TheShip.prototype = new Entity();
 TheShip.prototype.constructor = TheShip;
 
 TheShip.prototype.update = function () {
+  if(this.health <1){
+    this.removeFromWorld = true;
+  }
 	// movement
 	var xMove = 0;
 	var yMove = 0;
