@@ -33,6 +33,7 @@ function GameEngine() {
 	this.playerProjectiles = [];
 	this.enemyProjectiles = [];
 	this.extras = [];
+	this.effects = [];
 
 	// player input
 	this.wasclicked = false;
@@ -217,6 +218,9 @@ GameEngine.prototype.addEntity = function (entity) {
 	if (entity.name === "Extra") {
 		this.extras.push(entity);
 	}
+	if (entity.name === "Effect") {
+		this.effects.push(entity);
+	}
 }
 
 GameEngine.prototype.draw = function () {
@@ -237,6 +241,9 @@ GameEngine.prototype.draw = function () {
 	}
 	for (var i = 0; i < this.extras.length; i++) {
 		this.extras[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.effects.length; i++) {
+		this.effects[i].draw(this.ctx);
 	}
 	for (var i = 0; i < this.enemies.length; i++) {
 		this.enemies[i].draw(this.ctx);
@@ -307,6 +314,30 @@ GameEngine.prototype.update = function () {
 		var entity = this.enemyProjectiles[i];
 		if (entity.removeFromWorld) {
 			this.enemyProjectiles.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+	count = this.extras.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.extras[i];
+		if (entity.removeFromWorld) {
+			this.extras.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+	count = this.effects.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.effects[i];
+		if (entity.removeFromWorld) {
+			this.effects.splice(i, 1);
 			count--;
 			i--;
 		}
