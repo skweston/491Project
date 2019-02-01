@@ -359,7 +359,7 @@ function Scourge(game, spritesheet, xIn, yIn) {
   this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
   this.angle = 0;
   this.name = "Enemy";
-  this.speed = 0;
+  this.speed = 10;
   this.x = xIn;
   this.y = yIn;
   this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -369,7 +369,9 @@ function Scourge(game, spritesheet, xIn, yIn) {
   this.ctx = game.ctx;
   this.removeFromWorld = false;
   this.health = 1;
-  console.log("starting health: " + this.health);
+  this.kamikaze = false;
+  this.damage = 20;
+  //console.log("starting health: " + this.health);
   Entity.call(this, game, this.x, this.y);
 }
 
@@ -390,42 +392,93 @@ Scourge.prototype.update = function () {
         var ent = this.game.entities[i];
         ent.victims = [];
         var found = false;
+        //console.log("name: " + ent.name);
         if(ent.name === "ShipProjectile") {
             //console.log("Projectile");
+            
             if(Collide(this, ent)) {
+            	/*
                 for(var j = 0; j < ent.victims.length; j++) {
                     if(this === ent.victims[j]) {
                         found = true;
                     }
                 }
 
-        if(!found) {
-            // we need to reference the damage value of the projectile here, not do --
-            console.log("I've been hit!");
-            this.health--;
-            console.log("new health: " + this.health);
-            ent.victims.push(this);
-            //should be an if statement to check for persistent weapon
-            if(!ent.persistent) {
-                ent.removeFromWorld = true;
+        		if(!found) {
+            		// we need to reference the damage value of the projectile here, not do --
+            		console.log("I've been hit!");
+            		this.health--;
+            		//console.log("new health: " + this.health);
+            		ent.victims.push(this);
+            		//should be an if statement to check for persistent weapon
+            		if(!ent.persistent) {
+               			ent.removeFromWorld = true;
+            		}
+        		} 
+      		}*/
+
+      			console.log("I've been hit!");
+            	this.health--;
+            	//console.log("new health: " + this.health);
+            	//ent.victims.push(this);
+            	//should be an if statement to check for persistent weapon
+            	if(!ent.persistent) {
+               		ent.removeFromWorld = true;
+            	}
+            }	
+    	} else if(ent.name === "Player") {
+            //console.log("Player found");
+            //console.log("speed: " + this.speed);
+            //console.log("start x: " + this.x + ", y: " + this.y);
+            var delta = 1 / (distance(this, ent));
+            //console.log("delta: " + delta);
+            var dX = Math.abs(this.xMid - ent.xMid);
+            var dY = Math.abs(this.yMid - ent.yMid);
+
+            if(this.xMid > ent.xMid) {
+            	this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
+            } else if(this.xMid < ent.xMid) {
+            	this.xMid = (Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
+            }
+
+            if(this.yMid > ent.yMid) {
+            	this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
+            } else if(this.yMid < ent.yMid) {
+            	this.yMid = (Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
+            }
+
+            //this.xMid = -(Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
+            //this.yMid = -(Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
+            this.x = this.xMid - (this.pWidth * this.scale / 2);
+            this.y = this.yMid - (this.pHeight * this.scale / 2);;
+            //console.log("new x: " + this.x + ", y: " + this.y);
+
+            if(Collide(this, ent)) {
+            	console.log("Success!");
+            	this.health = 0;
+            	this.kamikaze = true;
+            	ent.health -= this.damage;
+
+            	this.removeFromWorld = true;
             }
         }
+	}
 
-        if(this.health < 1) {
-            this.removeFromWorld = true;
+	if(this.health < 1) {
+        console.log("I'm dead");
+        this.removeFromWorld = true;
 
-            var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
-            this.game.addEntity(explosion);
+        var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+        this.game.addEntity(explosion);
 
-            // drop a powerup!, this will change to Math.random type thing later, maybe 5% chance?
-            var spreader = new Spreader(this.game);
-            spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-            spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-            this.game.addEntity(spreader);
+        // drop a powerup!, this will change to Math.random type thing later, maybe 5% chance?
+        if(!this.kamikaze) {
+        	var spreader = new Spreader(this.game);
+        	spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+        	spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+        	this.game.addEntity(spreader);
         }
-      }
     }
-  }
 }
 
 Scourge.prototype.draw = function () {
@@ -472,6 +525,8 @@ function TheShip(game) {
     this.secondaryCooldownMax = 50;
     this.secondaryCooldown = 0;
     this.spreader = 0;
+
+    this.health = 200;
 
     this.game = game;
     this.ctx = game.ctx;
@@ -578,6 +633,14 @@ TheShip.prototype.update = function () {
     this.secondaryCooldown = this.secondaryCooldownMax;
     this.createProjectile("Secondary", 0, 0);
   }
+
+	if(this.health < 1) {
+   		console.log("I'm dead");
+        this.removeFromWorld = true;
+
+        var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+        this.game.addEntity(explosion);
+    }
 
     Entity.prototype.update.call(this);
 }
@@ -912,7 +975,7 @@ function PrototypeLevel(game) {
   var y = getRandomInt(700 - this.ship.pHeight);
 
   setInterval(function () {
-    console.log("Spawn at " + x + ", " + y);
+    //console.log("Spawn at " + x + ", " + y);
     that.game.addEntity(new Scourge(that.game, AM.getAsset("./img/scourge.png"), x, y));
 
     x = getRandomInt(800 - that.ship.pWidth);
