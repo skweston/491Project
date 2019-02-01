@@ -839,7 +839,7 @@ function ShipPrimary(game) {
 	this.angle = 0;
 	this.pierce = 0;
 	this.lifetime = 500;
-	this.damage = 2;
+	this.damage = 4;
 	this.maxSpeed = 1500;
 	this.velocity = {x: 0, y: 0};
 
@@ -903,7 +903,7 @@ function ShipSecondary(game) {
 	this.angle = 0;
 	this.pierce = 0;
 	this.lifetime = 1500;
-	this.damage = 10;
+	this.damage = 15;
 	this.maxSpeed = 500;
 	this.velocity = {x: 0, y: 0};
 
@@ -1087,7 +1087,7 @@ function PrototypeLevel(game) {
 
 	setInterval(function () {
 		border = Math.floor((Math.random() * 2));
-		console.log(border);
+		// console.log(border);
 
 		if (border === 0) {
 			x = (Math.random() * 1000) - 100;
