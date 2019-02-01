@@ -463,6 +463,7 @@ function TheShip(game) {
     this.boosting = false;
     this.cancelBoost = false;
     this.rolling = false;
+    this.rollCooldown = 0;
     this.x = 100;
     this.y = 100;
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -516,59 +517,63 @@ TheShip.prototype.update = function () {
     var dy = this.yMid - this.game.mouseY;
     this.angle = -Math.atan2(dy,dx);
 
-  // rolling
-  if (this.game.roll) {
-    this.rolling = true;
-  }
-  if (this.rolling) {
-    if (this.rollAnimation.isDone()) {
-      this.rollAnimation.elapsedTime = 0;
-      this.rolling = false;
-    }
-    else if (this.boostRollAnimation.isDone()) {
-      this.boostRollAnimation.elapsedTime = 0;
-      this.rolling = false;
-      if (this.cancelBoost) {
-        this.cancelBoost = false;
-        this.boosting = false;
-      }
-    }
-  }
+	// rolling
+	if (this.game.roll && this.rollCooldown === 0) {
+		this.rollCooldown = 100;
+		this.rolling = true;
+	}
+	if (this.rollCooldown > 0) {
+		this.rollCooldown -= 1;
+	}
+	if (this.rolling) {
+		if (this.rollAnimation.isDone()) {
+			this.rollAnimation.elapsedTime = 0;
+			this.rolling = false;
+		}
+		else if (this.boostRollAnimation.isDone()) {
+			this.boostRollAnimation.elapsedTime = 0;
+			this.rolling = false;
+			if (this.cancelBoost) {
+				this.cancelBoost = false;
+				this.boosting = false;
+			}
+		}
+	}
 
-  // boosting
-  if (this.game.boost && !this.rolling) {
-    this.cancelBoost = false;
-    this.boosting = true;
-    this.speed = 1;
-  }
-  if (!this.game.boost && !this.rolling) {
-    this.boosting = false;
-    this.speed = 0.5;
-  }
+	// boosting
+	if (this.game.boost && !this.rolling) {
+		this.cancelBoost = false;
+		this.boosting = true;
+		this.speed = 1;
+	}
+	if (!this.game.boost && !this.rolling) {
+		this.boosting = false;
+		this.speed = 0.5;
+	}
 
-  // boost input buffer during rolls
-  if (this.game.boost && this.rolling) {
-    this.cancelBoost = false;
-  }
-  if (!this.game.boost && this.rolling) {
-    this.cancelBoost = true;
-  }
+	// boost input buffer during rolls
+	if (this.game.boost && this.rolling) {
+		this.cancelBoost = false;
+	}
+	if (!this.game.boost && this.rolling) {
+		this.cancelBoost = true;
+	}
 
-  // shooting
-  if (this.primaryCooldown > 0) {
-    this.primaryCooldown -= 1;
-  }
-  if (this.secondaryCooldown > 0) {
-    this.secondaryCooldown -= 1;
-  }
-  if (this.spreader > 0) {
-    this.spreader -= 1;
-  }
-  if (this.game.firePrimary && this.primaryCooldown === 0) {
-    this.primaryCooldown = this.primaryCooldownMax;
-    for (var i = 0; i < 2; i++) {
-      var offset = (Math.PI / 24 * Math.pow(-1, i));
-      this.createProjectile("Primary", offset, 0);
+	// shooting
+	if (this.primaryCooldown > 0) {
+		this.primaryCooldown -= 1;
+	}
+	if (this.secondaryCooldown > 0) {
+		this.secondaryCooldown -= 1;
+	}
+	if (this.spreader > 0) {
+		this.spreader -= 1;
+	}
+	if (this.game.firePrimary && this.primaryCooldown === 0) {
+		this.primaryCooldown = this.primaryCooldownMax;
+		for (var i = 0; i < 2; i++) {
+			var offset = (Math.PI / 24 * Math.pow(-1, i));
+			this.createProjectile("Primary", offset, 0);
         }
         if (this.spreader > 0) {
           for (var i = 0; i < 2; i++) {
@@ -650,34 +655,34 @@ TheShip.prototype.draw = function () {
 /* ========================================================================================================== */
 
 function ShipPrimary(game) {
-  this.pWidth = 128;
-  this.pHeight = 128;
-  this.scale = 0.25;
-  this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.25;
+	this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 
-  this.name = "ShipProjectile";
-  this.x = 0;
-  this.y = 0;
-  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-  this.radius = 10;
-  this.angle = 0;
+	this.name = "ShipProjectile";
+	this.x = 0;
+	this.y = 0;
+	this.xMid = 0;
+	this.yMid = 0;
+	this.radius = 10;
+	this.angle = 0;
 
-  this.lifetime = 500;
-  this.damage = 2;
-  this.maxSpeed = 1500;
-  this.velocity = {x: 0, y: 0};
+	this.lifetime = 500;
+	this.damage = 2;
+	this.maxSpeed = 1500;
+	this.velocity = {x: 0, y: 0};
 
-  this.game = game;
-  this.ctx = game.ctx;
-  this.removeFromWorld = false;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
 }
 
 ShipPrimary.prototype = new Entity();
 ShipPrimary.prototype.constructor = ShipPrimary;
 
 ShipPrimary.prototype.update = function () {
-  this.x += this.velocity.x * this.game.clockTick;
+	this.x += this.velocity.x * this.game.clockTick;
     this.y += this.velocity.y * this.game.clockTick;
 
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -714,34 +719,34 @@ ShipPrimary.prototype.draw = function () {
 }
 
 function ShipSecondary(game) {
-  this.pWidth = 128;
-  this.pHeight = 128;
-  this.scale = 0.5;
-  this.animation = new Animation(AM.getAsset("./img/shipSecondary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.5;
+	this.animation = new Animation(AM.getAsset("./img/shipSecondary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 
-  this.name = "ShipProjectile";
-  this.x = 0;
-  this.y = 0;
-  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-  this.radius = 10;
-  this.angle = 0;
+	this.name = "ShipProjectile";
+	this.x = 0;
+	this.y = 0;
+	this.xMid = 0;
+	this.yMid = 0;
+	this.radius = 10;
+	this.angle = 0;
 
-  this.lifetime = 1500;
-  this.damage = 10;
-  this.maxSpeed = 500;
-  this.velocity = {x: 0, y: 0};
+	this.lifetime = 1500;
+	this.damage = 10;
+	this.maxSpeed = 500;
+	this.velocity = {x: 0, y: 0};
 
-  this.game = game;
-  this.ctx = game.ctx;
-  this.removeFromWorld = false;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
 }
 
 ShipSecondary.prototype = new Entity();
 ShipSecondary.prototype.constructor = ShipSecondary;
 
 ShipSecondary.prototype.update = function () {
-  this.x += this.velocity.x * this.game.clockTick;
+	this.x += this.velocity.x * this.game.clockTick;
     this.y += this.velocity.y * this.game.clockTick;
 
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -782,42 +787,42 @@ ShipSecondary.prototype.draw = function () {
 /* ========================================================================================================== */
 
 function Spreader(game) {
-  this.pWidth = 128;
-  this.pHeight = 128;
-  this.scale = 0.75;
-  this.animation = new Animation(AM.getAsset("./img/spreader.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.75;
+	this.animation = new Animation(AM.getAsset("./img/spreader.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
 
-  this.name = "PowerUp";
-  this.x = 0;
-  this.y = 0;
-  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-  this.radius = this.scale * 42;
-  this.angle = 0;
+	this.name = "PowerUp";
+	this.x = 0;
+	this.y = 0;
+	this.xMid = 0;
+	this.yMid = 0;
+	this.radius = this.scale * 42;
+	this.angle = 0;
 
-  this.lifetime = 1500;
+	this.lifetime = 1500;
 
-  this.game = game;
-  this.ctx = game.ctx;
-  this.removeFromWorld = false;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
 }
 
 Spreader.prototype = new Entity();
 Spreader.prototype.constructor = Spreader;
 
 Spreader.prototype.update = function () {
-  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
-  if (Collide(this, this.game.player[0])) {
-    this.game.player[0].spreader = 1000;
-    this.removeFromWorld = true;
-  }
+	if (Collide(this, this.game.player[0])) {
+		this.game.player[0].spreader = 1000;
+		this.removeFromWorld = true;
+	}
 
-  this.lifetime -= 1;
-  if (this.lifetime < 0) {
-    this.removeFromWorld = true;
-  }
+	this.lifetime -= 1;
+	if (this.lifetime < 0) {
+		this.removeFromWorld = true;
+	}
 
     Entity.prototype.update.call(this);
 }
