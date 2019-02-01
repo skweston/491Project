@@ -417,7 +417,7 @@ Scourge.prototype.update = function () {
         		} 
       		}*/
 
-      			console.log("I've been hit!");
+      			//console.log("I've been hit!");
             	this.health--;
             	//console.log("new health: " + this.health);
             	//ent.victims.push(this);
@@ -454,7 +454,7 @@ Scourge.prototype.update = function () {
             //console.log("new x: " + this.x + ", y: " + this.y);
 
             if(Collide(this, ent)) {
-            	console.log("Success!");
+            	//console.log("Success!");
             	this.health = 0;
             	this.kamikaze = true;
             	ent.health -= this.damage;
@@ -497,7 +497,7 @@ Scourge.prototype.update = function () {
 	}
 
 	if(this.health < 1) {
-        console.log("I'm dead");
+        //console.log("I'm dead");
         this.removeFromWorld = true;
 
         var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
@@ -1008,13 +1008,13 @@ function PrototypeLevel(game) {
   var y = spot.y;
 
   setInterval(function () {
-    console.log("Spawn at " + x + ", " + y);
-    that.game.addEntity(new Scourge(that.game, AM.getAsset("./img/scourge.png"), that.x, that.y));
+    //console.log("Spawn at " + x + ", " + y);
+    that.game.addEntity(new Scourge(that.game, AM.getAsset("./img/scourge.png"), x, y));
 
     var newSpot = getRandomCoordinates(that.game);
 
-    that.x = newSpot.x;
-    that.y = newSpot.y;
+    x = newSpot.x;
+    y = newSpot.y;
 
   }, 1000);
 }
