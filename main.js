@@ -430,7 +430,7 @@ Scourge.prototype.update = function () {
             //console.log("Player found");
             //console.log("speed: " + this.speed);
             //console.log("start x: " + this.x + ", y: " + this.y);
-            var delta = 2 / (distance(this, ent));
+            var delta = 7 / (distance(this, ent));
             //console.log("delta: " + delta);
             var dX = Math.abs(this.xMid - ent.xMid);
             var dY = Math.abs(this.yMid - ent.yMid);
@@ -1002,20 +1002,34 @@ function PrototypeLevel(game) {
 
   //console.log("The ship: " + this.ship.name);
   var that = this;
+  var spot = getRandomCoordinates(this.game);
 
-  var x = getRandomInt(800 - this.ship.pWidth);
-  var y = getRandomInt(700 - this.ship.pHeight);
+  var x = spot.x;
+  var y = spot.y;
 
   setInterval(function () {
-    //console.log("Spawn at " + x + ", " + y);
-    that.game.addEntity(new Scourge(that.game, AM.getAsset("./img/scourge.png"), x, y));
+    console.log("Spawn at " + x + ", " + y);
+    that.game.addEntity(new Scourge(that.game, AM.getAsset("./img/scourge.png"), that.x, that.y));
 
-    x = getRandomInt(that.game.ctx.canvas.width - that.ship.pWidth);
-    y = getRandomInt(that.game.ctx.canvas.height - that.ship.pHeight);
+    var newSpot = getRandomCoordinates(that.game);
 
-  }, 5000);
+    that.x = newSpot.x;
+    that.y = newSpot.y;
+
+  }, 1000);
 }
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
+function getRandomCoordinates(game) {
+	this.game = game;
+	var that = this;
+
+	this.x = (Math.random() * Math.floor(this.game.ctx.canvas.width + 150));
+	if(this.x > this.game.ctx.canvas.width) {
+		//X value is off the screen so y value can be anywhere
+		this.y = (Math.random() * Math.floor(this.game.ctx.canvas.height + 150));
+	} else {
+		//x value is on screen so y value must be off screen
+		this.y = (Math.random() * Math.floor(150)) + this.game.ctx.canvas.height;
+	}
+  	return this;
 }
