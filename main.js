@@ -189,6 +189,7 @@ function SpaceExplosion(game, shipXMid, shipYMid) {
                                  2,  0.15, 6, false, this.scale);
   this.game = game;
   this.ctx = game.ctx;
+  this.name = "Effect";
   this.xMid = shipXMid;
   this.yMid = shipYMid;
   //console.log("middle explosion: " + this.xMid + ", " + this.yMid);
@@ -212,6 +213,7 @@ SpaceExplosion.prototype.update = function () {
 function GroundExplosion(game, spritesheet, shipX, shipY) {
   this.animation = new Animation(spritesheet, 32, 32, 2, 0.15, 6, true, 1);
   this.game = game;
+  this.name = "Effect";
   this.ctx = game.ctx;
   this.x = shipX;
   this.y = shipY;
@@ -294,10 +296,10 @@ BossTurret.prototype.update = function () {
         this.removeFromWorld = true;
     }
 	for (var i = 0; i<this.game.playerProjectiles.length; i++){
-		console.log("inside for loop, pl")
+
 		var ent = this.game.playerProjectiles[i];
 		if(Collide(this, ent)){
-			console.log("Ship shot turret");
+
 			this.health -= ent.damage;
 			ent.removeFromWorld = true;
 		}
@@ -386,7 +388,7 @@ function LaserBlast(game, angle){
     this.y = 0;
     this.xMid = -100;
     this.yMid = -100;
-    this.radius = 4;
+    this.radius = 4 * this.scale;
     this.angle = angle;
 
     this.lifetime = 500;
@@ -521,7 +523,6 @@ Scourge.prototype.update = function () {
 		this.kamikaze = true;
 		ent.health -= this.damage;
 
-		this.removeFromWorld = true;
 	}
 
 
@@ -960,7 +961,7 @@ function Spreader(game) {
 	this.scale = 0.75;
 	this.animation = new Animation(AM.getAsset("./img/spreader.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
 
-	this.name = "PowerUp";
+	this.name = "Extra";
 	this.x = 0;
 	this.y = 0;
 	this.xMid = 0;
@@ -982,8 +983,8 @@ Spreader.prototype.update = function () {
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
-	if (Collide(this, this.game.player[0])) {
-		this.game.player[0].spreader = 1000;
+	if (Collide(this, this.game.ship)) {
+		this.game.ship.spreader = 1000;
 		this.removeFromWorld = true;
 	}
 
