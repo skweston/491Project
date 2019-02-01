@@ -430,7 +430,7 @@ Scourge.prototype.update = function () {
             //console.log("Player found");
             //console.log("speed: " + this.speed);
             //console.log("start x: " + this.x + ", y: " + this.y);
-            var delta = 1 / (distance(this, ent));
+            var delta = 2 / (distance(this, ent));
             //console.log("delta: " + delta);
             var dX = Math.abs(this.xMid - ent.xMid);
             var dY = Math.abs(this.yMid - ent.yMid);
@@ -450,7 +450,7 @@ Scourge.prototype.update = function () {
             //this.xMid = -(Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
             //this.yMid = -(Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
             this.x = this.xMid - (this.pWidth * this.scale / 2);
-            this.y = this.yMid - (this.pHeight * this.scale / 2);;
+            this.y = this.yMid - (this.pHeight * this.scale / 2);
             //console.log("new x: " + this.x + ", y: " + this.y);
 
             if(Collide(this, ent)) {
@@ -461,6 +461,38 @@ Scourge.prototype.update = function () {
 
             	this.removeFromWorld = true;
             }
+        } else if(ent.name === this.name && ent != this) {
+        	var dist = distance(this, ent);
+        	if(dist < this.radius + ent.radius) { //if special collision
+            	var delta = (this.radius + ent.radius) / (distance(this, ent));
+            	//console.log("delta: " + delta);
+            	var dX = Math.abs(this.xMid - ent.xMid);
+            	var dY = Math.abs(this.yMid - ent.yMid);
+
+            	if(this.xMid > ent.xMid) {
+            		this.xMid = this.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
+            		ent.xMid = ent.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
+            	} else if(this.xMid < ent.xMid) {
+            		this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
+            		ent.xMid = ent.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
+            	}
+
+            	if(this.yMid > ent.yMid) {
+            		this.yMid = this.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
+            		ent.YMid = ent.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
+            	} else if(this.yMid < ent.yMid) {
+            		this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
+            		ent.yMid = ent.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
+            	}
+
+            	//this.xMid = -(Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
+            	//this.yMid = -(Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
+            	this.x = this.xMid - (this.pWidth * this.scale / 2);
+            	this.y = this.yMid - (this.pHeight * this.scale / 2);
+            	//console.log("new x: " + this.x + ", y: " + this.y);
+            	ent.x = ent.xMid - (this.pWidth * this.scale / 2);
+            	ent.y = ent.yMid - (this.pHeight * this.scale / 2);
+        	}
         }
 	}
 
