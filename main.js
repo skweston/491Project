@@ -134,6 +134,8 @@ Animation.prototype.isDone = function () {
 /* ========================================================================================================== */
 function Background(game, spritesheet) {
 
+	this.name = "Background";
+
     this.spritesheet = spritesheet;
     this.game = game;
     this.ctx = game.ctx;
@@ -383,50 +385,50 @@ Scourge.prototype.update = function () {
     Entity.prototype.update.call(this);
 
     // update angle
-    var dx = this.game.player[0].xMid - this.xMid;
-    var dy = this.yMid - this.game.player[0].yMid;
+    var dx = this.game.ship.xMid - this.xMid;
+    var dy = this.yMid - this.game.ship.yMid;
     this.angle = -Math.atan2(dy,dx);
 
-    for(var i = 0; i < this.game.entities.length; i++) {
-        var ent = this.game.entities[i];
-        ent.victims = [];
-        var found = false;
-        if(ent.name === "ShipProjectile") {
-            //console.log("Projectile");
-            if(Collide(this, ent)) {
-                for(var j = 0; j < ent.victims.length; j++) {
-                    if(this === ent.victims[j]) {
-                        found = true;
-                    }
-                }
+  //   for(var i = 0; i < this.game.entities.length; i++) {
+  //       var ent = this.game.entities[i];
+  //       ent.victims = [];
+  //       var found = false;
+  //       if(ent.name === "ShipProjectile") {
+  //           //console.log("Projectile");
+  //           if(Collide(this, ent)) {
+  //               for(var j = 0; j < ent.victims.length; j++) {
+  //                   if(this === ent.victims[j]) {
+  //                       found = true;
+  //                   }
+  //               }
 
-        if(!found) {
-            // we need to reference the damage value of the projectile here, not do --
-            console.log("I've been hit!");
-            this.health--;
-            console.log("new health: " + this.health);
-            ent.victims.push(this);
-            //should be an if statement to check for persistent weapon
-            if(!ent.persistent) {
-                ent.removeFromWorld = true;
-            }
-        }
+  //       if(!found) {
+  //           // we need to reference the damage value of the projectile here, not do --
+  //           console.log("I've been hit!");
+  //           this.health--;
+  //           console.log("new health: " + this.health);
+  //           ent.victims.push(this);
+  //           //should be an if statement to check for persistent weapon
+  //           if(!ent.persistent) {
+  //               ent.removeFromWorld = true;
+  //           }
+  //       }
 
-        if(this.health < 1) {
-            this.removeFromWorld = true;
+  //       if(this.health < 1) {
+  //           this.removeFromWorld = true;
 
-            var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
-            this.game.addEntity(explosion);
+  //           var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+  //           this.game.addEntity(explosion);
 
-            // drop a powerup!, this will change to Math.random type thing later, maybe 5% chance?
-            var spreader = new Spreader(this.game);
-            spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-            spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-            this.game.addEntity(spreader);
-        }
-      }
-    }
-  }
+  //           // drop a powerup!, this will change to Math.random type thing later, maybe 5% chance?
+  //           var spreader = new Spreader(this.game);
+  //           spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+  //           spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+  //           this.game.addEntity(spreader);
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 Scourge.prototype.draw = function () {
@@ -694,7 +696,7 @@ function ShipPrimary(game) {
 	this.scale = 0.25;
 	this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 
-	this.name = "ShipProjectile";
+	this.name = "PlayerProjectile";
 	this.x = 0;
 	this.y = 0;
 	this.xMid = 0;
@@ -716,6 +718,11 @@ ShipPrimary.prototype = new Entity();
 ShipPrimary.prototype.constructor = ShipPrimary;
 
 ShipPrimary.prototype.update = function () {
+	// remove offscreen projectile
+	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+		this.removeFromWorld = true;
+	}
+
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
 
@@ -758,7 +765,7 @@ function ShipSecondary(game) {
 	this.scale = 0.5;
 	this.animation = new Animation(AM.getAsset("./img/shipSecondary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 
-	this.name = "ShipProjectile";
+	this.name = "PlayerProjectile";
 	this.x = 0;
 	this.y = 0;
 	this.xMid = 0;
@@ -780,6 +787,11 @@ ShipSecondary.prototype = new Entity();
 ShipSecondary.prototype.constructor = ShipSecondary;
 
 ShipSecondary.prototype.update = function () {
+	// remove offscreen projectile
+	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+		this.removeFromWorld = true;
+	}
+
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
 
@@ -919,6 +931,7 @@ AM.downloadAll(function () {
 
 	var ship = new TheShip(gameEngine);
 	gameEngine.ship = ship;
+	gameEngine.running = false;
 
 	// always load background first
 	gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/space1-1.png")));
@@ -938,6 +951,10 @@ AM.downloadAll(function () {
 	var level = new PrototypeLevel(gameEngine);
 	console.log("All Done!");
 });
+
+/* ========================================================================================================== */
+// Level Manager stuff
+/* ========================================================================================================== */
 
 function PrototypeLevel(game) {
 	this.game = game;
