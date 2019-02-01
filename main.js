@@ -967,7 +967,7 @@ function PrototypeLevel(game) {
 
 		if (border === 0) {
 			x = (Math.random() * 1000) - 100;
-			y = (Math.random() * 50);
+			y = (Math.random() * 100);
 
 			if (y < 50) { // top
 				y = -50 - y;
