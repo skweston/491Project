@@ -978,8 +978,8 @@ function PrototypeLevel(game) {
     //console.log("Spawn at " + x + ", " + y);
     that.game.addEntity(new Scourge(that.game, AM.getAsset("./img/scourge.png"), x, y));
 
-    x = getRandomInt(800 - that.ship.pWidth);
-    y = getRandomInt(700 - that.ship.pHeight);
+    x = getRandomInt(that.game.ctx.canvas.width - that.ship.pWidth);
+    y = getRandomInt(that.game.ctx.canvas.height - that.ship.pHeight);
 
   }, 5000);
 }
