@@ -492,9 +492,10 @@ Scourge.prototype.update = function () {
 		if(Collide(this,ent)){
 			this.health -= ent.damage;
 			ent.pierce--;
-			if(ent.pierce < 1){
-				ent.removeFromWorld;
+			if(ent.pierce < 0){
+				ent.removeFromWorld = true;
 			}
+			
 		}
 	}
 	var ent = this.game.ship;
@@ -522,7 +523,7 @@ Scourge.prototype.update = function () {
 		this.health = 0;
 		this.kamikaze = true;
 		ent.health -= this.damage;
-
+		this.removeFromWorld = true;
 	}
 
 
