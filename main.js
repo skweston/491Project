@@ -475,6 +475,7 @@ function TheShip(game) {
 	this.primaryCooldown = 0;
 	this.secondaryCooldownMax = 50;
 	this.secondaryCooldown = 0;
+	this.spreaderLevel = 0;
 	this.spreader = 0;
 
 	this.game = game;
@@ -583,20 +584,39 @@ TheShip.prototype.update = function () {
 	if (this.spreader > 0) {
 		this.spreader -= 1;
 	}
+	if (this.spreader <= 0) {
+		this.spreaderLevel = 0;
+	}
 	if (this.game.firePrimary && this.primaryCooldown === 0) {
 		this.primaryCooldown = this.primaryCooldownMax;
 		for (var i = 0; i < 2; i++) {
 			var offset = (Math.PI / 24 * Math.pow(-1, i));
 			this.createProjectile("Primary", offset, 0);
 		}
-		if (this.spreader > 0) {
+		if (this.spreaderLevel > 0) {
 			for (var i = 0; i < 2; i++) {
-				this.createProjectile("Primary", 0, ((Math.PI / 6) * Math.pow(-1, i)));
+				for (var j = 0; j < 2; j++) {
+					var offset = (Math.PI / 24 * Math.pow(-1, j));
+					this.createProjectile("Primary", offset, ((Math.PI / 12) * Math.pow(-1, i)));
+				}
+				if (this.spreaderLevel > 1) {
+					for (var j = 0; j < 2; j++) {
+						var offset = (Math.PI / 24 * Math.pow(-1, j));
+						this.createProjectile("Primary", offset, ((Math.PI / 6) * Math.pow(-1, i)));
+					}
+				}
 			}
 		}
 	}
 	if (this.game.fireSecondary && this.secondaryCooldown === 0) {
 		this.secondaryCooldown = this.secondaryCooldownMax;
+
+		if (this.spreaderLevel > 1) {
+			for (var i = 0; i < 2; i++) {
+				this.createProjectile("Secondary", 0, ((Math.PI / 8) * Math.pow(-1, i)));
+			}
+		}
+
 		this.createProjectile("Secondary", 0, 0);
 	}
 
@@ -828,8 +848,9 @@ Spreader.prototype.update = function () {
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
-	if (Collide(this, this.game.player[0])) {
-		this.game.player[0].spreader = 1000;
+	if (Collide(this, this.game.ship)) {
+		this.game.ship.spreader = 1000;
+		this.game.ship.spreaderLevel += 1;
 		this.removeFromWorld = true;
 	}
 
@@ -861,6 +882,7 @@ Spreader.prototype.draw = function () {
 /* ========================================================================================================== */
 
 var AM = new AssetManager();
+
 AM.queueDownload("./img/smartBomb.png");
 AM.queueDownload("./img/space1-1.png");
 
@@ -907,21 +929,18 @@ AM.downloadAll(function () {
 	// gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
 	// gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
 	// gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
-	//gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png")));
+	gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png"), 350, 350));
+	gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png"), 600, 100));
 
 	// the ship is always loaded last
 	gameEngine.addEntity(ship);
 
 	var level = new PrototypeLevel(gameEngine);
-	//level.start();
-
-	//Prototype Level
 	console.log("All Done!");
 });
 
 function PrototypeLevel(game) {
 	this.game = game;
-
 	var that = this;
 
 	var border = 0;
@@ -930,7 +949,6 @@ function PrototypeLevel(game) {
 
 	setInterval(function () {
 		border = Math.floor((Math.random() * 2));
-		console.log(border);
 
 		if (border === 0) {
 			x = (Math.random() * 1000) - 100;
