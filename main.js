@@ -592,13 +592,13 @@ TheShip.prototype.update = function () {
 	if (this.game.firePrimary && this.primaryCooldown === 0) {
 		this.primaryCooldown = this.primaryCooldownMax;
 		for (var i = 0; i < 2; i++) {
-			var offset = (Math.PI / 24 * Math.pow(-1, i));
+			var offset = (4 * Math.pow(-1, i));
 			this.createProjectile("Primary", offset, 0);
 		}
 		if (this.spreaderLevel > 0) {
 			for (var i = 0; i < 2; i++) {
 				for (var j = 0; j < 2; j++) {
-					var offset = (Math.PI / 24 * Math.pow(-1, j));
+					var offset = (4 * Math.pow(-1, j));
 					this.createProjectile("Primary", offset, ((Math.PI / 12) * Math.pow(-1, i)));
 				}
 				if (this.spreaderLevel > 1) {
@@ -640,11 +640,9 @@ TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var dir = direction(target, this);
 
 	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-				   ((this.radius + projectile.pWidth * projectile.scale / 2) *
-				   Math.cos(angle + offset));
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset));
 	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-				   ((this.radius + projectile.pHeight * projectile.scale / 2) *
-				   Math.sin(angle + offset));
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset));
 	projectile.velocity.x = dir.x * projectile.maxSpeed;
 	projectile.velocity.y = dir.y * projectile.maxSpeed;
 	projectile.angle = angle;
@@ -838,7 +836,7 @@ function Spreader(game) {
 	this.scale = 0.75;
 	this.animation = new Animation(AM.getAsset("./img/spreader.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
 
-	this.name = "PowerUp";
+	this.name = "Extra";
 	this.x = 0;
 	this.y = 0;
 	this.xMid = 0;
