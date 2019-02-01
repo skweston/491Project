@@ -662,8 +662,8 @@ function ShipPrimary(game) {
 	this.name = "ShipProjectile";
 	this.x = 0;
 	this.y = 0;
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.xMid = 0;
+	this.yMid = 0;
 	this.radius = 10;
 	this.angle = 0;
 
@@ -726,8 +726,8 @@ function ShipSecondary(game) {
 	this.name = "ShipProjectile";
 	this.x = 0;
 	this.y = 0;
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.xMid = 0;
+	this.yMid = 0;
 	this.radius = 10;
 	this.angle = 0;
 
@@ -794,8 +794,8 @@ function Spreader(game) {
 	this.name = "PowerUp";
 	this.x = 0;
 	this.y = 0;
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.xMid = 0;
+	this.yMid = 0;
 	this.radius = this.scale * 42;
 	this.angle = 0;
 
