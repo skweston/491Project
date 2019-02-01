@@ -1,5 +1,5 @@
 // useful global things here
-var SHOW_HITBOX = true;
+var SHOW_HITBOX = false;
 var SCORE = 0;
 
 /*
@@ -137,7 +137,7 @@ function Background(game, spritesheet) {
     this.spritesheet = spritesheet;
     this.game = game;
     this.ctx = game.ctx;
-
+	this.name = "Background";
     // Where the frame starts for the background. Divide image in half then subract the half the canvas,
     // for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
     this.sx = spritesheet.naturalWidth / 2 - this.ctx.canvas.width / 2;
@@ -417,7 +417,7 @@ LaserBlast.prototype.update = function () {
       }
 
 
-	  var ent = this.game.player[0];
+	  var ent = this.game.ship;
 	  if(Collide(this, ent)) {
 		  ent.health -= this.damage;
 		  this.removeFromWorld = true;
@@ -465,7 +465,7 @@ function Scourge(game, spritesheet, xIn, yIn) {
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
-    this.health = 1;
+    this.health = 20;
     this.kamikaze = false;
     this.damage = 20;
     //console.log("starting health: " + this.health);
@@ -481,121 +481,86 @@ Scourge.prototype.update = function () {
     Entity.prototype.update.call(this);
 
     // update angle
-    var dx = this.game.player[0].xMid - this.xMid;
-    var dy = this.yMid - this.game.player[0].yMid;
+    var dx = this.game.ship.xMid - this.xMid;
+    var dy = this.yMid - this.game.ship.yMid;
     this.angle = -Math.atan2(dy,dx);
 
 	for(var i = 0; i< this.game.playerProjectiles.length; i++ ){
-		
+		var ent = this.game.playerProjectiles[i];
+		if(Collide(this,ent)){
+			this.health -= ent.damage;
+			ent.pierce--;
+			if(ent.pierce < 1){
+				ent.removeFromWorld;
+			}
+		}
+	}
+	var ent = this.game.ship;
+
+    var delta = this.speed / (distance(this, ent));
+    var dX = Math.abs(this.xMid - ent.xMid);
+	var dY = Math.abs(this.yMid - ent.yMid);
+    if(this.xMid > ent.xMid) {
+		this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
+    } else if(this.xMid < ent.xMid) {
+		this.xMid = (Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
+    }
+
+    if(this.yMid > ent.yMid) {
+		this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
+    } else if(this.yMid < ent.yMid) {
+    	this.yMid = (Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
+    }
+
+    this.x = this.xMid - (this.pWidth * this.scale / 2);
+    this.y = this.yMid - (this.pHeight * this.scale / 2);
+
+	if(Collide(this, ent)) {
+
+		this.health = 0;
+		this.kamikaze = true;
+		ent.health -= this.damage;
+
+		this.removeFromWorld = true;
 	}
 
 
-     for(var i = 0; i < this.game.entities.length; i++) {
-        var ent = this.game.entities[i];
-        ent.victims = [];
-        var found = false;
-        //console.log("name: " + ent.name);
-        if(ent.name === "ShipProjectile") {
-            //console.log("Projectile");
+	for(var i = 0; i< this.game.enemies; i++){
+		var ent = this.game.enemies[i];
+		if(ent.name === this.name && ent != this) {
+           	var dist = distance(this, ent);
+           	if(dist < this.radius + ent.radius) { //if special collision
+               	var delta = (this.radius + ent.radius) / (distance(this, ent));
+               	//console.log("delta: " + delta);
+               	var dX = Math.abs(this.xMid - ent.xMid);
+               	var dY = Math.abs(this.yMid - ent.yMid);
 
-            if(Collide(this, ent)) {
-            	/*
-                for(var j = 0; j < ent.victims.length; j++) {
-                    if(this === ent.victims[j]) {
-                        found = true;
-                    }
-                }
+               	if(this.xMid > ent.xMid) {
+               		this.xMid = this.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
+               		ent.xMid = ent.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
+               	} else if(this.xMid < ent.xMid) {
+               		this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
+               		ent.xMid = ent.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
+               	}
 
-        		if(!found) {
-            		// we need to reference the damage value of the projectile here, not do --
-            		console.log("I've been hit!");
-            		this.health--;
-            		//console.log("new health: " + this.health);
-            		ent.victims.push(this);
-            		//should be an if statement to check for persistent weapon
-            		if(!ent.persistent) {
-               			ent.removeFromWorld = true;
-            		}
-        		}
-      		}*/
+               	if(this.yMid > ent.yMid) {
+               		this.yMid = this.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
+               		ent.YMid = ent.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
+               	} else if(this.yMid < ent.yMid) {
+               		this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
+               		ent.yMid = ent.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
+               	}
 
-      			//console.log("I've been hit!");
-            	this.health--;
-            	//console.log("new health: " + this.health);
-            	//ent.victims.push(this);
-            	//should be an if statement to check for persistent weapon
-            	if(!ent.persistent) {
-               		ent.removeFromWorld = true;
-            	}
-            }
-    	} else if(ent.name === "Player") {
-            //console.log("Player found");
-            //console.log("speed: " + this.speed);
-            //console.log("start x: " + this.x + ", y: " + this.y);
-            var delta = this.speed / (distance(this, ent));
-            //console.log("delta: " + delta);
-            var dX = Math.abs(this.xMid - ent.xMid);
-            var dY = Math.abs(this.yMid - ent.yMid);
+               	//this.xMid = -(Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
+               	//this.yMid = -(Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
+               	this.x = this.xMid - (this.pWidth * this.scale / 2);
+               	this.y = this.yMid - (this.pHeight * this.scale / 2);
+               	//console.log("new x: " + this.x + ", y: " + this.y);
+               	ent.x = ent.xMid - (this.pWidth * this.scale / 2);
+               	ent.y = ent.yMid - (this.pHeight * this.scale / 2);
+           	}
+           }
 
-            if(this.xMid > ent.xMid) {
-            	this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
-            } else if(this.xMid < ent.xMid) {
-            	this.xMid = (Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
-            }
-
-            if(this.yMid > ent.yMid) {
-            	this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
-            } else if(this.yMid < ent.yMid) {
-            	this.yMid = (Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
-            }
-
-            //this.xMid = -(Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
-            //this.yMid = -(Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
-            this.x = this.xMid - (this.pWidth * this.scale / 2);
-            this.y = this.yMid - (this.pHeight * this.scale / 2);
-            //console.log("new x: " + this.x + ", y: " + this.y);
-
-            if(Collide(this, ent)) {
-            	//console.log("Success!");
-            	this.health = 0;
-            	this.kamikaze = true;
-            	ent.health -= this.damage;
-
-            	this.removeFromWorld = true;
-            }
-        } else if(ent.name === this.name && ent != this) {
-        	var dist = distance(this, ent);
-        	if(dist < this.radius + ent.radius) { //if special collision
-            	var delta = (this.radius + ent.radius) / (distance(this, ent));
-            	//console.log("delta: " + delta);
-            	var dX = Math.abs(this.xMid - ent.xMid);
-            	var dY = Math.abs(this.yMid - ent.yMid);
-
-            	if(this.xMid > ent.xMid) {
-            		this.xMid = this.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
-            		ent.xMid = ent.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
-            	} else if(this.xMid < ent.xMid) {
-            		this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
-            		ent.xMid = ent.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
-            	}
-
-            	if(this.yMid > ent.yMid) {
-            		this.yMid = this.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
-            		ent.YMid = ent.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
-            	} else if(this.yMid < ent.yMid) {
-            		this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
-            		ent.yMid = ent.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
-            	}
-
-            	//this.xMid = -(Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
-            	//this.yMid = -(Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
-            	this.x = this.xMid - (this.pWidth * this.scale / 2);
-            	this.y = this.yMid - (this.pHeight * this.scale / 2);
-            	//console.log("new x: " + this.x + ", y: " + this.y);
-            	ent.x = ent.xMid - (this.pWidth * this.scale / 2);
-            	ent.y = ent.yMid - (this.pHeight * this.scale / 2);
-        	}
-        }
 	}
 
 	if(this.health < 1) {
@@ -870,7 +835,7 @@ function ShipPrimary(game) {
 	this.yMid = 0;
 	this.radius = 10;
 	this.angle = 0;
-
+	this.pierce = 0;
 	this.lifetime = 500;
 	this.damage = 2;
 	this.maxSpeed = 1500;
@@ -934,7 +899,7 @@ function ShipSecondary(game) {
 	this.yMid = 0;
 	this.radius = 10;
 	this.angle = 0;
-
+	this.pierce = 0;
 	this.lifetime = 1500;
 	this.damage = 10;
 	this.maxSpeed = 500;
