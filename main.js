@@ -929,46 +929,28 @@ function PrototypeLevel(game) {
 	var y = 0;
 
 	setInterval(function () {
-		border = Math.floor((Math.random() * 4));
+		border = Math.floor((Math.random() * 2));
+		console.log(border);
 
-		if (border === 0) { // top
+		if (border === 0) {
 			x = (Math.random() * 1000) - 100;
-			y = (Math.random() * 100);
-			if (y < 50) {
+			y = (Math.random() * 50);
+
+			if (y < 50) { // top
 				y = -50 - y;
 			}
-			else {
+			else { // bottom
 				y = 800 + y;
 			}
 		}
-		else if (border === 1) { // left
+		else {
 			y = (Math.random() * 1000) - 100;
 			x = (Math.random() * 100);
-			if (x < 50) {
+			if (x < 50) { // left
 				x = -50 - x;
 			}
-			else {
+			else { // right
 				x = 800 + x;
-			}
-		}
-		else if (border === 2) { // right
-			y = (Math.random() * 1000) - 100;
-			x = (Math.random() * 100);
-			if (x < 50) {
-				x = -50 - x;
-			}
-			else {
-				x = 800 + x;
-			}
-		}
-		else { // bottom
-			x = (Math.random() * 1000) - 100;
-			y = (Math.random() * 100);
-			if (y < 50) {
-				y = -50 - y;
-			}
-			else {
-				y = 800 + y;
 			}
 		}
 
