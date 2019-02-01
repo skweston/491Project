@@ -495,7 +495,7 @@ Scourge.prototype.update = function () {
 			if(ent.pierce < 0){
 				ent.removeFromWorld = true;
 			}
-			
+
 		}
 	}
 	var ent = this.game.ship;
@@ -970,7 +970,7 @@ function Spreader(game) {
 	this.radius = this.scale * 42;
 	this.angle = 0;
 
-	this.lifetime = 1500;
+	this.lifetime = 500;
 
 	this.game = game;
 	this.ctx = game.ctx;
