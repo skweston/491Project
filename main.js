@@ -1,5 +1,5 @@
 // useful global things here
-var SHOW_HITBOX = true;
+var SHOW_HITBOX = false;
 
 /*
 function distance(a, b) {
@@ -136,83 +136,46 @@ function Background(game, spritesheet) {
     this.spritesheet = spritesheet;
     this.game = game;
     this.ctx = game.ctx;
-    this.x = 0;
-    this.y = 0;
-    this.xMax = this.spritesheet.naturalWidth;
-    this.yMax = this.spritesheet.naturalHeight;
+
+    // Where the frame starts for the background. Divide image in half then subract the half the canvas,
+    // for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
+    this.sx = spritesheet.naturalWidth / 2 - this.ctx.canvas.width / 2;
+    this.sy = spritesheet.naturalHeight / 2 - this.ctx.canvas.height / 2;
+
+    // This is the location to draw the background
+    this.dx = 0;
+    this.dy = 0;
+
+    // This is the current canvas snapshot of the level
+    this.frameWidth = this.ctx.canvas.width;
+    this.frameHeight = this.ctx.canvas.height;
+
+    if (spritesheet.width - this.sx < this.frameWidth) {
+  this.frameWidth = this.spritesheet.width - this.sx;
+    }
+    if (spritesheet.height - this.sy < this.frameHeight) {
+  this.frameHeight = this.spritesheet.height - this.sy;
+    }
+
+    this.dWidth = this.frameWidth;
+    this.dHeight = this.frameHeight;
+
 
 };
 
-Background.prototype = new Entity();
-Background.prototype.constructor = Background;
-
 Background.prototype.draw = function () {
-    this.ctx.drawImage(this.spritesheet, this.game.camera.x , this.game.camera.y);
-    this.ctx.fillStyle = 'white';
-    this.ctx.fillRect(0, 0, 100, 20);
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillText(`B ${Math.floor(this.x)}=x \n ${Math.floor(this.y)}=y`, 10, 10);
-    Entity.prototype.draw.call(this);
+    this.ctx.drawImage(this.spritesheet,
+           this.sx, this.sy,
+           this.frameWidth, this.frameHeight,
+                   this.dx, this.dy,
+           this.dWidth, this.dHeight);
 };
 
 Background.prototype.update = function () {
 
-    Entity.prototype.update.call(this);
+
 
 };
-
-function Camera(game) {
-    this.game = game;
-    this.ctx = game.ctx;
-    this.ship = game.ship;
-    this.speed = this.ship.speed;
-    console.log ("canvase width: " + this.ctx.canvas.width);
-    this.x = 0; //this.ship.xMid - this.ctx.canvas.width  / 2;
-    this.y = 0; //this.ship.yMid - this.ctx.canvas.height / 2;
-
-}
-
-Camera.prototype = new Entity();
-Camera.prototype.constructor = Camera;
-
-Camera.prototype.draw = function () {
-    this.ctx.fillStyle = 'white';
-    this.ctx.fillRect(0, 0, 100, 100);
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillText(`C ${Math.floor(this.x)}=x \n ${Math.floor(this.y)} = y`, 10, 20);
-
-    Entity.prototype.draw.call(this);
-};
-
-Camera.prototype.update = function () {
-    this.speed = this.game.ship.speed;
-    // this.x = -this.ship.xMid + this.ctx.canvas.width  / 2;
-    // this.y = -this.ship.yMid + this.ctx.canvas.height / 2;
-    // movement
-    if (this.game.moveUp) {
-
-    		this.y += 10 * this.speed;
-
-    }
-    if (this.game.moveLeft) {
-
-    		this.x += 10 * this.speed;
-
-    }
-    if (this.game.moveDown) {
-
-    		this.y -= 10 * this.speed;
-
-    }
-    if (this.game.moveRight) {
-
-    		this.x -= 10 * this.speed;
-
-    }
-
-    Entity.prototype.update.call(this);
-};
-
 
 /* =========== General Effects ========= */
 function SpaceExplosion(game, shipXMid, shipYMid) {
@@ -388,17 +351,17 @@ LaserBlast.prototype.draw = function () {
 /* ========================================================================================================== */
 // Scourge - Enemy
 /* ========================================================================================================== */
-function Scourge(game, spritesheet) {
+function Scourge(game, spritesheet, xIn, yIn) {
 
-	this.pWidth = 128;
-	this.pHeight = 128;
-	this.scale = .5;
-	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
-	this.angle = 0;
-	this.name = "Enemy";
-	this.speed = 0;
-	this.x = 350;
-	this.y = 350;
+  this.pWidth = 128;
+  this.pHeight = 128;
+  this.scale = .5;
+  this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
+  this.angle = 0;
+  this.name = "Enemy";
+  this.speed = 0.7;
+  this.x = xIn;
+  this.y = yIn;
   this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
   this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
   this.radius = 41 * this.scale;
@@ -415,51 +378,52 @@ Scourge.prototype.constructor = Scourge;
 
 //function SpaceExplosion(game, spritesheet, shipX, shipY) {
 Scourge.prototype.update = function () {
-  //console.log("Scourge: " + this.xMid + ", " + this.yMid);
-  Entity.prototype.update.call(this);
+    //console.log("Scourge: " + this.xMid + ", " + this.yMid);
+    Entity.prototype.update.call(this);
 
     // update angle
     var dx = this.game.player[0].xMid - this.xMid;
     var dy = this.yMid - this.game.player[0].yMid;
     this.angle = -Math.atan2(dy,dx);
 
-  for(var i = 0; i < this.game.entities.length; i++) {
-    var ent = this.game.entities[i];
-    ent.victims = [];
-    var found = false;
-    if(ent.name === "ShipProjectile") {
-      //console.log("Projectile");
-      if(Collide(this, ent)) {
-        for(var j = 0; j < ent.victims.length; j++) {
-          if(this === ent.victims[j]) {
-            found = true;
-          }
-        }
+    for(var i = 0; i < this.game.entities.length; i++) {
+        var ent = this.game.entities[i];
+        ent.victims = [];
+        var found = false;
+        if(ent.name === "ShipProjectile") {
+            //console.log("Projectile");
+            if(Collide(this, ent)) {
+                for(var j = 0; j < ent.victims.length; j++) {
+                    if(this === ent.victims[j]) {
+                        found = true;
+                    }
+                }
 
         if(!found) {
-        	// we need to reference the damage value of the projectile here, not do --
-          console.log("I've been hit!");
-          this.health--;
-          console.log("new health: " + this.health);
-          ent.victims.push(this);
-          //should be an if statement to check for persistent weapon
-          if(!ent.persistent) {
-            ent.removeFromWorld = true;
-          }
-
+            // we need to reference the damage value of the projectile here, not do --
+            console.log("I've been hit!");
+            this.health--;
+            console.log("new health: " + this.health);
+            ent.victims.push(this);
+            //should be an if statement to check for persistent weapon
+            if(!ent.persistent) {
+                ent.removeFromWorld = true;
+            }
         }
 
         if(this.health < 1) {
-          this.removeFromWorld = true;
+            this.removeFromWorld = true;
 
-          var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
-          this.game.addEntity(explosion);
+            var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+            this.game.addEntity(explosion);
 
-          // drop a powerup!, this will change to Math.random type thing later, maybe 5% chance?
-          var spreader = new Spreader(this.game);
-          spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-          spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-          this.game.addEntity(spreader);
+            // drop a powerup!, this will change to Math.random type thing later, maybe 5% chance?
+            var spreader = new Spreader(this.game);
+            spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+            spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+            this.game.addEntity(spreader);
+        } else{
+
         }
       }
     }
@@ -485,9 +449,9 @@ Scourge.prototype.draw = function () {
 // The Ship
 /* ========================================================================================================== */
 function TheShip(game) {
-	this.pWidth = 128;
-	this.pHeight = 128;
-	this.scale = 0.5;
+  this.pWidth = 128;
+  this.pHeight = 128;
+  this.scale = 0.5;
     this.idleAnimation = new Animation(AM.getAsset("./img/shipIdle.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
     this.boostAnimation = new Animation(AM.getAsset("./img/shipBoost.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
     this.rollAnimation = new Animation(AM.getAsset("./img/shipRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
@@ -499,8 +463,8 @@ function TheShip(game) {
     this.boosting = false;
     this.cancelBoost = false;
     this.rolling = false;
-    this.x = 400 - (this.pWidth * this.scale /2)+1;
-    this.y = 400 - (this.pHeight * this.scale / 2) + 1;
+    this.x = 100;
+    this.y = 100;
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
     this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
     this.radius = this.scale * 64;
@@ -521,153 +485,161 @@ TheShip.prototype = new Entity();
 TheShip.prototype.constructor = TheShip;
 
 TheShip.prototype.update = function () {
-	// movement
-	// if (this.game.moveUp) {
-	// 	if (this.yMid - this.radius > 400) {
-	// 		this.y -= 10 * this.speed;
-	// 	}
-	// }
-	// if (this.game.moveLeft) {
-	// 	if (this.xMid - this.radius > 400) {
-	// 		this.x -= 10 * this.speed;
-	// 	}
-	// }
-	// if (this.game.moveDown) {
-	// 	if (this.yMid + this.radius < 7000) {
-	// 		this.y += 10 * this.speed;
-	// 	}
-	// }
-	// if (this.game.moveRight) {
-	// 	if (this.xMid + this.radius < 8000) {
-	// 		this.x += 10 * this.speed;
-	// 	}
-	// }
+  // movement
+  if (this.game.moveUp) {
+    if (this.yMid - this.radius > 0) {
+      this.y -= 10 * this.speed;
+    }
+  }
+  if (this.game.moveLeft) {
+    if (this.xMid - this.radius > 0) {
+      this.x -= 10 * this.speed;
+    }
+  }
+  if (this.game.moveDown) {
+    if (this.yMid + this.radius < 700) {
+      this.y += 10 * this.speed;
+    }
+  }
+  if (this.game.moveRight) {
+    if (this.xMid + this.radius < 800) {
+      this.x += 10 * this.speed;
+    }
+  }
 
-	// update center hitbox
-    this.xMid = 400; //(this.x + (this.pWidth * this.scale / 2)) - 1;
-    this.yMid = 400; //(this.y + (this.pHeight * this.scale / 2)) - 1;
+  // update center hitbox
+    this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+    this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
     // update angle
     var dx = this.game.mouseX - this.xMid;
     var dy = this.yMid - this.game.mouseY;
     this.angle = -Math.atan2(dy,dx);
-    //console.log(this.angle);
 
-	// rolling
-	if (this.game.roll) {
-		this.rolling = true;
-	}
-	if (this.rolling) {
-		if (this.rollAnimation.isDone()) {
-			this.rollAnimation.elapsedTime = 0;
-			this.rolling = false;
-		}
-		else if (this.boostRollAnimation.isDone()) {
-			this.boostRollAnimation.elapsedTime = 0;
-			this.rolling = false;
-			if (this.cancelBoost) {
-				this.cancelBoost = false;
-				this.boosting = false;
-			}
-		}
-	}
+  // rolling
+  if (this.game.roll) {
+    this.rolling = true;
+  }
+  if (this.rolling) {
+    if (this.rollAnimation.isDone()) {
+      this.rollAnimation.elapsedTime = 0;
+      this.rolling = false;
+    }
+    else if (this.boostRollAnimation.isDone()) {
+      this.boostRollAnimation.elapsedTime = 0;
+      this.rolling = false;
+      if (this.cancelBoost) {
+        this.cancelBoost = false;
+        this.boosting = false;
+      }
+    }
+  }
 
-	// boosting
-	if (this.game.boost && !this.rolling) {
-		this.cancelBoost = false;
-		this.boosting = true;
-		this.speed = 1;
-	}
-	if (!this.game.boost && !this.rolling) {
-		this.boosting = false;
-		this.speed = 0.5;
-	}
+  // boosting
+  if (this.game.boost && !this.rolling) {
+    this.cancelBoost = false;
+    this.boosting = true;
+    this.speed = 1;
+  }
+  if (!this.game.boost && !this.rolling) {
+    this.boosting = false;
+    this.speed = 0.5;
+  }
 
-	// boost input buffer during rolls
-	if (this.game.boost && this.rolling) {
-		this.cancelBoost = false;
-	}
-	if (!this.game.boost && this.rolling) {
-		this.cancelBoost = true;
-	}
+  // boost input buffer during rolls
+  if (this.game.boost && this.rolling) {
+    this.cancelBoost = false;
+  }
+  if (!this.game.boost && this.rolling) {
+    this.cancelBoost = true;
+  }
 
-	// shooting
-	if (this.primaryCooldown > 0) {
-		this.primaryCooldown -= 1;
-	}
-	if (this.secondaryCooldown > 0) {
-		this.secondaryCooldown -= 1;
-	}
-	if (this.game.firePrimary && this.primaryCooldown === 0) {
-		this.primaryCooldown = this.primaryCooldownMax;
-		for (var i = 0; i < 2; i++) {
-       		var projectile = new ShipPrimary(this.game);
-       		var target = {x: this.game.mouseX - (projectile.pHeight / 4),
-       					  y: this.game.mouseY - (projectile.pWidth / 4)};
-       		var dir = direction(target, this);
-       		projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-       					   ((this.radius + projectile.pWidth * projectile.scale / 2) *
-       					   Math.cos(this.angle + (Math.PI / 24 * Math.pow(-1, i))));
-       		projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-       					   ((this.radius + projectile.pHeight * projectile.scale / 2) *
-       					   Math.sin(this.angle + (Math.PI / 24 * Math.pow(-1, i))));
-       		projectile.velocity.x = dir.x * projectile.maxSpeed;
-       		projectile.velocity.y = dir.y * projectile.maxSpeed;
-       		projectile.angle = this.angle;
-
-        	this.game.addEntity(projectile);
+  // shooting
+  if (this.primaryCooldown > 0) {
+    this.primaryCooldown -= 1;
+  }
+  if (this.secondaryCooldown > 0) {
+    this.secondaryCooldown -= 1;
+  }
+  if (this.spreader > 0) {
+    this.spreader -= 1;
+  }
+  if (this.game.firePrimary && this.primaryCooldown === 0) {
+    this.primaryCooldown = this.primaryCooldownMax;
+    for (var i = 0; i < 2; i++) {
+      var offset = (Math.PI / 24 * Math.pow(-1, i));
+      this.createProjectile("Primary", offset, 0);
         }
-	}
-	if (this.game.fireSecondary && this.secondaryCooldown === 0) {
-		this.secondaryCooldown = this.secondaryCooldownMax;
-		var projectile = new ShipSecondary(this.game);
-		var target = {x: this.game.mouseX - (projectile.pWidth / 4),
-					  y: this.game.mouseY - (projectile.pHeight / 4)};
-        var dir = direction(target, this);
-
-        projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-        			   ((this.radius + projectile.pWidth * projectile.scale / 2) * Math.cos(this.angle));
-        projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-        			   ((this.radius + projectile.pHeight * projectile.scale / 2)* Math.sin(this.angle));
-        projectile.velocity.x = dir.x * projectile.maxSpeed;
-        projectile.velocity.y = dir.y * projectile.maxSpeed;
-        projectile.angle = this.angle;
-
-		this.game.addEntity(projectile);
-	}
+        if (this.spreader > 0) {
+          for (var i = 0; i < 2; i++) {
+            this.createProjectile("Primary", 0, ((Math.PI / 6) * Math.pow(-1, i)));
+          }
+        }
+  }
+  if (this.game.fireSecondary && this.secondaryCooldown === 0) {
+    this.secondaryCooldown = this.secondaryCooldownMax;
+    this.createProjectile("Secondary", 0, 0);
+  }
 
     Entity.prototype.update.call(this);
 }
 
+TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
+  var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+                     {xMid: this.game.mouseX, yMid: this.game.mouseY});
+  var angle = this.angle + adjustAngle;
+  if (type === "Primary") {
+    var projectile = new ShipPrimary(this.game);
+  }
+  if (type === "Secondary") {
+    var projectile = new ShipSecondary(this.game);
+  }
+    var target = {x: Math.cos(angle) * dist + this.xMid,
+              y: Math.sin(angle) * dist + this.yMid};
+    var dir = direction(target, this);
+
+    projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+               ((this.radius + projectile.pWidth * projectile.scale / 2) *
+               Math.cos(angle + offset));
+    projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
+               ((this.radius + projectile.pHeight * projectile.scale / 2) *
+               Math.sin(angle + offset));
+    projectile.velocity.x = dir.x * projectile.maxSpeed;
+    projectile.velocity.y = dir.y * projectile.maxSpeed;
+    projectile.angle = angle;
+
+  this.game.addEntity(projectile);
+}
+
 TheShip.prototype.draw = function () {
-	if (this.rolling) {
-		if (this.boosting) {
-			this.boostRollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-		}
-		else {
-			this.rollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-		}
-	}
-	else {
-		if (this.boosting) {
-			this.boostAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-		}
-		else {
-			this.idleAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-		}
-	}
+  if (this.rolling) {
+    if (this.boosting) {
+      this.boostRollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+    }
+    else {
+      this.rollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+    }
+  }
+  else {
+    if (this.boosting) {
+      this.boostAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+    }
+    else {
+      this.idleAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+    }
+  }
 
     this.reticleAnimation.drawFrame(this.game.clockTick, this.ctx,
-    							   (this.game.mouseX - (this.pWidth * 0.25 / 2) - 1),
-    							   (this.game.mouseY - (this.pHeight * 0.25 / 2) - 1), 0); // - (this.pHeight * 0.25 / 2));
+                     (this.game.mouseX - (this.pWidth * 0.25 / 2) - 1),
+                     (this.game.mouseY - (this.pHeight * 0.25 / 2) - 1), 0); // - (this.pHeight * 0.25 / 2));
 
     if (SHOW_HITBOX) {
-    	this.ctx.beginPath();
-    	this.ctx.strokeStyle = "Red";
-    	this.ctx.lineWidth = 1;
-    	this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
-    	this.ctx.stroke();
-    	this.ctx.closePath();
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = "Red";
+      this.ctx.lineWidth = 1;
+      this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+      this.ctx.stroke();
+      this.ctx.closePath();
     }
 
     Entity.prototype.draw.call(this);
@@ -678,34 +650,34 @@ TheShip.prototype.draw = function () {
 /* ========================================================================================================== */
 
 function ShipPrimary(game) {
-	this.pWidth = 128;
-	this.pHeight = 128;
-	this.scale = 0.25;
-	this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
+  this.pWidth = 128;
+  this.pHeight = 128;
+  this.scale = 0.25;
+  this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 
-	this.name = "ShipProjectile";
-	this.x = 0;
-	this.y = 0;
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 10;
-	this.angle = 0;
+  this.name = "ShipProjectile";
+  this.x = 0;
+  this.y = 0;
+  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+  this.radius = 10;
+  this.angle = 0;
 
-	this.lifetime = 500;
-	this.damage = 2;
-	this.maxSpeed = 1500;
-	this.velocity = {x: 0, y: 0};
+  this.lifetime = 500;
+  this.damage = 2;
+  this.maxSpeed = 1500;
+  this.velocity = {x: 0, y: 0};
 
-	this.game = game;
-	this.ctx = game.ctx;
-	this.removeFromWorld = false;
+  this.game = game;
+  this.ctx = game.ctx;
+  this.removeFromWorld = false;
 }
 
 ShipPrimary.prototype = new Entity();
 ShipPrimary.prototype.constructor = ShipPrimary;
 
 ShipPrimary.prototype.update = function () {
-	this.x += this.velocity.x * this.game.clockTick;
+  this.x += this.velocity.x * this.game.clockTick;
     this.y += this.velocity.y * this.game.clockTick;
 
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -730,46 +702,46 @@ ShipPrimary.prototype.draw = function () {
     this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
     if (SHOW_HITBOX) {
-    	this.ctx.beginPath();
-    	this.ctx.strokeStyle = "Red";
-    	this.ctx.lineWidth = 1;
-    	this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
-    	this.ctx.stroke();
-    	this.ctx.closePath();
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = "Red";
+      this.ctx.lineWidth = 1;
+      this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+      this.ctx.stroke();
+      this.ctx.closePath();
     }
 
     Entity.prototype.draw.call(this);
 }
 
 function ShipSecondary(game) {
-	this.pWidth = 128;
-	this.pHeight = 128;
-	this.scale = 0.5;
-	this.animation = new Animation(AM.getAsset("./img/shipSecondary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
+  this.pWidth = 128;
+  this.pHeight = 128;
+  this.scale = 0.5;
+  this.animation = new Animation(AM.getAsset("./img/shipSecondary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 
-	this.name = "ShipProjectile";
-	this.x = 0;
-	this.y = 0;
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 10;
-	this.angle = 0;
+  this.name = "ShipProjectile";
+  this.x = 0;
+  this.y = 0;
+  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+  this.radius = 10;
+  this.angle = 0;
 
-	this.lifetime = 1500;
-	this.damage = 10;
-	this.maxSpeed = 500;
-	this.velocity = {x: 0, y: 0};
+  this.lifetime = 1500;
+  this.damage = 10;
+  this.maxSpeed = 500;
+  this.velocity = {x: 0, y: 0};
 
-	this.game = game;
-	this.ctx = game.ctx;
-	this.removeFromWorld = false;
+  this.game = game;
+  this.ctx = game.ctx;
+  this.removeFromWorld = false;
 }
 
 ShipSecondary.prototype = new Entity();
 ShipSecondary.prototype.constructor = ShipSecondary;
 
 ShipSecondary.prototype.update = function () {
-	this.x += this.velocity.x * this.game.clockTick;
+  this.x += this.velocity.x * this.game.clockTick;
     this.y += this.velocity.y * this.game.clockTick;
 
     this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -794,12 +766,12 @@ ShipSecondary.prototype.draw = function () {
     this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
     if (SHOW_HITBOX) {
-    	this.ctx.beginPath();
-    	this.ctx.strokeStyle = "Red";
-    	this.ctx.lineWidth = 1;
-    	this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
-    	this.ctx.stroke();
-    	this.ctx.closePath();
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = "Red";
+      this.ctx.lineWidth = 1;
+      this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+      this.ctx.stroke();
+      this.ctx.closePath();
     }
 
     Entity.prototype.draw.call(this);
@@ -810,42 +782,42 @@ ShipSecondary.prototype.draw = function () {
 /* ========================================================================================================== */
 
 function Spreader(game) {
-	this.pWidth = 128;
-	this.pHeight = 128;
-	this.scale = 0.75;
-	this.animation = new Animation(AM.getAsset("./img/spreader.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
+  this.pWidth = 128;
+  this.pHeight = 128;
+  this.scale = 0.75;
+  this.animation = new Animation(AM.getAsset("./img/spreader.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
 
-	this.name = "PowerUp";
-	this.x = 0;
-	this.y = 0;
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = this.scale * 42;
-	this.angle = 0;
+  this.name = "PowerUp";
+  this.x = 0;
+  this.y = 0;
+  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+  this.radius = this.scale * 42;
+  this.angle = 0;
 
-	this.lifetime = 1500;
+  this.lifetime = 1500;
 
-	this.game = game;
-	this.ctx = game.ctx;
-	this.removeFromWorld = false;
+  this.game = game;
+  this.ctx = game.ctx;
+  this.removeFromWorld = false;
 }
 
 Spreader.prototype = new Entity();
 Spreader.prototype.constructor = Spreader;
 
 Spreader.prototype.update = function () {
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
-	if (Collide(this, this.game.player[0])) {
-		this.game.player[0].spreader = 30000;
-		this.removeFromWorld = true;
-	}
+  if (Collide(this, this.game.player[0])) {
+    this.game.player[0].spreader = 1000;
+    this.removeFromWorld = true;
+  }
 
-	this.lifetime -= 1;
-	if (this.lifetime < 0) {
-		this.removeFromWorld = true;
-	}
+  this.lifetime -= 1;
+  if (this.lifetime < 0) {
+    this.removeFromWorld = true;
+  }
 
     Entity.prototype.update.call(this);
 }
@@ -854,12 +826,12 @@ Spreader.prototype.draw = function () {
     this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
     if (SHOW_HITBOX) {
-    	this.ctx.beginPath();
-    	this.ctx.strokeStyle = "Red";
-    	this.ctx.lineWidth = 1;
-    	this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
-    	this.ctx.stroke();
-    	this.ctx.closePath();
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = "Red";
+      this.ctx.lineWidth = 1;
+      this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+      this.ctx.stroke();
+      this.ctx.closePath();
     }
 
     Entity.prototype.draw.call(this);
@@ -898,14 +870,7 @@ AM.downloadAll(function () {
 
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
-    // Camera, ship and background need to be privileged for map config and boundary settings.
-    var background = new Background(gameEngine, AM.getAsset("./img/space1-1.png"));
-    gameEngine.background = background;
-    var ship   = new TheShip(gameEngine);
-    gameEngine.ship = ship; //3 Privilege
-    var camera = new Camera(gameEngine);//4
-    gameEngine.camera = camera; //6 Privilege
-    gameEngine.addEntity(background);
+    gameEngine.start();
 
     // always load background first
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/space1-1.png")));
@@ -916,12 +881,48 @@ AM.downloadAll(function () {
     // gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 310, 520));
     // gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 375, 325));
     // gameEngine.addEntity(new BossTurret(gameEngine, AM.getAsset("./img/BossTurret.png"), 435, 520));
-    gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png")));
+    //gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png")));
 
     // the ship is always loaded last
-    gameEngine.addEntity(ship);
-    gameEngine.addEntity(camera);//5
+    gameEngine.addEntity(new TheShip(gameEngine));
 
-    gameEngine.start();
-    console.log("All Done!");
+  var level = new PrototypeLevel(gameEngine);
+  //level.start();
+
+  //Prototype Level
+
+  console.log("All Done!");
 });
+
+//canvas 800x700
+function PrototypeLevel(game) {
+  this.game = game;
+  //var x = 600;
+  //var y = 600;
+
+  for(var i = 0; i < this.game.entities.length; i++) {
+    if(this.game.entities[i].name === "Player") {
+      console.log(this.game.entities[i].name);
+      this.ship = this.game.entities[i];
+    }
+  }
+
+  //console.log("The ship: " + this.ship.name);
+  var that = this;
+
+  var x = getRandomInt(800 - this.ship.pWidth);
+  var y = getRandomInt(700 - this.ship.pHeight);
+
+  setInterval(function () {
+    console.log("Spawn at " + x + ", " + y);
+    that.game.addEntity(new Scourge(that.game, AM.getAsset("./img/scourge.png"), x, y));
+
+    x = getRandomInt(800 - that.ship.pWidth);
+    y = getRandomInt(700 - that.ship.pHeight);
+
+  }, 5000);
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
