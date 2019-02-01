@@ -1,5 +1,6 @@
 // useful global things here
 var SHOW_HITBOX = false;
+var SCORE = 0;
 
 /*
 function distance(a, b) {
@@ -890,8 +891,12 @@ AM.downloadAll(function () {
 	var ctx = canvas.getContext("2d");
 
 	var gameEngine = new GameEngine();
+
 	gameEngine.init(ctx);
 	gameEngine.start();
+
+	var ship = new TheShip(gameEngine);
+	gameEngine.ship = ship;
 
 	// always load background first
 	gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/space1-1.png")));
@@ -905,45 +910,70 @@ AM.downloadAll(function () {
 	//gameEngine.addEntity(new Scourge(gameEngine, AM.getAsset("./img/scourge.png")));
 
 	// the ship is always loaded last
-	gameEngine.addEntity(new TheShip(gameEngine));
+	gameEngine.addEntity(ship);
 
 	var level = new PrototypeLevel(gameEngine);
 	//level.start();
 
 	//Prototype Level
-
 	console.log("All Done!");
 });
 
-//canvas 800x800
 function PrototypeLevel(game) {
-  this.game = game;
-  //var x = 600;
-  //var y = 600;
+	this.game = game;
 
-  for(var i = 0; i < this.game.entities.length; i++) {
-    if(this.game.entities[i].name === "Player") {
-      console.log(this.game.entities[i].name);
-      this.ship = this.game.entities[i];
-    }
-  }
+	var that = this;
 
-  //console.log("The ship: " + this.ship.name);
-  var that = this;
+	var border = 0;
+	var x = 0;
+	var y = 0;
 
-  var x = getRandomInt(800 - this.ship.pWidth);
-  var y = getRandomInt(800 - this.ship.pHeight);
+	setInterval(function () {
+		border = Math.floor((Math.random() * 4));
 
-  setInterval(function () {
-    console.log("Spawn at " + x + ", " + y);
-    that.game.addEntity(new Scourge(that.game, AM.getAsset("./img/scourge.png"), x, y));
+		if (border === 0) { // top
+			x = (Math.random() * 1000) - 100;
+			y = (Math.random() * 100);
+			if (y < 50) {
+				y = -50 - y;
+			}
+			else {
+				y = 800 + y;
+			}
+		}
+		else if (border === 1) { // left
+			y = (Math.random() * 1000) - 100;
+			x = (Math.random() * 100);
+			if (x < 50) {
+				x = -50 - x;
+			}
+			else {
+				x = 800 + x;
+			}
+		}
+		else if (border === 2) { // right
+			y = (Math.random() * 1000) - 100;
+			x = (Math.random() * 100);
+			if (x < 50) {
+				x = -50 - x;
+			}
+			else {
+				x = 800 + x;
+			}
+		}
+		else { // bottom
+			x = (Math.random() * 1000) - 100;
+			y = (Math.random() * 100);
+			if (y < 50) {
+				y = -50 - y;
+			}
+			else {
+				y = 800 + y;
+			}
+		}
 
-    x = getRandomInt(800 - that.ship.pWidth);
-    y = getRandomInt(700 - that.ship.pHeight);
-
-  }, 5000);
-}
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
+		that.game.addEntity(new Scourge(that.game, AM.getAsset("./img/scourge.png"), x, y));
+		// console.log("added a boy");
+		// console.log("x: " + x + ", y:" + y);
+	}, 1000);
 }
