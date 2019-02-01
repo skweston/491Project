@@ -347,12 +347,8 @@ BossTurret.prototype.createProjectile = function(type, offset, adjustAngle) {
 				  y: Math.sin(angle) * dist + this.yMid};
 	var dir = direction(this.game.ship, this);
 
-	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-				   ((this.radius + projectile.pWidth * projectile.scale / 2) *
-				   Math.cos(angle + offset));
-	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-				   ((this.radius + projectile.pHeight * projectile.scale / 2) *
-				   Math.sin(angle + offset));
+	projectile.x = this.xMid;
+	projectile.y = this.yMid;
 	projectile.velocity.x = dir.x * projectile.maxSpeed;
 	projectile.velocity.y = dir.y * projectile.maxSpeed;
 	projectile.angle = angle;
@@ -489,7 +485,12 @@ Scourge.prototype.update = function () {
     var dy = this.yMid - this.game.player[0].yMid;
     this.angle = -Math.atan2(dy,dx);
 
-    for(var i = 0; i < this.game.entities.length; i++) {
+	for(var i = 0; i< this.game.playerProjectiles.length; i++ ){
+		
+	}
+
+
+     for(var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
         ent.victims = [];
         var found = false;
@@ -862,7 +863,7 @@ function ShipPrimary(game) {
 	this.scale = 0.25;
 	this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 
-	this.name = "ShipProjectile";
+	this.name = "PlayerProjectile";
 	this.x = 0;
 	this.y = 0;
 	this.xMid = 0;
@@ -926,7 +927,7 @@ function ShipSecondary(game) {
 	this.scale = 0.5;
 	this.animation = new Animation(AM.getAsset("./img/shipSecondary1.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 
-	this.name = "ShipProjectile";
+	this.name = "PlayerProjectile";
 	this.x = 0;
 	this.y = 0;
 	this.xMid = 0;

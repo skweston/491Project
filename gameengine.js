@@ -26,7 +26,7 @@ Timer.prototype.tick = function () {
 }
 
 function GameEngine() {
-    this.entities = [];
+    // this.entities = [];
     this.background = [];
     this.player = [];
     this.enemies = [];
@@ -198,7 +198,7 @@ GameEngine.prototype.startInput = function () {
 
 GameEngine.prototype.addEntity = function (entity) {
     // console.log('added entity');
-    this.entities.push(entity);
+    // this.entities.push(entity);
     if (entity.name === "Background") {
         this.background.push(entity);
     }
@@ -220,45 +220,101 @@ GameEngine.prototype.addEntity = function (entity) {
 }
 
 GameEngine.prototype.draw = function () {
-    this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
-    this.ctx.save();
-    for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].draw(this.ctx);
-    }
-    // for (var i = 0; i < this.background.length; i++) {
-    //     this.background[i].draw(this.ctx);
-    // }
-    // for (var i = 0; i < this.playerProjectiles.length; i++) {
-    //     this.playerProjectiles[i].draw(this.ctx);
-    // }
-    // for (var i = 0; i < this.enemyProjectiles.length; i++) {
-    //     this.enemyProjectiles[i].draw(this.ctx);
-    // }
-    // for (var i = 0; i < this.enemies.length; i++) {
-    //     this.enemies[i].draw(this.ctx);
-    // }
-    // for (var i = 0; i < this.player.length; i++) {
-    //     this.player[i].draw(this.ctx);
-    // }
-    this.ctx.restore();
+	this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
+	this.ctx.save();
+	// for (var i = 0; i < this.entities.length; i++) {
+		//     this.entities[i].draw(this.ctx);
+	// }
+
+	for (var i = 0; i < this.background.length; i++) {
+		this.background[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.playerProjectiles.length; i++) {
+		this.playerProjectiles[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.enemyProjectiles.length; i++) {
+		this.enemyProjectiles[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.enemies.length; i++) {
+		this.enemies[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.player.length; i++) {
+		this.player[i].draw(this.ctx);
+	}
+
+	this.ctx.restore();
 }
 
 GameEngine.prototype.update = function () {
-    var entitiesCount = this.entities.length;
+	// var entitiesCount = this.entities.length;
 
-    for (var i = 0; i < entitiesCount; i++) {
-        var entity = this.entities[i];
-        if(entity.removeFromWorld){
-            this.entities.splice(i,1);
-            entitiesCount--;
-            i--;
-      } else {
-        entity.update();
-      }
-    }
-    this.wasclicked = false;
-    this.roll = false;
-    this.bomb = false;
+	// for (var i = 0; i < entitiesCount; i++) {
+	// 	var entity = this.entities[i];
+	// 	if(entity.removeFromWorld){
+	// 		this.entities.splice(i,1);
+	// 		entitiesCount--;
+	// 		i--;
+	// 	}
+	// 	else {
+	// 		entity.update();
+	// 	}
+	// }
+
+	var count = this.player.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.player[i];
+		if (entity.removeFromWorld) {
+			this.player.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
+	count = this.enemies.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.enemies[i];
+		if (entity.removeFromWorld) {
+			this.enemies.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
+	count = this.playerProjectiles.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.playerProjectiles[i];
+		if (entity.removeFromWorld) {
+			this.playerProjectiles.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
+	count = this.enemyProjectiles.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.enemyProjectiles[i];
+		if (entity.removeFromWorld) {
+			this.enemyProjectiles.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
+	this.wasclicked = false;
+	this.roll = false;
+	this.bomb = false;
 }
 
 GameEngine.prototype.loop = function () {
