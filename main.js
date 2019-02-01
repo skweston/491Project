@@ -359,7 +359,7 @@ function Scourge(game, spritesheet, xIn, yIn) {
   this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
   this.angle = 0;
   this.name = "Enemy";
-  this.speed = 10;
+  this.speed = 7;
   this.x = xIn;
   this.y = yIn;
   this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -430,7 +430,7 @@ Scourge.prototype.update = function () {
             //console.log("Player found");
             //console.log("speed: " + this.speed);
             //console.log("start x: " + this.x + ", y: " + this.y);
-            var delta = 7 / (distance(this, ent));
+            var delta = this.speed / (distance(this, ent));
             //console.log("delta: " + delta);
             var dX = Math.abs(this.xMid - ent.xMid);
             var dY = Math.abs(this.yMid - ent.yMid);
