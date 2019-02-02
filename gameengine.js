@@ -27,6 +27,7 @@ Timer.prototype.tick = function () {
 
 function GameEngine() {
 	// this.entities = [];
+	this.levels = [];
 	this.background = [];
 	this.player = [];
 	this.enemies = [];
@@ -35,8 +36,11 @@ function GameEngine() {
 	this.extras = [];
 	this.effects = [];
 
+	// start the game
+	this.mouse = false;
+	this.clicked = false;
+
 	// player input
-	this.wasclicked = false;
 	this.mouseX = 0;
 	this.mouseY = 0;
 	this.firePrimary = false;
@@ -89,6 +93,7 @@ GameEngine.prototype.startInput = function () {
 
 	this.ctx.canvas.addEventListener("click", function (e) {
 		that.click = getXandY(e);
+		that.clicked = true;
 		that.wasclicked = true;
 		// console.log(e);
 		// console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
@@ -129,16 +134,18 @@ GameEngine.prototype.startInput = function () {
 
 	this.ctx.canvas.addEventListener("mousemove", function (e) {
 		//console.log(e);
-		that.mouse = getXandY(e);
+		that.mouse = true;
 		that.mouseX = (e.x - 7);
 		that.mouseY = (e.y - 7);
 		//console.log("Current mouse x: " + that.mousex + " current mouse y: " + that.mousey );
 	}, false);
 
+	this.ctx.canvas.addEventListener("mouseleave", function (e) {
+		that.mouse = false;
+	}, false);
+
 	this.ctx.canvas.addEventListener("mousewheel", function (e) {
-		// console.log(e);
 		that.wheel = e;
-		// console.log("Click Event - X,Y " + e.clientX + ", " + e.clientY + " Delta " + e.deltaY);
 	}, false);
 
 	this.ctx.canvas.addEventListener("keydown", function (e) {
@@ -200,6 +207,9 @@ GameEngine.prototype.startInput = function () {
 GameEngine.prototype.addEntity = function (entity) {
 	// console.log('added entity');
 	// this.entities.push(entity);
+	if (entity.name === "Level") {
+		this.levels.push(entity);
+	}
 	if (entity.name === "Background") {
 		this.background.push(entity);
 	}
@@ -232,6 +242,9 @@ GameEngine.prototype.draw = function () {
 
 	for (var i = 0; i < this.background.length; i++) {
 		this.background[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.levels.length; i++) {
+		this.levels[i].draw(this.ctx);
 	}
 	for (var i = 0; i < this.playerProjectiles.length; i++) {
 		this.playerProjectiles[i].draw(this.ctx);
@@ -269,12 +282,11 @@ GameEngine.prototype.update = function () {
 	// 		entity.update();
 	// 	}
 	// }
-
-	var count = this.player.length;
+	var count = this.background.length;
 	for (var i = 0; i < count; i++) {
-		var entity = this.player[i];
+		var entity = this.background[i];
 		if (entity.removeFromWorld) {
-			this.player.splice(i, 1);
+			this.background.splice(i, 1);
 			count--;
 			i--;
 		}
@@ -282,12 +294,12 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
-	// console.log("there are currently: " + this.enemies.length);
-	count = this.enemies.length;
+
+	count = this.levels.length;
 	for (var i = 0; i < count; i++) {
-		var entity = this.enemies[i];
+		var entity = this.levels[i];
 		if (entity.removeFromWorld) {
-			this.enemies.splice(i, 1);
+			this.levels.splice(i, 1);
 			count--;
 			i--;
 		}
@@ -338,6 +350,32 @@ GameEngine.prototype.update = function () {
 		var entity = this.effects[i];
 		if (entity.removeFromWorld) {
 			this.effects.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
+	count = this.enemies.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.enemies[i];
+		if (entity.removeFromWorld) {
+			this.enemies.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+	
+	count = this.player.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.player[i];
+		if (entity.removeFromWorld) {
+			this.player.splice(i, 1);
 			count--;
 			i--;
 		}
