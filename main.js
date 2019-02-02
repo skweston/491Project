@@ -1182,7 +1182,8 @@ PlayGame.prototype.draw = function (ctx) {
 	ctx.font = "24pt Impact";
 	ctx.fillStyle = "Red";
 	ctx.textAlign = "left";
-	ctx.fillText("Score: " + SCORE, 10, 40);
+	ctx.fillText("Health: " + this.game.ship.health, 10, 40);
+	ctx.fillText("Score: " + SCORE, 10, 70);
 }
 
 /* ========================================================================================================== */
