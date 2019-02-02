@@ -235,23 +235,40 @@ GroundExplosion.prototype.update = function () {
 // Boss 1
 /* ========================================================================================================== */
 function Boss1(game){
-	this.animation = new Animation(AM.getAsset("./img/Boss1.png"), 200, 450, 1200, 0.175, 6, true, 1);
-	this.name = "Enemy";
-	this.x = 300;
-	this.y = 175;
-	this.angle = 0;
-	this.speed = 0;
-	this.angle = 0;
-	this.game = game;
-	this.ctx = game.ctx;
-	this.removeFromWorld = false;
+	this.pWidth = 200;
+	this.pHeight = 450;
+	this.scale = 1;
+    this.animation = new Animation(AM.getAsset("./img/Boss1.png"), 200, 450, 1200, 0.175, 6, true, 1);
+    this.name = "Enemy";
+    this.x = Math.random() *800;
+    this.y = 2000;
+    this.angle = 0;
+    this.speed = 100;
+    this.game = game;
+    this.ctx = game.ctx;
+    this.removeFromWorld = false;
+	this.turret1 = new BossTurret(this.game, this, 70, 125);
+	this.turret2 = new BossTurret(this.game, this, 70, 195);
+	this.turret3 = new BossTurret(this.game, this, 10, 330);
+	this.turret4 = new BossTurret(this.game, this, 135, 330);
+	game.addEntity(this.turret1);
+	game.addEntity(this.turret2);
+	game.addEntity(this.turret3);
+	game.addEntity(this.turret4);
+
+	this.turretsRemaining = 4;
+
 }
 Boss1.prototype = new Entity();
 Boss1.prototype.constructor = Boss1;
 
 Boss1.prototype.update = function () {
-	this.x += this.game.clockTick * this.speed;
-	if (this.x > 800) this.x = -230;
+	console.log("boss is updating");
+	this.y -= this.game.clockTick * this.speed;
+
+	if (this.turretsRemaining === 0){
+		this.removeFromWorld = true;
+	}
 
 
 	Entity.prototype.update.call(this);
@@ -259,6 +276,19 @@ Boss1.prototype.update = function () {
 
 Boss1.prototype.draw = function () {
 	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+
+	if(!this.turret1.removeFromWorld){
+		this.turret1.animation.drawFrame(this.game.clockTick, this.ctx, this.turret1.x, this.turret1.y, this.turret1.angle);
+	}
+	if(!this.turret2.removeFromWorld){
+		this.turret2.animation.drawFrame(this.game.clockTick, this.ctx, this.turret2.x, this.turret2.y, this.turret2.angle);
+	}
+	if(!this.turret3.removeFromWorld){
+		this.turret3.animation.drawFrame(this.game.clockTick, this.ctx, this.turret3.x, this.turret3.y, this.turret3.angle);
+	}
+	if(!this.turret4.removeFromWorld){
+		this.turret4.animation.drawFrame(this.game.clockTick, this.ctx, this.turret4.x, this.turret4.y, this.turret4.angle);
+	}
 	Entity.prototype.draw.call(this);
 }
 
@@ -266,36 +296,49 @@ Boss1.prototype.draw = function () {
 // Boss turret
 /* ========================================================================================================== */
 
-function BossTurret(game){
-	this.pWidth = 32;
-	this.pHeight = 32;
-	this.scale = 1.5;
-	this.animation = new Animation(AM.getAsset("./img/BossTurret.png"), this.pWidth, this.pHeight, 675, 0.2, 21, true, this.scale);
-	this.name = "Enemy";
-	this.x = 500;
-	this.y = 500;
-	this.xMid = this.x + (this.pWidth * this.scale) / 2;
-	this.yMid = this.y + (this.pHeight * this.scale) / 2;
-	this.radius = 8 * this.scale;
-	this.speed = 0;
-	this.angle = 0;
-	this.game = game;
-	this.ctx = game.ctx;
-	this.removeFromWorld = false;
-	this.health = 50;
+function BossTurret(game, boss, xOffset, yOffset){
+    this.pWidth = 32;
+    this.pHeight = 32;
+    this.scale = 1.5;
+    this.animation = new Animation(AM.getAsset("./img/BossTurret.png"), this.pWidth, this.pHeight, 675, 0.2, 21, true, this.scale);
+    this.name = "Enemy";
+	this.xOffset = xOffset;
+	this.yOffset = yOffset;
+	this.x = boss.x + xOffset;
+    this.y = boss.y + yOffset;
+    this.xMid = this.x + (this.pWidth * this.scale) / 2;
+    this.yMid = this.y + (this.pHeight * this.scale) / 2;
+    this.radius = 8 * this.scale;
+    this.speed = 0;
+    this.angle = 0;
+    this.game = game;
+    this.ctx = game.ctx;
+    this.removeFromWorld = false;
+    this.health = 5;
 	this.shootCooldown = 30;
 	this.missleCooldown = 1500;
 	this.shotCount = 0;
-	// this.boss = boss;
+	this.boss = boss;
+
+
 }
 BossTurret.prototype = new Entity();
 BossTurret.prototype.constructor = Boss1;
 
 BossTurret.prototype.update = function () {
+
+	this.x = this.boss.x + this.xOffset;
+	this.y = this.boss.y + this.yOffset;
+
+	this.xMid = this.x + (this.pWidth * this.scale) / 2;
+	this.yMid = this.y + (this.pHeight * this.scale) / 2;
+
 	this.shootCooldown--;
 	if(this.health < 1){
-		this.removeFromWorld = true;
-	}
+		this.boss.turretsRemaining--;
+
+        this.removeFromWorld = true;
+    }
 	for (var i = 0; i<this.game.playerProjectiles.length; i++){
 
 		var ent = this.game.playerProjectiles[i];
@@ -305,18 +348,10 @@ BossTurret.prototype.update = function () {
 			ent.removeFromWorld = true;
 		}
 	}
-
-
-
-	//this.x += this.game.clockTick * this.speed;
-	//if (this.x > 800) this.x = -230;
-	var dx = this.game.ship.xMid - this.xMid-1;
-	var dy = (this.yMid - this.game.ship.yMid)-1;
-	// this should be the angle in radians
-	this.angle = -Math.atan2(dy,dx);
-	//if we want it in degrees
-	//this.angle *= 180 / Math.PI;
-
+    var dx = this.game.ship.xMid - this.xMid-1;
+    var dy = (this.yMid - this.game.ship.yMid)-1;
+    // this should be the angle in radians
+    this.angle = -Math.atan2(dy,dx);
 
 	if (this.shootCooldown < 1){
 		if (this.shotCount >= 2){
@@ -328,8 +363,7 @@ BossTurret.prototype.update = function () {
 			this.createProjectile("LaserBlast", 0, -Math.PI/2)
 			this.shotCount++;
 		}
-	//  console.log("the x of the turret: " + this.x  + " and the y: " + this.y);
-		this.createProjectile("LaserBlast", 0, -Math.PI/2);
+        // this.createProjectile("LaserBlast", 0, -Math.PI/2);
 	}
 
 
@@ -358,7 +392,7 @@ BossTurret.prototype.createProjectile = function(type, offset, adjustAngle) {
 	this.game.addEntity(projectile);
 }
 BossTurret.prototype.draw = function () {
-	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	//this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
@@ -560,7 +594,7 @@ Scourge.prototype.update = function () {
 			var spreader = new Spreader(this.game);
 			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
 			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			
+
 			this.game.addEntity(spreader);
 		}
 
@@ -1066,6 +1100,7 @@ Spreader.prototype.draw = function () {
 
 function PlayGame(game) {
 	this.name = "Level";
+	this.bossTimer = 500;
 	this.spawnTimer = 0;
 	this.spawnNum = 1;
 	this.counter = 0;
@@ -1096,7 +1131,11 @@ PlayGame.prototype.update = function () {
 	if (this.game.clicked) {
 		this.game.running = true;
 	}
-
+	this.bossTimer--;
+	if(this.bossTimer < 0){
+		this.bossTimer = 500;
+		this.game.addEntity(new Boss1(this.game));
+	}
 	if (this.spawnTimer > 0) {
 		this.spawnTimer--;
 	}
@@ -1182,6 +1221,9 @@ AM.queueDownload("./img/shipBoostRoll.png");
 AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary1.png");
 AM.queueDownload("./img/shipSecondary1.png");
+AM.queueDownload("./img/Boss1.png");
+AM.queueDownload("./img/BossTurret.png");
+AM.queueDownload("./img/LaserBlast.png");
 
 AM.queueDownload("./img/spreader.png");
 
@@ -1196,7 +1238,7 @@ AM.downloadAll(function () {
 	var ctx = canvas.getContext("2d");
 
 	var gameEngine = new GameEngine();
-	
+
 	gameEngine.init(ctx);
 	gameEngine.start();
 
@@ -1213,6 +1255,8 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(pg);
 
 	gameEngine.ship = ship;
+
+
 
 	console.log("All Done!");
 });
