@@ -915,29 +915,29 @@ PlayGame.prototype.update = function () {
 		var x = Math.random() * 800;
 		var y = 0;
 
-		// border = Math.floor((Math.random() * 2));
+		border = Math.floor((Math.random() * 2));
 
-		// if (border === 0) {
-		// 	x = (Math.random() * 1000) - 100;
-		// 	y = (Math.random() * 100);
+		if (border === 0) {
+			x = (Math.random() * 1000) - 100;
+			y = (Math.random() * 100);
 
-		// 	if (y < 50) { // top
-		// 		y = -50 - y;
-		// 	}
-		// 	else { // bottom
-		// 		y = 800 + y;
-		// 	}
-		// }
-		// else {
-		// 	y = (Math.random() * 1000) - 100;
-		// 	x = (Math.random() * 100);
-		// 	if (x < 50) { // left
-		// 		x = -50 - x;
-		// 	}
-		// 	else { // right
-		// 		x = 800 + x;
-		// 	}
-		// }
+			if (y < 50) { // top
+				y = -50 - y;
+			}
+			else { // bottom
+				y = 800 + y;
+			}
+		}
+		else {
+			y = (Math.random() * 1000) - 100;
+			x = (Math.random() * 100);
+			if (x < 50) { // left
+				x = -50 - x;
+			}
+			else { // right
+				x = 800 + x;
+			}
+		}
 
 		this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
 	}
