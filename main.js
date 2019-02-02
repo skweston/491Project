@@ -642,8 +642,9 @@ function Spawner(game) {
 
     this.pWidth = 32;
     this.pHeight = 32;
-    this.scale = 1.5;this.animation = new Animation(AM.getAsset("./img/SpawnDoor.png"), this.pWidth, this.pHeight,  640, 0.1, 5, true, this.scale);
-
+    this.scale = 4;
+	this.openingAnimation = new Animation(AM.getAsset("./img/SpawnDoor.png"), this.pWidth, this.pHeight,  640, 0.1, 4, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/SpawnDoor.png"), this.pWidth, this.pHeight, 640, 0.1, 1, true, this.scale);
     this.name = "Enemy";
     this.x = 0;
     this.y = 0;
@@ -657,9 +658,10 @@ function Spawner(game) {
     this.removeFromWorld = false;
     this.health = 50;
 
+	//the spawns that the spawner 'owns'
 	this.spawns = [
-                            new Scourge(this.game, AM.getAsset("./img/scourge.png"), this.x, this.y),
-                            new Scourge(this.game, AM.getAsset("./img/scourge.png"), this.x, this.y)
+                            new Scourge(this.game, AM.getAsset("./img/scourge.png"), this.x+this.pWidth, this.y+this.pHeight),
+                            new Scourge(this.game, AM.getAsset("./img/scourge.png"), this.x+this.pWidth, this.y+this.pHeight)
                             //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 30, y + 30),
                             //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 40, y + 40),
                             //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 50, y + 50),
@@ -683,16 +685,17 @@ Spawner.prototype.update = function () {
     //if we want it in degrees
     //this.angle *= 180 / Math.PI;
 */
-	console.log(`${this.generateEnemy} ${this.game.clicked}`);
-    if (this.game.clicked && this.generateEnemy === 0 ){
-      console.log("before loop: " + this.x  + " and the y: " + this.y);
+	//timer reaches 0 Enter
+    if (this.generateEnemy === 0 ){
+		//checks all spawns if they are alive, once one is found that isn't it tips flag and inserts it to game
         for (let i = 0, flag = true; i < this.maxSpawn && flag; i++) {
-			console.log(`${this.spawns[i].removeFromWorld} ${this.spawns[i].x}`);
+
             if (this.spawns[i].removeFromWorld === false) {
                 flag = false;
                 this.game.addEntity(this.spawns[i], this.x, this.y);
             }
         }
+		//set the timer back, even if nothing is released because of max being reached.
         this.generateEnemy = this.timerReset;
     }
 
@@ -701,8 +704,12 @@ Spawner.prototype.update = function () {
 }
 
 Spawner.prototype.draw = function () {
-    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-
+	if(this.generateEnemy < 25) {
+    	this.openingAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	else {
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
     //Entity.prototype.draw.call(this);
 }
 
