@@ -632,6 +632,81 @@ Scourge.prototype.draw = function () {
 }
 
 /* ========================================================================================================== */
+// Spawner - Enemy
+/* ========================================================================================================== */
+function Spawner(game) {
+    //Specific to spawners:
+    this.timerReset = 500;
+    this.generateEnemy = this.timerReset;
+    this.maxSpawn = 2; // maybe make this a difficulty variable.
+
+    this.pWidth = 32;
+    this.pHeight = 32;
+    this.scale = 1.5;this.animation = new Animation(AM.getAsset("./img/SpawnDoor.png"), this.pWidth, this.pHeight,  640, 0.1, 5, true, this.scale);
+
+    this.name = "Enemy";
+    this.x = 0;
+    this.y = 0;
+    this.xMid = this.x + (this.pWidth * this.scale) / 2;
+    this.yMid = this.y + (this.pHeight * this.scale) / 2;
+    this.radius = 16;
+    this.speed = 0;
+    this.angle = 0;
+    this.game = game;
+    this.ctx = game.ctx;
+    this.removeFromWorld = false;
+    this.health = 50;
+
+	this.spawns = [
+                            new Scourge(this.game, AM.getAsset("./img/scourge.png"), this.x, this.y),
+                            new Scourge(this.game, AM.getAsset("./img/scourge.png"), this.x, this.y)
+                            //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 30, y + 30),
+                            //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 40, y + 40),
+                            //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 50, y + 50),
+    ];
+}
+Spawner.prototype = new Entity();
+Spawner.prototype.constructor = Spawner;
+
+Spawner.prototype.update = function () {
+    this.generateEnemy--;
+    if(this.health < 1){
+      this.removeFromWorld = true;
+    }
+/* Dont need this as the spawner should remain stationary
+    //this.x += this.game.clockTick * this.speed;
+    //if (this.x > 800) this.x = -230;
+    var dx = this.game.mouseX - this.xMid-1;
+    var dy = (this.yMid - this.game.mouseY)-1;
+    // this should be the angle in radians
+    this.angle = -Math.atan2(dy,dx);
+    //if we want it in degrees
+    //this.angle *= 180 / Math.PI;
+*/
+	console.log(`${this.generateEnemy} ${this.game.clicked}`);
+    if (this.game.clicked && this.generateEnemy === 0 ){
+      console.log("before loop: " + this.x  + " and the y: " + this.y);
+        for (let i = 0, flag = true; i < this.maxSpawn && flag; i++) {
+			console.log(`${this.spawns[i].removeFromWorld} ${this.spawns[i].x}`);
+            if (this.spawns[i].removeFromWorld === false) {
+                flag = false;
+                this.game.addEntity(this.spawns[i], this.x, this.y);
+            }
+        }
+        this.generateEnemy = this.timerReset;
+    }
+
+
+    Entity.prototype.update.call(this);
+}
+
+Spawner.prototype.draw = function () {
+    this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+
+    //Entity.prototype.draw.call(this);
+}
+
+/* ========================================================================================================== */
 // The Ship
 /* ========================================================================================================== */
 
@@ -1144,6 +1219,7 @@ PlayGame.prototype.update = function () {
 	if(this.game.running && this.bossTimer === 0){
 		this.bossTimer = 1000;
 		this.game.addEntity(new Boss1(this.game));
+		this.game.addEntity(new Spawner(this.game));
 	}
 	if (this.spawnTimer > 0) {
 		this.spawnTimer--;
@@ -1181,7 +1257,7 @@ PlayGame.prototype.update = function () {
 				}
 			}
 
-			this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
+			//this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
 
 			this.counter++;
 			if (this.counter % 10 === 0) {
@@ -1238,6 +1314,7 @@ AM.queueDownload("./img/spreader.png");
 
 // enemies
 AM.queueDownload("./img/scourge.png");
+AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
 
