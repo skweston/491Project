@@ -269,7 +269,7 @@ Boss1.prototype.update = function () {
 	if (this.turretsRemaining === 0){
 		this.removeFromWorld = true;
 	}
-	if(this.y < -2000){
+	if(!this.game.running){
 		this.turret1.removeFromWorld = true;
 		this.turret2.removeFromWorld = true;
 		this.turret3.removeFromWorld = true;
