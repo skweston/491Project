@@ -93,7 +93,6 @@ GameEngine.prototype.startInput = function () {
 
 	this.ctx.canvas.addEventListener("click", function (e) {
 		that.click = getXandY(e);
-		that.clicked = true;
 		that.wasclicked = true;
 		// console.log(e);
 		// console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
@@ -171,6 +170,9 @@ GameEngine.prototype.startInput = function () {
 		}
 		if (e.code === "Space") {
 			that.roll = true;
+		}
+		if (e.code === "Enter") {
+			that.clicked = true;
 		}
 	}, false);
 
@@ -370,7 +372,7 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
-	
+
 	count = this.player.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.player[i];

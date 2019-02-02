@@ -1162,7 +1162,7 @@ PlayGame.prototype.draw = function (ctx) {
 		ctx.fillText("Space to perform a roll", 400, 430);
 		ctx.fillText("Grab powerups to shoot more at once", 400, 460);
 		ctx.fillText("Survive as long as you can!", 400, 490);
-		ctx.fillText("Click to Play!", 400, 520);
+		ctx.fillText("Press Enter to start", 400, 520);
 	}
 }
 
