@@ -1,5 +1,6 @@
 // useful global things here
 var SHOW_HITBOX = false;
+var SCORE = 0;
 
 /*
 function distance(a, b) {
@@ -266,10 +267,13 @@ Boss1.prototype.update = function () {
 	//console.log("boss is updating");
 	this.y -= this.game.clockTick * this.speed;
 
-	if (this.turretsRemaining === 0){
+	if (this.turretsRemaining === 0) {
+		SCORE += 5;
+
 		this.removeFromWorld = true;
 	}
-	if(!this.game.running || this.y < -500){
+
+	if(!this.game.running || this.y === -500) {
 		this.turret1.removeFromWorld = true;
 		this.turret2.removeFromWorld = true;
 		this.turret3.removeFromWorld = true;
@@ -342,7 +346,9 @@ BossTurret.prototype.update = function () {
 
 	this.shootCooldown--;
 
-	if(this.health < 1){
+	if(this.health < 1) {
+		SCORE += 3;
+
 		this.boss.turretsRemaining--;
 
         this.removeFromWorld = true;
@@ -598,6 +604,8 @@ Scourge.prototype.update = function () {
 
 	// check health
 	if (this.health < 1) {
+		SCORE++;
+
 		if (Math.random() * 100 < 20) {
 			var spreader = new Spreader(this.game);
 			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
@@ -1123,6 +1131,7 @@ PlayGame.prototype.reset = function () {
 	this.game.clicked = false;
 	this.spawnNum = 1;
 	this.counter = 0;
+	this.bossTimer = 1000;
 
 	for (var i = 0; i < this.game.extras.length; i++) {
 		this.game.extras[i].removeFromWorld = true;
@@ -1136,13 +1145,14 @@ PlayGame.prototype.reset = function () {
 }
 
 PlayGame.prototype.update = function () {
-	if (this.game.roll) {
+	if (!this.game.running && this.game.roll) {
+		SCORE = 0;
 		this.game.running = true;
 	}
 	if (this.bossTimer > 0){
 		this.bossTimer--;
 	}
-	if(this.game.running && this.bossTimer === 0){
+	if (this.game.running && this.bossTimer === 0) {
 		this.bossTimer = 1000;
 		this.game.addEntity(new Boss1(this.game));
 	}
@@ -1185,9 +1195,10 @@ PlayGame.prototype.update = function () {
 			this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
 
 			this.counter++;
-			if (this.counter % 10 === 0) {
-				this.spawnNum++;
-			}
+		}
+
+		if (this.counter % 10 === 0) {
+			this.spawnNum++;
 		}
 	}
 
@@ -1213,6 +1224,11 @@ PlayGame.prototype.draw = function (ctx) {
 		ctx.fillText("Survive as long as you can!", 400, 490);
 		ctx.fillText("Press Space to start", 400, 520);
 	}
+
+	ctx.font = "24pt Impact";
+	ctx.fillStyle = "Red";
+	ctx.textAlign = "left";
+	ctx.fillText("Score: " + SCORE, 10, 40);
 }
 
 /* ========================================================================================================== */
@@ -1265,8 +1281,6 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(pg);
 
 	gameEngine.ship = ship;
-
-
 
 	console.log("All Done!");
 });
