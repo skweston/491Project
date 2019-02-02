@@ -269,7 +269,13 @@ Boss1.prototype.update = function () {
 	if (this.turretsRemaining === 0){
 		this.removeFromWorld = true;
 	}
-
+	if(this.y < -2000){
+		this.turret1.removeFromWorld = true;
+		this.turret2.removeFromWorld = true;
+		this.turret3.removeFromWorld = true;
+		this.turret4.removeFromWorld = true;
+		this.removeFromWorld = true;
+	}
 
 	Entity.prototype.update.call(this);
 }
@@ -1100,7 +1106,7 @@ Spreader.prototype.draw = function () {
 
 function PlayGame(game) {
 	this.name = "Level";
-	this.bossTimer = 500;
+	this.bossTimer = 1000;
 	this.spawnTimer = 0;
 	this.spawnNum = 1;
 	this.counter = 0;
@@ -1131,9 +1137,11 @@ PlayGame.prototype.update = function () {
 	if (this.game.clicked) {
 		this.game.running = true;
 	}
-	this.bossTimer--;
-	if(this.bossTimer < 0){
-		this.bossTimer = 500;
+	if (this.bossTimer > 0){
+		this.bossTimer--;
+	}
+	if(this.game.running && this.bossTimer === 0){
+		this.bossTimer = 1000;
 		this.game.addEntity(new Boss1(this.game));
 	}
 	if (this.spawnTimer > 0) {
