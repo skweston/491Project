@@ -550,7 +550,7 @@ Scourge.prototype.update = function () {
 
 	// check collision with ship
 	if (Collide(this, this.game.ship)) {
-		ent.health -= this.damage;
+		this.game.ship.health -= this.damage;
 		this.removeFromWorld = true;
 	}
 
