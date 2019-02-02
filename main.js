@@ -263,7 +263,7 @@ Boss1.prototype = new Entity();
 Boss1.prototype.constructor = Boss1;
 
 Boss1.prototype.update = function () {
-	console.log("boss is updating");
+	//console.log("boss is updating");
 	this.y -= this.game.clockTick * this.speed;
 
 	if (this.turretsRemaining === 0){
@@ -276,7 +276,7 @@ Boss1.prototype.update = function () {
 		this.turret4.removeFromWorld = true;
 		this.removeFromWorld = true;
 	}
-	//add a comment
+
 
 	Entity.prototype.update.call(this);
 }
