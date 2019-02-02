@@ -240,7 +240,7 @@ function Boss1(game){
 	this.scale = 1;
     this.animation = new Animation(AM.getAsset("./img/Boss1.png"), 200, 450, 1200, 0.175, 6, true, 1);
     this.name = "Enemy";
-    this.x = Math.random() *800;
+    this.x = Math.random() *600;
     this.y = 2000;
     this.angle = 0;
     this.speed = 100;
@@ -269,7 +269,7 @@ Boss1.prototype.update = function () {
 	if (this.turretsRemaining === 0){
 		this.removeFromWorld = true;
 	}
-	if(!this.game.running){
+	if(!this.game.running || this.y < -500){
 		this.turret1.removeFromWorld = true;
 		this.turret2.removeFromWorld = true;
 		this.turret3.removeFromWorld = true;
