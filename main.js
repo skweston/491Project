@@ -134,6 +134,8 @@ Animation.prototype.isDone = function () {
 /* ========================================================================================================== */
 function Background(game, spritesheet) {
 
+	this.name = "Background";
+
     this.spritesheet = spritesheet;
     this.game = game;
     this.ctx = game.ctx;
@@ -628,6 +630,7 @@ function TheShip(game) {
 	this.primaryCooldown = 0;
 	this.secondaryCooldownMax = 50;
 	this.secondaryCooldown = 0;
+	this.spreaderLevel = 0;
 	this.spreader = 0;
 
 	this.game = game;
@@ -739,20 +742,39 @@ TheShip.prototype.update = function () {
 	if (this.spreader > 0) {
 		this.spreader -= 1;
 	}
+	if (this.spreader <= 0) {
+		this.spreaderLevel = 0;
+	}
 	if (this.game.firePrimary && this.primaryCooldown === 0) {
 		this.primaryCooldown = this.primaryCooldownMax;
 		for (var i = 0; i < 2; i++) {
-			var offset = (Math.PI / 24 * Math.pow(-1, i));
+			var offset = (4 * Math.pow(-1, i));
 			this.createProjectile("Primary", offset, 0);
 		}
-		if (this.spreader > 0) {
+		if (this.spreaderLevel > 0) {
 			for (var i = 0; i < 2; i++) {
-				this.createProjectile("Primary", 0, ((Math.PI / 6) * Math.pow(-1, i)));
+				for (var j = 0; j < 2; j++) {
+					var offset = (4 * Math.pow(-1, j));
+					this.createProjectile("Primary", offset, ((Math.PI / 12) * Math.pow(-1, i)));
+				}
+				if (this.spreaderLevel > 1) {
+					for (var j = 0; j < 2; j++) {
+						var offset = (Math.PI / 24 * Math.pow(-1, j));
+						this.createProjectile("Primary", offset, ((Math.PI / 6) * Math.pow(-1, i)));
+					}
+				}
 			}
 		}
 	}
 	if (this.game.fireSecondary && this.secondaryCooldown === 0) {
 		this.secondaryCooldown = this.secondaryCooldownMax;
+
+		if (this.spreaderLevel > 1) {
+			for (var i = 0; i < 2; i++) {
+				this.createProjectile("Secondary", 0, ((Math.PI / 8) * Math.pow(-1, i)));
+			}
+		}
+
 		this.createProjectile("Secondary", 0, 0);
 	}
 
@@ -774,11 +796,9 @@ TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var dir = direction(target, this);
 
 	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-				   ((this.radius + projectile.pWidth * projectile.scale / 2) *
-				   Math.cos(angle + offset));
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset));
 	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-				   ((this.radius + projectile.pHeight * projectile.scale / 2) *
-				   Math.sin(angle + offset));
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset));
 	projectile.velocity.x = dir.x * projectile.maxSpeed;
 	projectile.velocity.y = dir.y * projectile.maxSpeed;
 	projectile.angle = angle;
@@ -852,6 +872,11 @@ ShipPrimary.prototype = new Entity();
 ShipPrimary.prototype.constructor = ShipPrimary;
 
 ShipPrimary.prototype.update = function () {
+	// remove offscreen projectile
+	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+		this.removeFromWorld = true;
+	}
+
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
 
@@ -916,6 +941,11 @@ ShipSecondary.prototype = new Entity();
 ShipSecondary.prototype.constructor = ShipSecondary;
 
 ShipSecondary.prototype.update = function () {
+	// remove offscreen projectile
+	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+		this.removeFromWorld = true;
+	}
+
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
 
@@ -1017,6 +1047,7 @@ Spreader.prototype.draw = function () {
 /* ========================================================================================================== */
 
 var AM = new AssetManager();
+
 AM.queueDownload("./img/smartBomb.png");
 AM.queueDownload("./img/space1-1.png");
 
@@ -1070,15 +1101,15 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(ship);
 
 	var level = new PrototypeLevel(gameEngine);
-	//level.start();
-
-	//Prototype Level
 	console.log("All Done!");
 });
 
+/* ========================================================================================================== */
+// Level Manager stuff
+/* ========================================================================================================== */
+
 function PrototypeLevel(game) {
 	this.game = game;
-
 	var that = this;
 
 	var border = 0;
