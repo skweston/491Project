@@ -276,6 +276,7 @@ Boss1.prototype.update = function () {
 		this.turret4.removeFromWorld = true;
 		this.removeFromWorld = true;
 	}
+	//add a comment
 
 	Entity.prototype.update.call(this);
 }
