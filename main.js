@@ -620,8 +620,8 @@ function TheShip(game) {
 	this.cancelBoost = false;
 	this.rolling = false;
 	this.rollCooldown = 0;
-	this.x = 100;
-	this.y = 100;
+	this.x = 400 - (this.pWidth * this.scale / 2);
+	this.y = 400 - (this.pHeight * this.scale / 2);
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 	this.radius = this.scale * 64;
@@ -1049,9 +1049,9 @@ Spreader.prototype.draw = function () {
 // Level Manager stuff
 /* ========================================================================================================== */
 
-function PlayGame(game, x, y) {
+function PlayGame(game) {
 	this.name = "Level";
-	Entity.call(this, game, x, y);
+	Entity.call(this, game);
 }
 
 PlayGame.prototype = new Entity();
@@ -1106,7 +1106,12 @@ PlayGame.prototype.draw = function (ctx) {
 		if (this.game.mouse) {
 			ctx.fillStyle = "Pink";
 		}
-		ctx.fillText("Click to Play!", this.x, this.y);
+		ctx.textAlign = "center";
+		ctx.fillText("WASD to move", 400, 340);
+		ctx.fillText("LClick and RClick to shoot", 400, 370);
+		ctx.fillText("LShift to boost", 400, 400);
+		ctx.fillText("Survive and get a high score!", 400, 430);
+		ctx.fillText("Click to Play!", 400, 460);
 	}
 }
 
@@ -1189,7 +1194,7 @@ AM.downloadAll(function () {
 
 	var ship = new TheShip(gameEngine);
 	var background = new Background(gameEngine, AM.getAsset("./img/space1-1.png"));
-	var pg = new PlayGame(gameEngine, 320, 350);
+	var pg = new PlayGame(gameEngine);
 
 	gameEngine.addEntity(ship);
 	gameEngine.addEntity(background);
