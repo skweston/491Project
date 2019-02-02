@@ -1100,6 +1100,7 @@ PlayGame.prototype.reset = function () {
 
 PlayGame.prototype.update = function () {
 	if (!this.game.running && this.game.roll) {
+		this.game.ship = 100;
 		SCORE = 0;
 		this.game.running = true;
 	}
