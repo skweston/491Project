@@ -134,6 +134,8 @@ Animation.prototype.isDone = function () {
 /* ========================================================================================================== */
 function Background(game, spritesheet) {
 
+	this.name = "Background";
+
     this.spritesheet = spritesheet;
     this.game = game;
     this.ctx = game.ctx;
@@ -492,9 +494,10 @@ Scourge.prototype.update = function () {
 		if(Collide(this,ent)){
 			this.health -= ent.damage;
 			ent.pierce--;
-			if(ent.pierce < 1){
-				ent.removeFromWorld;
+			if(ent.pierce < 0){
+				ent.removeFromWorld = true;
 			}
+
 		}
 	}
 	var ent = this.game.ship;
@@ -522,7 +525,7 @@ Scourge.prototype.update = function () {
 		this.health = 0;
 		this.kamikaze = true;
 		ent.health -= this.damage;
-
+		this.removeFromWorld = true;
 	}
 
 
@@ -627,6 +630,7 @@ function TheShip(game) {
 	this.primaryCooldown = 0;
 	this.secondaryCooldownMax = 50;
 	this.secondaryCooldown = 0;
+	this.spreaderLevel = 0;
 	this.spreader = 0;
 
 	this.game = game;
@@ -738,20 +742,39 @@ TheShip.prototype.update = function () {
 	if (this.spreader > 0) {
 		this.spreader -= 1;
 	}
+	if (this.spreader <= 0) {
+		this.spreaderLevel = 0;
+	}
 	if (this.game.firePrimary && this.primaryCooldown === 0) {
 		this.primaryCooldown = this.primaryCooldownMax;
 		for (var i = 0; i < 2; i++) {
-			var offset = (Math.PI / 24 * Math.pow(-1, i));
+			var offset = (4 * Math.pow(-1, i));
 			this.createProjectile("Primary", offset, 0);
 		}
-		if (this.spreader > 0) {
+		if (this.spreaderLevel > 0) {
 			for (var i = 0; i < 2; i++) {
-				this.createProjectile("Primary", 0, ((Math.PI / 6) * Math.pow(-1, i)));
+				for (var j = 0; j < 2; j++) {
+					var offset = (4 * Math.pow(-1, j));
+					this.createProjectile("Primary", offset, ((Math.PI / 12) * Math.pow(-1, i)));
+				}
+				if (this.spreaderLevel > 1) {
+					for (var j = 0; j < 2; j++) {
+						var offset = (Math.PI / 24 * Math.pow(-1, j));
+						this.createProjectile("Primary", offset, ((Math.PI / 6) * Math.pow(-1, i)));
+					}
+				}
 			}
 		}
 	}
 	if (this.game.fireSecondary && this.secondaryCooldown === 0) {
 		this.secondaryCooldown = this.secondaryCooldownMax;
+
+		if (this.spreaderLevel > 1) {
+			for (var i = 0; i < 2; i++) {
+				this.createProjectile("Secondary", 0, ((Math.PI / 8) * Math.pow(-1, i)));
+			}
+		}
+
 		this.createProjectile("Secondary", 0, 0);
 	}
 
@@ -773,11 +796,9 @@ TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var dir = direction(target, this);
 
 	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-				   ((this.radius + projectile.pWidth * projectile.scale / 2) *
-				   Math.cos(angle + offset));
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset));
 	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-				   ((this.radius + projectile.pHeight * projectile.scale / 2) *
-				   Math.sin(angle + offset));
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset));
 	projectile.velocity.x = dir.x * projectile.maxSpeed;
 	projectile.velocity.y = dir.y * projectile.maxSpeed;
 	projectile.angle = angle;
@@ -838,7 +859,7 @@ function ShipPrimary(game) {
 	this.angle = 0;
 	this.pierce = 0;
 	this.lifetime = 500;
-	this.damage = 2;
+	this.damage = 4;
 	this.maxSpeed = 1500;
 	this.velocity = {x: 0, y: 0};
 
@@ -851,6 +872,11 @@ ShipPrimary.prototype = new Entity();
 ShipPrimary.prototype.constructor = ShipPrimary;
 
 ShipPrimary.prototype.update = function () {
+	// remove offscreen projectile
+	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+		this.removeFromWorld = true;
+	}
+
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
 
@@ -902,7 +928,7 @@ function ShipSecondary(game) {
 	this.angle = 0;
 	this.pierce = 0;
 	this.lifetime = 1500;
-	this.damage = 10;
+	this.damage = 15;
 	this.maxSpeed = 500;
 	this.velocity = {x: 0, y: 0};
 
@@ -915,6 +941,11 @@ ShipSecondary.prototype = new Entity();
 ShipSecondary.prototype.constructor = ShipSecondary;
 
 ShipSecondary.prototype.update = function () {
+	// remove offscreen projectile
+	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+		this.removeFromWorld = true;
+	}
+
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
 
@@ -969,7 +1000,7 @@ function Spreader(game) {
 	this.radius = this.scale * 42;
 	this.angle = 0;
 
-	this.lifetime = 1500;
+	this.lifetime = 500;
 
 	this.game = game;
 	this.ctx = game.ctx;
@@ -1016,6 +1047,7 @@ Spreader.prototype.draw = function () {
 /* ========================================================================================================== */
 
 var AM = new AssetManager();
+
 AM.queueDownload("./img/smartBomb.png");
 AM.queueDownload("./img/space1-1.png");
 
@@ -1069,15 +1101,15 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(ship);
 
 	var level = new PrototypeLevel(gameEngine);
-	//level.start();
-
-	//Prototype Level
 	console.log("All Done!");
 });
 
+/* ========================================================================================================== */
+// Level Manager stuff
+/* ========================================================================================================== */
+
 function PrototypeLevel(game) {
 	this.game = game;
-
 	var that = this;
 
 	var border = 0;
@@ -1086,7 +1118,7 @@ function PrototypeLevel(game) {
 
 	setInterval(function () {
 		border = Math.floor((Math.random() * 2));
-		console.log(border);
+		// console.log(border);
 
 		if (border === 0) {
 			x = (Math.random() * 1000) - 100;

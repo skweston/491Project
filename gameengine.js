@@ -282,7 +282,7 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
-
+	// console.log("there are currently: " + this.enemies.length);
 	count = this.enemies.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.enemies[i];
