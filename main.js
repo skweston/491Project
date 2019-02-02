@@ -507,7 +507,7 @@ function Scourge(game, spritesheet, xIn, yIn) {
 	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
 	this.angle = 0;
 	this.name = "Enemy";
-	this.speed = 7;
+	this.speed = 0.7;
 	this.x = xIn;
 	this.y = yIn;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -526,63 +526,17 @@ Scourge.prototype = new Entity();
 Scourge.prototype.constructor = Scourge;
 
 Scourge.prototype.update = function () {
-	// move the scourge
-	var ent = this.game.ship;
-
-	var delta = this.speed / (distance(this, ent));
-	var dX = Math.abs(this.xMid - ent.xMid);
-	var dY = Math.abs(this.yMid - ent.yMid);
-	if(this.xMid > ent.xMid) {
-		this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
-	} else if(this.xMid < ent.xMid) {
-		this.xMid = (Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
-	}
-
-	if(this.yMid > ent.yMid) {
-		this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
-	} else if(this.yMid < ent.yMid) {
-		this.yMid = (Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
-	}
-
-	this.x = this.xMid - (this.pWidth * this.scale / 2);
-	this.y = this.yMid - (this.pHeight * this.scale / 2);
-
-	// for(var i = 0; i < this.game.enemies; i++){
-	// 	var ent = this.game.enemies[i];
-	// 	if(ent.name === this.name && ent != this) {
-	// 		var dist = distance(this, ent);
-	// 		if(dist < this.radius + ent.radius) {
-	// 			var delta = (this.radius + ent.radius) / (distance(this, ent));
-	// 			var dX = Math.abs(this.xMid - ent.xMid);
-	// 			var dY = Math.abs(this.yMid - ent.yMid);
-
-	// 			if(this.xMid > ent.xMid) {
-	// 				this.xMid = this.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
-	// 				ent.xMid = ent.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
-	// 			} else if(this.xMid < ent.xMid) {
-	// 				this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
-	// 				ent.xMid = ent.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
-	// 			}
-
-	// 			if(this.yMid > ent.yMid) {
-	// 				this.yMid = this.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
-	// 				ent.YMid = ent.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
-	// 			} else if(this.yMid < ent.yMid) {
-	// 				this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
-	// 				ent.yMid = ent.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
-	// 			}
-	// 			this.x = this.xMid - (this.pWidth * this.scale / 2);
-	// 			this.y = this.yMid - (this.pHeight * this.scale / 2);
-	// 			ent.x = ent.xMid - (this.pWidth * this.scale / 2);
-	// 			ent.y = ent.yMid - (this.pHeight * this.scale / 2);
-	// 		}
-	// 	}
-	// }
-
 	// update angle
 	var dx = this.game.ship.xMid - this.xMid;
 	var dy = this.yMid - this.game.ship.yMid;
 	this.angle = -Math.atan2(dy,dx);
+
+	// move the scourge
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	// check collision with player projectiles
 	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
