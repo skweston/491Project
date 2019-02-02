@@ -370,7 +370,7 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
-	
+
 	count = this.player.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.player[i];
