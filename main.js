@@ -174,6 +174,19 @@ Camera.prototype.update = function () {
 		this.y = this.game.ship.yMid - (this.ctx.canvas.height/this.deadzoneRatio);
 	}
 
+	if(this.x < 0){
+		this.x = 0;
+	}
+	if(this.y < 0){
+		this.y = 0;
+	}
+	if (this.x + this.ctx.canvas.width > (this.game.ctx.canvas.width)){
+		this.x = this.game.ctx.canvas.width - this.ctx.canvas.width;
+	}
+	if (this.y + this.ctx.canvas.height > (this.game.ctx.canvas.height)){
+		this.y = this.game.ctx.canvas.height - this.ctx.canvas.height;
+	}
+
 
 
 };
@@ -290,14 +303,14 @@ function Boss1(game){
 	this.pWidth = 200;
 	this.pHeight = 450;
 	this.scale = 1;
-    this.animation = new Animation(AM.getAsset("./img/Boss1.png"), 200, 450, 1200, 0.175, 6, true, 1);
-    this.name = "Enemy";
-    this.x = Math.random() *600;
-    this.y = 2000;
-    this.angle = 0;
-    this.speed = 100;
     this.game = game;
     this.ctx = game.ctx;
+    this.animation = new Animation(AM.getAsset("./img/Boss1.png"), 200, 450, 1200, 0.175, 6, true, 1);
+    this.name = "Enemy";
+    this.x = (Math.random() * this.ctx.canvas.width) - 200;
+    this.y = this.ctx.canvas.height + 500;
+    this.angle = 0;
+    this.speed = 100;
     this.removeFromWorld = false;
 	this.turret1 = new BossTurret(this.game, this, 70, 125);
 	this.turret2 = new BossTurret(this.game, this, 70, 195);
@@ -1171,7 +1184,7 @@ PlayGame.prototype.update = function () {
 
 		for (var i = 0; i < this.spawnNum; i++) {
 			var border = 0;
-			var x = Math.random() * 800;
+			var x = Math.random() * this.game.ctx.canvas.width;
 			var y = 0;
 
 			border = Math.floor((Math.random() * 2));
@@ -1184,7 +1197,7 @@ PlayGame.prototype.update = function () {
 					y = -50 - y;
 				}
 				else { // bottom
-					y = 800 + y;
+					y = this.game.ctx.canvas.height + y;
 				}
 			}
 			else {
@@ -1195,7 +1208,7 @@ PlayGame.prototype.update = function () {
 					x = -50 - x;
 				}
 				else { // right
-					x = 800 + x;
+					x = this.game.ctx.canvas.width + x;
 				}
 			}
 
