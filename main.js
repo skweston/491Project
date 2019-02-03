@@ -676,6 +676,7 @@ function TheShip(game) {
 
 	this.name = "Player";
 	this.health = 100;
+	this.boost = 1000;
 	this.speed = 0.5;
 	this.boosting = false;
 	this.cancelBoost = false;
@@ -693,6 +694,8 @@ function TheShip(game) {
 	this.secondaryCooldown = 0;
 	this.spreaderLevel = 0;
 	this.spreader = 0;
+	this.boostGainRate = 1;
+	this.boostConsumeRate = 2;
 
 
 	this.removeFromWorld = false;
@@ -776,14 +779,16 @@ TheShip.prototype.update = function () {
 	}
 
 	// boosting
-	if (this.game.boost && !this.rolling) {
+	if (this.boost > 0 && this.game.boost && !this.rolling) {
 		this.cancelBoost = false;
 		this.boosting = true;
 		this.speed = 1;
+		this.boost -= this.boostConsumeRate;
 	}
 	if (!this.game.boost && !this.rolling) {
 		this.boosting = false;
 		this.speed = 0.5;
+		this.boost += this.boostGainRate;
 	}
 
 	// boost input buffer during rolls
@@ -1250,6 +1255,10 @@ PlayGame.prototype.draw = function (ctx) {
 	ctx.textAlign = "left";
 	ctx.fillText("Health: " + this.game.ship.health,  this.game.camera.x + 10, this.game.camera.y + 40);
 	ctx.fillText("Score: " + SCORE, this.game.camera.x + 10, this.game.camera.y + 70);
+	//Boost meter
+	ctx.fillText("Boost Meter: ",  this.game.camera.x + 10, this.game.camera.y + 100);
+	ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
+	ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
 }
 
 /* ========================================================================================================== */
