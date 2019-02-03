@@ -134,25 +134,46 @@ Animation.prototype.isDone = function () {
 // Camera
 /* ========================================================================================================== */
 function Camera(game){
-	this.game = game;
-	this.x = 0;
-	this.y = 0;
-	this.ctx = this.game.cameraCtx;
 
+	this.game = game;
+	this.ctx = this.game.cameraCtx;
+	this.x = this.game.ship.xMid - this.ctx.canvas.width/2;
+	this.y = this.game.ship.yMid - this.ctx.canvas.height/2;
+
+	this.deadzoneRatio = 3;
 
 }
 Camera.prototype.draw = function (cameraCtx) {
-	cameraCtx.drawImage(this.game.ctx.canvas, this.x , this.y, 800, 800, 0, 0, 800, 800);
+	cameraCtx.drawImage(this.game.ctx.canvas, this.x , this.y,
+		 				this.ctx.canvas.width, this.ctx.canvas.height,
+		 				0, 0,
+						this.ctx.canvas.width, this.ctx.canvas.height);
 
 
 };
 
 Camera.prototype.update = function () {
-	this.x = this.game.ship.xMid - 400;
-	this.y = this.game.ship.yMid - 400;
+	// this.game.reticle.x =
+	// this.game.reticle.y =
+	// this.x = this.game.ship.xMid - this.ctx.canvas.width/2;
+	// this.y = this.game.ship.yMid - this.ctx.canvas.height/2;
 
 	//this is where we'll build the binding box to house the ship in a deadzone.
 	//that logic is what will be needed to update x and y to better values.
+
+	if(this.game.ship.xMid > this.x + this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio)){
+		this.x = this.game.ship.xMid - (this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio));
+	}
+	if(this.game.ship.yMid > this.y + this.ctx.canvas.height-(this.ctx.canvas.height/this.deadzoneRatio)){
+		this.y = this.game.ship.yMid - (this.ctx.canvas.height-(this.ctx.canvas.height/this.deadzoneRatio));
+	}
+	if(this.game.ship.xMid < this.x + (this.ctx.canvas.width/this.deadzoneRatio)){
+		this.x = this.game.ship.xMid - (this.ctx.canvas.width/this.deadzoneRatio);
+	}
+	if(this.game.ship.yMid < this.y + (this.ctx.canvas.height/this.deadzoneRatio)){
+		this.y = this.game.ship.yMid - (this.ctx.canvas.height/this.deadzoneRatio);
+	}
+
 
 
 };
@@ -629,6 +650,8 @@ Scourge.prototype.draw = function () {
 /* ========================================================================================================== */
 
 function TheShip(game) {
+	this.game = game;
+	this.ctx = game.ctx;
 	this.pWidth = 128;
 	this.pHeight = 128;
 	this.scale = 0.5;
@@ -645,8 +668,8 @@ function TheShip(game) {
 	this.cancelBoost = false;
 	this.rolling = false;
 	this.rollCooldown = 0;
-	this.x = 400 - (this.pWidth * this.scale / 2);
-	this.y = 400 - (this.pHeight * this.scale / 2);
+	this.x = this.game.cameraCtx.canvas.width/2 - (this.pWidth * this.scale / 2);
+	this.y = this.game.cameraCtx.canvas.height/2 - (this.pHeight * this.scale / 2);
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 	this.radius = this.scale * 64;
@@ -658,8 +681,7 @@ function TheShip(game) {
 	this.spreaderLevel = 0;
 	this.spreader = 0;
 
-	this.game = game;
-	this.ctx = game.ctx;
+
 	this.removeFromWorld = false;
 	Entity.call(this, game, this.x, this.y);
 }
@@ -1270,6 +1292,7 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(background);
 	gameEngine.addEntity(pg);
 
+	gameEngine.reticle = reticle;
 	gameEngine.ship = ship;
 	gameEngine.cameraTrick = cameraTrick;
 	gameEngine.camera = new Camera(gameEngine);

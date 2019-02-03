@@ -95,21 +95,27 @@ GameEngine.prototype.startInput = function () {
 	// event listeners are added here
 
 	this.cameraCtx.canvas.addEventListener("click", function (e) {
-		that.click = getXandY(e);
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		that.wasclicked = true;
 		// console.log(e);
 		// console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("contextmenu", function (e) {
-		that.click = getXandY(e);
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		// console.log(e);
 		// console.log("Right Click Event - X,Y " + e.clientX + ", " + e.clientY);
 		e.preventDefault();
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("mousedown", function (e) {
-		that.click = getXandY(e);
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		// console.log(e);
 		if (e.which === 1) {
 			that.firePrimary = true;
@@ -122,7 +128,9 @@ GameEngine.prototype.startInput = function () {
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("mouseup", function (e) {
-		that.click = getXandY(e);
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		// console.log(e);
 		if (e.which === 1) {
 			that.firePrimary = false;
@@ -142,7 +150,18 @@ GameEngine.prototype.startInput = function () {
 		//console.log("Current mouse x: " + that.mousex + " current mouse y: " + that.mousey );
 	}, false);
 
+	this.cameraCtx.canvas.addEventListener("mouseover", function (e) {
+		//console.log(e);
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
+		//console.log("Current mouse x: " + that.mousex + " current mouse y: " + that.mousey );
+	}, false);
+
 	this.cameraCtx.canvas.addEventListener("mouseleave", function (e) {
+
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		that.mouse = false;
 	}, false);
 
