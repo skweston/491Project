@@ -137,8 +137,8 @@ GameEngine.prototype.startInput = function () {
 	this.cameraCtx.canvas.addEventListener("mousemove", function (e) {
 		//console.log(e);
 		that.mouse = true;
-		that.mouseX = (e.x - 7);
-		that.mouseY = (e.y - 7);
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		//console.log("Current mouse x: " + that.mousex + " current mouse y: " + that.mousey );
 	}, false);
 
@@ -241,7 +241,7 @@ GameEngine.prototype.addEntity = function (entity) {
 GameEngine.prototype.draw = function () {
 	this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
 	this.ctx.save();
-
+	this.cameraCtx.clearRect(0,0,800,800);
 	this.cameraCtx.save();
 	// for (var i = 0; i < this.entities.length; i++) {
 		//     this.entities[i].draw(this.ctx);
@@ -271,8 +271,9 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.player.length; i++) {
 		this.player[i].draw(this.ctx);
 	}
-	this.camera.draw(this.cameraCtx);
+
 	this.ctx.restore();
+	this.camera.draw(this.cameraCtx);
 	this.cameraCtx.restore();
 }
 
@@ -290,6 +291,8 @@ GameEngine.prototype.update = function () {
 	// 		entity.update();
 	// 	}
 	// }
+	this.camera.update();
+
 	var count = this.background.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.background[i];
@@ -391,7 +394,7 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
-	this.camera.update();
+
 
 	this.wasclicked = false;
 	this.roll = false;

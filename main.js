@@ -144,11 +144,13 @@ function Camera(game){
 Camera.prototype.draw = function (cameraCtx) {
 	cameraCtx.drawImage(this.game.ctx.canvas, this.x , this.y, 800, 800, 0, 0, 800, 800);
 
+
 };
 
 Camera.prototype.update = function () {
 	this.x = this.game.ship.xMid - 400;
 	this.y = this.game.ship.yMid - 400;
+
 	//this is where we'll build the binding box to house the ship in a deadzone.
 	//that logic is what will be needed to update x and y to better values.
 
@@ -165,6 +167,8 @@ function Background(game, spritesheet) {
 	this.spritesheet = spritesheet;
 	this.game = game;
 	this.ctx = game.ctx;
+	this.ctx.canvas.width = this.spritesheet.naturalWidth;
+	this.ctx.canvas.height = this.spritesheet.naturalHeight;
 
 	// Where the frame starts for the background. Divide image in half then subract the half the canvas,
 	// for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
@@ -673,24 +677,24 @@ TheShip.prototype.update = function () {
 	var xMove = 0;
 	var yMove = 0;
 	if (this.game.moveUp) {
-		if (this.yMid - this.radius > 0) {
-			yMove -= 10 * this.speed;
-		}
+
+		yMove -= 10 * this.speed;
+
 	}
 	if (this.game.moveLeft) {
-		if (this.xMid - this.radius > 0) {
-			xMove -= 10 * this.speed;
-		}
+
+		xMove -= 10 * this.speed;
+
 	}
 	if (this.game.moveDown) {
-		if (this.yMid + this.radius < 800) {
-			yMove += 10 * this.speed;
-		}
+
+		yMove += 10 * this.speed;
+
 	}
 	if (this.game.moveRight) {
-		if (this.xMid + this.radius < 800) {
-			xMove += 10 * this.speed;
-		}
+
+		xMove += 10 * this.speed;
+
 	}
 
 	if (xMove === 0) {
@@ -878,7 +882,7 @@ function ShipPrimary(game) {
 	this.radius = 10;
 	this.angle = 0;
 	this.pierce = 0;
-	this.lifetime = 500;
+	this.lifetime = 300;
 	this.damage = 4;
 	this.maxSpeed = 1500;
 	this.velocity = {x: 0, y: 0};
@@ -893,9 +897,9 @@ ShipPrimary.prototype.constructor = ShipPrimary;
 
 ShipPrimary.prototype.update = function () {
 	// remove offscreen projectile
-	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
-		this.removeFromWorld = true;
-	}
+	// if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+	// 	this.removeFromWorld = true;
+	// }
 
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
@@ -947,7 +951,7 @@ function ShipSecondary(game) {
 	this.radius = 10;
 	this.angle = 0;
 	this.pierce = 0;
-	this.lifetime = 1500;
+	this.lifetime = 300;
 	this.damage = 15;
 	this.maxSpeed = 500;
 	this.velocity = {x: 0, y: 0};
@@ -1245,8 +1249,6 @@ AM.downloadAll(function () {
 	var cameraTrick = document.getElementById("gameWorld");
 	var cameraCtx = cameraTrick.getContext("2d");
 	var canvas = document.createElement('canvas');
-	canvas.width = 800;
-	canvas.height = 800;
 	var ctx = canvas.getContext("2d");
 
 	var gameEngine = new GameEngine();
