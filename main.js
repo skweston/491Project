@@ -677,24 +677,24 @@ TheShip.prototype.update = function () {
 	var xMove = 0;
 	var yMove = 0;
 	if (this.game.moveUp) {
-
+		if (this.yMid - this.radius > 0){
 		yMove -= 10 * this.speed;
-
+	}
 	}
 	if (this.game.moveLeft) {
-
-		xMove -= 10 * this.speed;
-
+		if (this.xMid - this.radius > 0) {
+			xMove -= 10 * this.speed;
+		}
 	}
 	if (this.game.moveDown) {
-
-		yMove += 10 * this.speed;
-
+		if (this.yMid + this.radius < this.game.ctx.canvas.height) {
+			yMove += 10 * this.speed;
+		}
 	}
 	if (this.game.moveRight) {
-
-		xMove += 10 * this.speed;
-
+		if (this.xMid + this.radius < this.game.ctx.canvas.width) {
+			xMove += 10 * this.speed;
+		}
 	}
 
 	if (xMove === 0) {
@@ -966,9 +966,9 @@ ShipSecondary.prototype.constructor = ShipSecondary;
 
 ShipSecondary.prototype.update = function () {
 	// remove offscreen projectile
-	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
-		this.removeFromWorld = true;
-	}
+	// if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+	// 	this.removeFromWorld = true;
+	// }
 
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
@@ -1213,7 +1213,7 @@ PlayGame.prototype.draw = function (ctx) {
 	ctx.font = "24pt Impact";
 	ctx.fillStyle = "Red";
 	ctx.textAlign = "left";
-	ctx.fillText("Health: " + this.game.ship.health, 10, 40);
+	ctx.fillText("Health: " + this.game.ship.health,  10,  40);
 	ctx.fillText("Score: " + SCORE, 10, 70);
 }
 
