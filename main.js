@@ -72,7 +72,7 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
 	this.scale = scale;
 }
 
-Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
+Animation.prototype.drawFrame = function (tick, ctx, x, y, angle, game) {
 	this.elapsedTime += tick;
 	if (this.isDone()) {
 		if (this.loop) this.elapsedTime = 0;
@@ -116,6 +116,8 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
 	offscreenCtx.drawImage(thirdCanvas, -(this.frameWidth*this.scale / 2), -(this.frameHeight*this.scale / 2));
 	offscreenCtx.restore();
 	thirdCtx.clearRect(0,0, size, size);
+
+
 	ctx.drawImage(offscreenCanvas, x-(xOffset/2), y- (yOffset/2));
 
 
@@ -128,6 +130,30 @@ Animation.prototype.currentFrame = function () {
 Animation.prototype.isDone = function () {
 	return (this.elapsedTime >= this.totalTime);
 }
+/* ========================================================================================================== */
+// Camera
+/* ========================================================================================================== */
+function Camera(game){
+	this.game = game;
+	this.x = 0;
+	this.y = 0;
+	this.ctx = this.game.cameraCtx;
+
+
+}
+Camera.prototype.draw = function (cameraCtx) {
+	cameraCtx.drawImage(this.game.ctx.canvas, this.x , this.y, 800, 800, 0, 0, 800, 800);
+
+};
+
+Camera.prototype.update = function () {
+	this.x = this.game.ship.xMid - 400;
+	this.y = this.game.ship.yMid - 400;
+	//this is where we'll build the binding box to house the ship in a deadzone.
+	//that logic is what will be needed to update x and y to better values.
+
+
+};
 
 /* ========================================================================================================== */
 // Background
@@ -1216,13 +1242,17 @@ AM.queueDownload("./img/SpaceExplosion.png");
 
 AM.downloadAll(function () {
 	console.log("starting up da sheild");
-	var canvas = document.getElementById("gameWorld");
+	var cameraTrick = document.getElementById("gameWorld");
+	var cameraCtx = cameraTrick.getContext("2d");
+	var canvas = document.createElement('canvas');
+	canvas.width = 800;
+	canvas.height = 800;
 	var ctx = canvas.getContext("2d");
 
 	var gameEngine = new GameEngine();
 
-	gameEngine.init(ctx);
-	gameEngine.start();
+	gameEngine.init(ctx, cameraCtx);
+
 
 	gameEngine.running = false;
 
@@ -1237,6 +1267,8 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(pg);
 
 	gameEngine.ship = ship;
-
+	gameEngine.cameraTrick = cameraTrick;
+	gameEngine.camera = new Camera(gameEngine);
+	gameEngine.start();
 	console.log("All Done!");
 });
