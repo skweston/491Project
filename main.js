@@ -71,7 +71,7 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
 	this.scale = scale;
 }
 
-Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
+Animation.prototype.drawFrame = function (tick, ctx, x, y, angle, game) {
 	this.elapsedTime += tick;
 	if (this.isDone()) {
 		if (this.loop) this.elapsedTime = 0;
@@ -115,6 +115,8 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle) {
 	offscreenCtx.drawImage(thirdCanvas, -(this.frameWidth*this.scale / 2), -(this.frameHeight*this.scale / 2));
 	offscreenCtx.restore();
 	thirdCtx.clearRect(0,0, size, size);
+
+
 	ctx.drawImage(offscreenCanvas, x-(xOffset/2), y- (yOffset/2));
 
 
@@ -127,6 +129,32 @@ Animation.prototype.currentFrame = function () {
 Animation.prototype.isDone = function () {
 	return (this.elapsedTime >= this.totalTime);
 }
+/* ========================================================================================================== */
+// Camera
+/* ========================================================================================================== */
+function Camera(game){
+	this.game = game;
+	this.x = 0;
+	this.y = 0;
+	this.ctx = this.game.cameraCtx;
+
+
+}
+Camera.prototype.draw = function (cameraCtx) {
+	cameraCtx.drawImage(this.game.ctx.canvas, this.x , this.y, 800, 800, 0, 0, 800, 800);
+
+
+};
+
+Camera.prototype.update = function () {
+	this.x = this.game.ship.xMid - 400;
+	this.y = this.game.ship.yMid - 400;
+
+	//this is where we'll build the binding box to house the ship in a deadzone.
+	//that logic is what will be needed to update x and y to better values.
+
+
+};
 
 /* ========================================================================================================== */
 // Background
@@ -138,6 +166,8 @@ function Background(game, spritesheet) {
 	this.spritesheet = spritesheet;
 	this.game = game;
 	this.ctx = game.ctx;
+	this.ctx.canvas.width = this.spritesheet.naturalWidth;
+	this.ctx.canvas.height = this.spritesheet.naturalHeight;
 
 	// Where the frame starts for the background. Divide image in half then subract the half the canvas,
 	// for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
@@ -500,7 +530,7 @@ function Scourge(game, spritesheet, xIn, yIn) {
 	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
 	this.angle = 0;
 	this.name = "Enemy";
-	this.speed = 7;
+	this.speed = 0.7;
 	this.x = xIn;
 	this.y = yIn;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -519,63 +549,17 @@ Scourge.prototype = new Entity();
 Scourge.prototype.constructor = Scourge;
 
 Scourge.prototype.update = function () {
-	// move the scourge
-	var ent = this.game.ship;
-
-	var delta = this.speed / (distance(this, ent));
-	var dX = Math.abs(this.xMid - ent.xMid);
-	var dY = Math.abs(this.yMid - ent.yMid);
-	if(this.xMid > ent.xMid) {
-		this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
-	} else if(this.xMid < ent.xMid) {
-		this.xMid = (Math.sqrt((delta * delta) * (dX * dX))) + this.xMid;
-	}
-
-	if(this.yMid > ent.yMid) {
-		this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
-	} else if(this.yMid < ent.yMid) {
-		this.yMid = (Math.sqrt((delta * delta) * (dY * dY))) + this.yMid;
-	}
-
-	this.x = this.xMid - (this.pWidth * this.scale / 2);
-	this.y = this.yMid - (this.pHeight * this.scale / 2);
-
-	// for(var i = 0; i < this.game.enemies; i++){
-	// 	var ent = this.game.enemies[i];
-	// 	if(ent.name === this.name && ent != this) {
-	// 		var dist = distance(this, ent);
-	// 		if(dist < this.radius + ent.radius) {
-	// 			var delta = (this.radius + ent.radius) / (distance(this, ent));
-	// 			var dX = Math.abs(this.xMid - ent.xMid);
-	// 			var dY = Math.abs(this.yMid - ent.yMid);
-
-	// 			if(this.xMid > ent.xMid) {
-	// 				this.xMid = this.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
-	// 				ent.xMid = ent.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
-	// 			} else if(this.xMid < ent.xMid) {
-	// 				this.xMid = this.xMid - (Math.sqrt((delta * delta) * (dX * dX)));
-	// 				ent.xMid = ent.xMid + (Math.sqrt((delta * delta) * (dX * dX)));
-	// 			}
-
-	// 			if(this.yMid > ent.yMid) {
-	// 				this.yMid = this.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
-	// 				ent.YMid = ent.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
-	// 			} else if(this.yMid < ent.yMid) {
-	// 				this.yMid = this.yMid - (Math.sqrt((delta * delta) * (dY * dY)));
-	// 				ent.yMid = ent.yMid + (Math.sqrt((delta * delta) * (dY * dY)));
-	// 			}
-	// 			this.x = this.xMid - (this.pWidth * this.scale / 2);
-	// 			this.y = this.yMid - (this.pHeight * this.scale / 2);
-	// 			ent.x = ent.xMid - (this.pWidth * this.scale / 2);
-	// 			ent.y = ent.yMid - (this.pHeight * this.scale / 2);
-	// 		}
-	// 	}
-	// }
-
 	// update angle
 	var dx = this.game.ship.xMid - this.xMid;
 	var dy = this.yMid - this.game.ship.yMid;
 	this.angle = -Math.atan2(dy,dx);
+
+	// move the scourge
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	// check collision with player projectiles
 	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
@@ -766,9 +750,9 @@ TheShip.prototype.update = function () {
 	var xMove = 0;
 	var yMove = 0;
 	if (this.game.moveUp) {
-		if (this.yMid - this.radius > 0) {
-			yMove -= 10 * this.speed;
-		}
+		if (this.yMid - this.radius > 0){
+		yMove -= 10 * this.speed;
+	}
 	}
 	if (this.game.moveLeft) {
 		if (this.xMid - this.radius > 0) {
@@ -776,12 +760,12 @@ TheShip.prototype.update = function () {
 		}
 	}
 	if (this.game.moveDown) {
-		if (this.yMid + this.radius < 800) {
+		if (this.yMid + this.radius < this.game.ctx.canvas.height) {
 			yMove += 10 * this.speed;
 		}
 	}
 	if (this.game.moveRight) {
-		if (this.xMid + this.radius < 800) {
+		if (this.xMid + this.radius < this.game.ctx.canvas.width) {
 			xMove += 10 * this.speed;
 		}
 	}
@@ -971,7 +955,7 @@ function ShipPrimary(game) {
 	this.radius = 10;
 	this.angle = 0;
 	this.pierce = 0;
-	this.lifetime = 500;
+	this.lifetime = 300;
 	this.damage = 4;
 	this.maxSpeed = 1500;
 	this.velocity = {x: 0, y: 0};
@@ -986,9 +970,9 @@ ShipPrimary.prototype.constructor = ShipPrimary;
 
 ShipPrimary.prototype.update = function () {
 	// remove offscreen projectile
-	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
-		this.removeFromWorld = true;
-	}
+	// if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+	// 	this.removeFromWorld = true;
+	// }
 
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
@@ -1040,7 +1024,7 @@ function ShipSecondary(game) {
 	this.radius = 10;
 	this.angle = 0;
 	this.pierce = 0;
-	this.lifetime = 1500;
+	this.lifetime = 300;
 	this.damage = 15;
 	this.maxSpeed = 500;
 	this.velocity = {x: 0, y: 0};
@@ -1055,9 +1039,9 @@ ShipSecondary.prototype.constructor = ShipSecondary;
 
 ShipSecondary.prototype.update = function () {
 	// remove offscreen projectile
-	if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
-		this.removeFromWorld = true;
-	}
+	// if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
+	// 	this.removeFromWorld = true;
+	// }
 
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
@@ -1217,7 +1201,9 @@ PlayGame.prototype.reset = function () {
 }
 
 PlayGame.prototype.update = function () {
-	if (this.game.clicked) {
+	if (!this.game.running && this.game.roll) {
+		this.game.ship.health = 100;
+		SCORE = 0;
 		this.game.running = true;
 	}
 	if (this.bossTimer > 0){
@@ -1295,6 +1281,12 @@ PlayGame.prototype.draw = function (ctx) {
 		ctx.fillText("Survive as long as you can!", 400, 490);
 		ctx.fillText("Press Enter to start", 400, 520);
 	}
+
+	ctx.font = "24pt Impact";
+	ctx.fillStyle = "Red";
+	ctx.textAlign = "left";
+	ctx.fillText("Health: " + this.game.ship.health,  10,  40);
+	ctx.fillText("Score: " + SCORE, 10, 70);
 }
 
 /* ========================================================================================================== */
@@ -1304,7 +1296,9 @@ PlayGame.prototype.draw = function (ctx) {
 var AM = new AssetManager();
 
 AM.queueDownload("./img/space1-1.png");
-
+AM.queueDownload("./img/Uberspace.png");
+AM.queueDownload("./img/4kBackground1.png");
+AM.queueDownload("./img/4kBackground2.png");
 // ship stuff
 AM.queueDownload("./img/shipIdle.png");
 AM.queueDownload("./img/shipBoost.png");
@@ -1327,19 +1321,21 @@ AM.queueDownload("./img/SpaceExplosion.png");
 
 AM.downloadAll(function () {
 	console.log("starting up da sheild");
-	var canvas = document.getElementById("gameWorld");
+	var cameraTrick = document.getElementById("gameWorld");
+	var cameraCtx = cameraTrick.getContext("2d");
+	var canvas = document.createElement('canvas');
 	var ctx = canvas.getContext("2d");
 
 	var gameEngine = new GameEngine();
 
-	gameEngine.init(ctx);
-	gameEngine.start();
+	gameEngine.init(ctx, cameraCtx);
+
 
 	gameEngine.running = false;
 
 	var ship = new TheShip(gameEngine);
 	var reticle = new Reticle(gameEngine);
-	var background = new Background(gameEngine, AM.getAsset("./img/space1-1.png"));
+	var background = new Background(gameEngine, AM.getAsset("./img/4kBackground1.png"));
 	var pg = new PlayGame(gameEngine);
 
 	gameEngine.addEntity(ship);
@@ -1348,8 +1344,8 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(pg);
 
 	gameEngine.ship = ship;
-
-
-
+	gameEngine.cameraTrick = cameraTrick;
+	gameEngine.camera = new Camera(gameEngine);
+	gameEngine.start();
 	console.log("All Done!");
 });
