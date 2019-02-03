@@ -1236,20 +1236,20 @@ PlayGame.prototype.draw = function (ctx) {
 		}
 
 		ctx.textAlign = "center";
-		ctx.fillText("WASD to move", 400, 340);
-		ctx.fillText("LClick and RClick to shoot", 400, 370);
-		ctx.fillText("LShift to boost", 400, 400);
-		ctx.fillText("Space to perform a roll", 400, 430);
-		ctx.fillText("Grab powerups to shoot more at once", 400, 460);
-		ctx.fillText("Survive as long as you can!", 400, 490);
-		ctx.fillText("Press Space to start", 400, 520);
+		ctx.fillText("WASD to move", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 340);
+		ctx.fillText("LClick and RClick to shoot", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 370);
+		ctx.fillText("LShift to boost", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400);
+		ctx.fillText("Space to perform a roll", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 430);
+		ctx.fillText("Grab powerups to shoot more at once", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 460);
+		ctx.fillText("Survive as long as you can!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 490);
+		ctx.fillText("Press Space to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
 	}
 
 	ctx.font = "24pt Impact";
 	ctx.fillStyle = "Red";
 	ctx.textAlign = "left";
-	ctx.fillText("Health: " + this.game.ship.health,  10,  40);
-	ctx.fillText("Score: " + SCORE, 10, 70);
+	ctx.fillText("Health: " + this.game.ship.health,  this.game.camera.x + 10, this.game.camera.y + 40);
+	ctx.fillText("Score: " + SCORE, this.game.camera.x + 10, this.game.camera.y + 70);
 }
 
 /* ========================================================================================================== */
