@@ -1225,7 +1225,8 @@ var AM = new AssetManager();
 
 AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/Uberspace.png");
-
+AM.queueDownload("./img/4kBackground1.png");
+AM.queueDownload("./img/4kBackground2.png");
 // ship stuff
 AM.queueDownload("./img/shipIdle.png");
 AM.queueDownload("./img/shipBoost.png");
@@ -1261,7 +1262,7 @@ AM.downloadAll(function () {
 
 	var ship = new TheShip(gameEngine);
 	var reticle = new Reticle(gameEngine);
-	var background = new Background(gameEngine, AM.getAsset("./img/Uberspace.png"));
+	var background = new Background(gameEngine, AM.getAsset("./img/4kBackground1.png"));
 	var pg = new PlayGame(gameEngine);
 
 	gameEngine.addEntity(ship);
