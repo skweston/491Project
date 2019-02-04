@@ -721,6 +721,30 @@ TheShip.prototype.update = function () {
 	if(this.health < 1){
 		this.removeFromWorld = true;
 	}
+	// boosting
+	this.speed = 0.5;
+	this.boosting = false;
+
+	if (this.game.boost && !this.rolling && this.boost > 1) {
+		this.cancelBoost = false;
+		this.boosting = true;
+		this.speed = 1;
+		this.boost -= this.boostConsumeRate;
+	}
+	if (!this.game.boost && !this.rolling) {
+		this.boosting = false;
+		this.speed = 0.5;
+		this.boost += this.boostGainRate;
+	}
+
+	// boost input buffer during rolls
+	if (this.game.boost && this.rolling) {
+		this.cancelBoost = false;
+	}
+	if (!this.game.boost && this.rolling) {
+		this.cancelBoost = true;
+	}
+
 	// movement
 	var xMove = 0;
 	var yMove = 0;
@@ -798,26 +822,7 @@ TheShip.prototype.update = function () {
 		}
 	}
 
-	// boosting
-	if (this.boost > 0 && this.game.boost && !this.rolling) {
-		this.cancelBoost = false;
-		this.boosting = true;
-		this.speed = 1;
-		this.boost -= this.boostConsumeRate;
-	}
-	if (!this.game.boost && !this.rolling) {
-		this.boosting = false;
-		this.speed = 0.5;
-		this.boost += this.boostGainRate;
-	}
 
-	// boost input buffer during rolls
-	if (this.game.boost && this.rolling) {
-		this.cancelBoost = false;
-	}
-	if (!this.game.boost && this.rolling) {
-		this.cancelBoost = true;
-	}
 
 	// shooting
 	if (this.primaryCooldown > 0) {
