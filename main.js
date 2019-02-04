@@ -317,7 +317,7 @@ function Boss1(game){
     this.ctx = game.ctx;
     this.animation = new Animation(AM.getAsset("./img/Boss1.png"), 200, 450, 1200, 0.175, 6, true, 1);
     this.name = "Enemy";
-    this.x = (Math.random() * this.ctx.canvas.width) - 200;
+    this.x = Math.random() * (this.ctx.canvas.width-200);
     this.y = this.ctx.canvas.height + 500;
     this.angle = 0;
     this.speed = 100;
