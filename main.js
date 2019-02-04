@@ -630,7 +630,7 @@ LaserBlast.prototype.update = function () {
 
 
 	  var ent = this.game.ship;
-	  if(Collide(this, ent)) {
+	  if(!ent.rolling && Collide(this, ent)) {
 		  ent.health -= this.damage;
 		  this.removeFromWorld = true;
 	  }
@@ -715,7 +715,7 @@ Scourge.prototype.update = function () {
 	}
 
 	// check collision with ship
-	if (Collide(this, this.game.ship)) {
+	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
 		this.game.ship.health -= this.damage;
 		this.removeFromWorld = true;
 	}
@@ -832,6 +832,8 @@ TheShip.prototype.update = function () {
 
 	// boost input buffer during rolls
 	if (this.game.boost && this.rolling) {
+		this.boosting = true;
+		this.speed = 1;
 		this.cancelBoost = false;
 	}
 	if (!this.game.boost && this.rolling) {
