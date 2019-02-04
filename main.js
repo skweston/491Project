@@ -321,7 +321,7 @@ function BloodSplatter(game, shipXMid, shipYMid) {
   //spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
   this.animation = new Animation(AM.getAsset("./img/BloodSplatter.png"),
 								 this.pWidth, this.pHeight,
-								 2,  0.13, 7, false, this.scale);
+								 7,  0.13, 7, false, this.scale);
   this.game = game;
   this.ctx = game.ctx;
   this.name = "Effect";
@@ -349,6 +349,44 @@ BloodSplatter.prototype.update = function () {
 }
 
 
+function BossExplosion(game, xIn, yIn, chain) {
+  this.pWidth = 128;
+  this.pHeight = 128;
+  this.scale = 1;
+  //spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
+  this.animation = new Animation(AM.getAsset("./img/BossExplosion.png"),
+								 this.pWidth, this.pHeight,
+								 24,  0.2, 24, false, this.scale);
+  this.game = game;
+  this.ctx = game.ctx;
+  this.name = "Effect";
+  this.x = xIn;
+  this.y = yIn;
+  this.chain = chain - 1
+  this.lifetime = 100;
+
+  this.removeFromWorld = false; //need to remove from world when animation finishes.
+}
+
+BossExplosion.prototype.draw = function () {
+  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  //console.log("explosion: " + this.x + ", " + this.y);
+  Entity.prototype.draw.call(this);
+}
+
+BossExplosion.prototype.update = function () {
+	this.lifetime--;
+	if (this.lifetime < 1){
+		this.removeFromWorld = true;
+	}
+	if (this.chain > 1){
+		var chainedExplosion = new BossExplosion (this.game, this.x, this.y+115, this.chain-1);
+		this.game.addEntity(chainedExplosion);
+		this.chain = 0;
+	}
+
+}
+
 /* ========================================================================================================== */
 // Boss 1
 /* ========================================================================================================== */
@@ -362,6 +400,8 @@ function Boss1(game){
     this.name = "Enemy";
     this.x = Math.random() * (this.ctx.canvas.width-200);
     this.y = this.ctx.canvas.height + 500;
+	this.xMid = this.x - this.pWidth/2;
+	this.yMid = this.y - this.pHeight/2;
     this.angle = 0;
     this.speed = 100;
     this.removeFromWorld = false;
@@ -384,9 +424,13 @@ Boss1.prototype.update = function () {
 	//console.log("boss is updating");
 	this.y -= this.game.clockTick * this.speed;
 
+	this.xMid = this.x - this.pWidth/2;
+	this.yMid = this.y - this.pHeight/2;
+
 	if (this.turretsRemaining === 0) {
 		SCORE += 5;
-
+		var explosion = new BossExplosion(this.game, this.x, this.y, 3);
+		this.game.addEntity(explosion);
 		this.removeFromWorld = true;
 	}
 
@@ -467,7 +511,8 @@ BossTurret.prototype.update = function () {
 		SCORE += 3;
 
 		this.boss.turretsRemaining--;
-
+		var explosion = new BossExplosion(this.game, this.x, this.y, 0);
+		this.game.addEntity(explosion);
         this.removeFromWorld = true;
     }
 	for (var i = 0; i<this.game.playerProjectiles.length; i++){
@@ -1363,6 +1408,7 @@ AM.queueDownload("./img/LaserBlast.png");
 
 //effects
 AM.queueDownload("./img/BloodSplatter.png");
+AM.queueDownload("./img/BossExplosion.png");
 AM.queueDownload("./img/SpaceExplosion.png");
 
 AM.downloadAll(function () {
