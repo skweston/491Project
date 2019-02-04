@@ -310,8 +310,8 @@ GameEngine.prototype.update = function () {
 	// 		entity.update();
 	// 	}
 	// }
-	this.camera.update();
 
+	this.camera.update();
 	var count = this.background.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.background[i];
@@ -413,7 +413,7 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
-
+	this.camera.update();
 
 	this.wasclicked = false;
 	this.roll = false;

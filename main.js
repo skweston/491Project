@@ -30,6 +30,7 @@ function Collide(a, b) {
 	//console.log("checking collision");
 	return distance(a, b) < a.radius + b.radius;
 }
+
 /* ========================================================================================================== */
 // Entity Template
 /* ========================================================================================================== */
@@ -139,8 +140,9 @@ function Camera(game){
 	this.ctx = this.game.cameraCtx;
 	this.x = this.game.ship.xMid - this.ctx.canvas.width/2;
 	this.y = this.game.ship.yMid - this.ctx.canvas.height/2;
-
+	this.isScrolling = false;
 	this.deadzoneRatio = 3;
+
 
 }
 Camera.prototype.draw = function (cameraCtx) {
@@ -158,22 +160,30 @@ Camera.prototype.update = function () {
 	// this.x = this.game.ship.xMid - this.ctx.canvas.width/2;
 	// this.y = this.game.ship.yMid - this.ctx.canvas.height/2;
 
-	//this is where we'll build the binding box to house the ship in a deadzone.
-	//that logic is what will be needed to update x and y to better values.
+
+
+	//deadzone bounding box logic
+
 
 	if(this.game.ship.xMid > this.x + this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio)){
 		this.x = this.game.ship.xMid - (this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio));
+		this.isScrolling = true;
 	}
 	if(this.game.ship.yMid > this.y + this.ctx.canvas.height-(this.ctx.canvas.height/this.deadzoneRatio)){
 		this.y = this.game.ship.yMid - (this.ctx.canvas.height-(this.ctx.canvas.height/this.deadzoneRatio));
+		this.isScrolling = true;
 	}
 	if(this.game.ship.xMid < this.x + (this.ctx.canvas.width/this.deadzoneRatio)){
 		this.x = this.game.ship.xMid - (this.ctx.canvas.width/this.deadzoneRatio);
+		this.isScrolling = true;
 	}
 	if(this.game.ship.yMid < this.y + (this.ctx.canvas.height/this.deadzoneRatio)){
 		this.y = this.game.ship.yMid - (this.ctx.canvas.height/this.deadzoneRatio);
+		this.isScrolling = true;
 	}
 
+
+	//bounds the edge of the background so we don't draw in the void
 	if(this.x < 0){
 		this.x = 0;
 	}
@@ -737,13 +747,23 @@ TheShip.prototype.update = function () {
 
 	if (xMove === 0) {
 		this.y += yMove;
+		if(this.game.camera.isScrolling){
+			this.game.mouseY += yMove;
+		}
 	}
 	else if (yMove === 0) {
 		this.x += xMove;
+		if(this.game.camera.isScrolling){
+			this.game.mouseX += xMove;
+		}
 	}
 	else {
 		this.x += xMove * 0.7;
 		this.y += yMove * 0.7;
+		if(this.game.camera.isScrolling){
+			this.game.mouseX += xMove * 0.7;
+	 		this.game.mouseY += yMove * 0.7;
+		}
 	}
 
 	// update center hitbox
