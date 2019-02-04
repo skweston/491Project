@@ -281,11 +281,11 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.extras.length; i++) {
 		this.extras[i].draw(this.ctx);
 	}
-	for (var i = 0; i < this.effects.length; i++) {
-		this.effects[i].draw(this.ctx);
-	}
 	for (var i = 0; i < this.enemies.length; i++) {
 		this.enemies[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.effects.length; i++) {
+		this.effects[i].draw(this.ctx);
 	}
 	for (var i = 0; i < this.player.length; i++) {
 		this.player[i].draw(this.ctx);

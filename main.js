@@ -321,7 +321,7 @@ function BloodSplatter(game, shipXMid, shipYMid) {
   //spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
   this.animation = new Animation(AM.getAsset("./img/BloodSplatter.png"),
 								 this.pWidth, this.pHeight,
-								 7,  0.13, 7, false, this.scale);
+								 7,  0.1, 7, false, this.scale);
   this.game = game;
   this.ctx = game.ctx;
   this.name = "Effect";
@@ -349,7 +349,7 @@ BloodSplatter.prototype.update = function () {
 }
 
 
-function BossExplosion(game, xIn, yIn, chain) {
+function BossExplosion(game, xIn, yIn, chain, boss) {
   this.pWidth = 128;
   this.pHeight = 128;
   this.scale = 1;
@@ -362,10 +362,15 @@ function BossExplosion(game, xIn, yIn, chain) {
   this.name = "Effect";
   this.x = xIn;
   this.y = yIn;
-  this.chain = chain - 1
-  this.lifetime = 100;
+  this.boss = boss;
+  this.speed = boss.speed;
+  this.chain = chain - 1;
+  this.lifetime = 200;
 
   this.removeFromWorld = false; //need to remove from world when animation finishes.
+
+  this.xExplosionAdjust = 200-this.pWidth;
+  this.yExplosionAdjust = 450-this.pHeight;
 }
 
 BossExplosion.prototype.draw = function () {
@@ -375,14 +380,18 @@ BossExplosion.prototype.draw = function () {
 }
 
 BossExplosion.prototype.update = function () {
+	this.y -= this.game.clockTick * this.speed;
 	this.lifetime--;
 	if (this.lifetime < 1){
 		this.removeFromWorld = true;
 	}
 	if (this.chain > 1){
-		var chainedExplosion = new BossExplosion (this.game, this.x, this.y+115, this.chain-1);
+		var chainedExplosion = new BossExplosion (this.game,
+								this.boss.x + (Math.random() * this.xExplosionAdjust),
+								this.boss.y+ (Math.random() * this.yExplosionAdjust),
+								this.chain-1, this.boss);
 		this.game.addEntity(chainedExplosion);
-		this.chain = 0;
+		this.chain--;
 	}
 
 }
@@ -404,6 +413,8 @@ function Boss1(game){
 	this.yMid = this.y - this.pHeight/2;
     this.angle = 0;
     this.speed = 100;
+	this.deathTimer = 200;
+	this.dying = false;
     this.removeFromWorld = false;
 	this.turret1 = new BossTurret(this.game, this, 70, 125);
 	this.turret2 = new BossTurret(this.game, this, 70, 195);
@@ -428,10 +439,17 @@ Boss1.prototype.update = function () {
 	this.yMid = this.y - this.pHeight/2;
 
 	if (this.turretsRemaining === 0) {
-		SCORE += 5;
-		var explosion = new BossExplosion(this.game, this.x, this.y, 3);
-		this.game.addEntity(explosion);
-		this.removeFromWorld = true;
+
+		this.deathTimer--;
+		if (!this.dying){
+			var explosion = new BossExplosion(this.game, this.x, this.y, 7, this);
+			this.game.addEntity(explosion);
+			SCORE += 5;
+		}
+		if (this.deathTimer < 1){
+			this.removeFromWorld = true;
+		}
+		this.dying = true;
 	}
 
 	if(!this.game.running || this.y === -500) {
@@ -511,7 +529,7 @@ BossTurret.prototype.update = function () {
 		SCORE += 3;
 
 		this.boss.turretsRemaining--;
-		var explosion = new BossExplosion(this.game, this.x, this.y, 0);
+		var explosion = new BossExplosion(this.game, this.x- this.pWidth, this.y, 0, this.boss);
 		this.game.addEntity(explosion);
         this.removeFromWorld = true;
     }
@@ -1337,7 +1355,7 @@ PlayGame.prototype.update = function () {
 				}
 			}
 
-			this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
+			//this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
 
 			this.counter++;
 		}
