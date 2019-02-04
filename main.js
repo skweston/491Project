@@ -1355,7 +1355,7 @@ PlayGame.prototype.update = function () {
 				}
 			}
 
-			//this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
+			this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
 
 			this.counter++;
 		}
