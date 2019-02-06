@@ -365,7 +365,7 @@ function BossExplosion(game, xIn, yIn, chain, boss) {
   this.boss = boss;
   this.speed = boss.speed;
   this.chain = chain - 1;
-  this.lifetime = 200;
+  this.lifetime = 150;
 
   this.removeFromWorld = false; //need to remove from world when animation finishes.
 
@@ -413,7 +413,7 @@ function Boss1(game){
 	this.yMid = this.y - this.pHeight/2;
     this.angle = 0;
     this.speed = 100;
-	this.deathTimer = 200;
+	this.deathTimer = 150;
 	this.dying = false;
     this.removeFromWorld = false;
 	this.turret1 = new BossTurret(this.game, this, 70, 125);
