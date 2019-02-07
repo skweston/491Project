@@ -13,6 +13,7 @@ function TheShip(game) {
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, 0.25);
 
 	this.name = "Player";
+    this.invincible = false;
 	this.health = 100;
 	this.speed = 0.5;
 	this.boosting = false;
@@ -95,6 +96,7 @@ TheShip.prototype.update = function () {
 	if (this.game.roll && this.rollCooldown === 0) {
 		this.rollCooldown = 100;
 		this.rolling = true;
+        this.invincible = true;
 	}
 	if (this.rollCooldown > 0) {
 		this.rollCooldown -= 1;
@@ -103,6 +105,7 @@ TheShip.prototype.update = function () {
 		if (this.rollAnimation.isDone()) {
 			this.rollAnimation.elapsedTime = 0;
 			this.rolling = false;
+            this.invincible = false;
 		}
 		else if (this.boostRollAnimation.isDone()) {
 			this.boostRollAnimation.elapsedTime = 0;

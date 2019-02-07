@@ -229,8 +229,10 @@ LaserBlast.prototype.update = function () {
 
 	  var ent = this.game.ship;
 	  if(Collide(this, ent)) {
-		  ent.health -= this.damage;
-		  this.removeFromWorld = true;
+          if(!ent.invincible) {
+		            ent.health -= this.damage;
+          }
+          this.removeFromWorld = true;
 	  }
 
 	  this.lifetime -= 1;
@@ -312,7 +314,9 @@ Scourge.prototype.update = function () {
 
 	// check collision with ship
 	if (Collide(this, this.game.ship)) {
-		this.game.ship.health -= this.damage;
+        if(!this.game.ship.invincible) {
+                  this.game.ship.health -= this.damage;
+        }
 		this.removeFromWorld = true;
 	}
 
