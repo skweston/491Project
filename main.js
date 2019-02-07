@@ -1,5 +1,6 @@
 // useful global things here
 var SHOW_HITBOX = false;
+var SCORE = 0;
 
 /*
 function distance(a, b) {
