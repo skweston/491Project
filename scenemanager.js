@@ -1,4 +1,3 @@
-
 /* ========================================================================================================== */
 // Level Manager stuff
 /* ========================================================================================================== */
@@ -20,6 +19,7 @@ PlayGame.prototype.reset = function () {
 	this.game.clicked = false;
 	this.spawnNum = 1;
 	this.counter = 0;
+	this.bossTimer = 1000;
 
 	for (var i = 0; i < this.game.extras.length; i++) {
 		this.game.extras[i].removeFromWorld = true;
@@ -41,10 +41,9 @@ PlayGame.prototype.update = function () {
 	if (this.bossTimer > 0){
 		this.bossTimer--;
 	}
-	if(this.game.running && this.bossTimer === 0){
+	if (this.game.running && this.bossTimer === 0) {
 		this.bossTimer = 1000;
 		this.game.addEntity(new Boss1(this.game));
-		this.game.addEntity(new Spawner(this.game));
 	}
 	if (this.spawnTimer > 0) {
 		this.spawnTimer--;
@@ -54,7 +53,7 @@ PlayGame.prototype.update = function () {
 
 		for (var i = 0; i < this.spawnNum; i++) {
 			var border = 0;
-			var x = Math.random() * 800;
+			var x = Math.random() * this.game.ctx.canvas.width;
 			var y = 0;
 
 			border = Math.floor((Math.random() * 2));
@@ -67,7 +66,7 @@ PlayGame.prototype.update = function () {
 					y = -50 - y;
 				}
 				else { // bottom
-					y = 800 + y;
+					y = this.game.ctx.canvas.height + y;
 				}
 			}
 			else {
@@ -78,16 +77,17 @@ PlayGame.prototype.update = function () {
 					x = -50 - x;
 				}
 				else { // right
-					x = 800 + x;
+					x = this.game.ctx.canvas.width + x;
 				}
 			}
 
-			//this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
+			this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
 
 			this.counter++;
-			if (this.counter % 10 === 0) {
-				this.spawnNum++;
-			}
+		}
+
+		if (this.counter % 10 === 0) {
+			this.spawnNum++;
 		}
 	}
 
@@ -105,18 +105,22 @@ PlayGame.prototype.draw = function (ctx) {
 		}
 
 		ctx.textAlign = "center";
-		ctx.fillText("WASD to move", 400, 340);
-		ctx.fillText("LClick and RClick to shoot", 400, 370);
-		ctx.fillText("LShift to boost", 400, 400);
-		ctx.fillText("Space to perform a roll", 400, 430);
-		ctx.fillText("Grab powerups to shoot more at once", 400, 460);
-		ctx.fillText("Survive as long as you can!", 400, 490);
-		ctx.fillText("Press Enter to start", 400, 520);
+		ctx.fillText("WASD to move", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 340);
+		ctx.fillText("LClick and RClick to shoot", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 370);
+		ctx.fillText("LShift to boost", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400);
+		ctx.fillText("Space to perform a roll", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 430);
+		ctx.fillText("Grab powerups to shoot more at once", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 460);
+		ctx.fillText("Survive as long as you can!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 490);
+		ctx.fillText("Press Space to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
 	}
 
 	ctx.font = "24pt Impact";
 	ctx.fillStyle = "Red";
 	ctx.textAlign = "left";
-	ctx.fillText("Health: " + this.game.ship.health,  10,  40);
-	ctx.fillText("Score: " + SCORE, 10, 70);
+	ctx.fillText("Health: " + this.game.ship.health,  this.game.camera.x + 10, this.game.camera.y + 40);
+	ctx.fillText("Score: " + SCORE, this.game.camera.x + 10, this.game.camera.y + 70);
+	//Boost meter
+	ctx.fillText("Boost Meter: ",  this.game.camera.x + 10, this.game.camera.y + 100);
+	ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
+	ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
 }
