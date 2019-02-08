@@ -30,6 +30,9 @@ PlayGame.prototype.reset = function () {
 	for(var i = 0; i< this.game.enemyProjectiles.length; i++){
 		this.game.enemyProjectiles[i].removeFromWorld = true;
 	}
+	for(var i = 0; i< this.game.playerProjectiles.length; i++){
+		this.game.playerProjectiles[i].removeFromWorld = true;
+	}
 
 	var ship = new TheShip(this.game);
 	var reticle = new Reticle(this.game);
