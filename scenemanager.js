@@ -27,8 +27,11 @@ PlayGame.prototype.reset = function () {
 	for (var i = 0; i < this.game.enemies.length; i++){
 		this.game.enemies[i].removeFromWorld = true;
 	}
-	for(var i = 0; i< this.game.enemyProjectiles.lenght; i++){
+	for(var i = 0; i< this.game.enemyProjectiles.length; i++){
 		this.game.enemyProjectiles[i].removeFromWorld = true;
+	}
+	for(var i = 0; i< this.game.playerProjectiles.length; i++){
+		this.game.playerProjectiles[i].removeFromWorld = true;
 	}
 
 	var ship = new TheShip(this.game);
