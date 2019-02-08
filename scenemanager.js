@@ -32,9 +32,9 @@ PlayGame.prototype.reset = function () {
 	}
 
 	var ship = new TheShip(this.game);
-	// var reticle = new Reticle(this.game);
+	var reticle = new Reticle(this.game);
 	this.game.addEntity(ship);
-	// this.game.addEntity(reticle);
+	this.game.addEntity(reticle);
 	this.game.ship = ship;
 }
 
