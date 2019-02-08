@@ -9,6 +9,8 @@ function PlayGame(game) {
 	this.spawnNum = 1;
 	this.counter = 0;
 	Entity.call(this, game);
+
+	this.currentLevel = new PrototypeLevel();
 }
 
 PlayGame.prototype = new Entity();
@@ -53,8 +55,29 @@ PlayGame.prototype.update = function () {
 	}
 	if (this.game.running && this.bossTimer === 0) {
 		this.bossTimer = 1000;
-		this.game.addEntity(new Boss1(this.game));
+		//this.game.addEntity(new Boss1(this.game));
+		this.game.addEntity(this.currentLevel.boss);
 	}
+
+	this.spawnAtRandom();
+
+	if (this.game.ship.health < 1) {
+		var audio = document.createElement('audio');
+		audio.src = "./img/die.wav";
+		audio.play();
+		this.reset();
+	}
+}
+
+PlayGame.prototype.draw = function (ctx) {
+	if(!this.game.running) {
+		this.mainMenu(ctx);
+	}
+
+	this.hud(ctx);
+}
+
+PlayGame.prototype.spawnAtRandom = function () {
 	if (this.spawnTimer > 0) {
 		this.spawnTimer--;
 	}
@@ -91,7 +114,8 @@ PlayGame.prototype.update = function () {
 				}
 			}
 
-			this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
+			//this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
+			this.game.addEntity(this.currentLevel.random(x, y, this.game));
 
 			this.counter++;
 		}
@@ -100,33 +124,6 @@ PlayGame.prototype.update = function () {
 			this.spawnNum++;
 		}
 	}
-
-	if (this.game.ship.health < 1) {
-		this.reset();
-	}
-}
-
-PlayGame.prototype.draw = function (ctx) {
-
-	if(!this.game.running) {
-		this.mainMenu(ctx);
-	}
-
-	this.hud(ctx);
-}
-
-
-//make function of PlayGame - ALL
-PlayGame.prototype.spawnAtRandom = function () {
-
-}
-
-//PlayGame.prototype.clearAllEnemies = function ()
-
-
-
-function PrototypeLevel() {
-	//move prototype level build to here
 }
 
 PlayGame.prototype.hud = function (ctx) {
@@ -160,7 +157,28 @@ PlayGame.prototype.mainMenu = function (ctx) {
 	ctx.fillText("Press Left Alt to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
 }
 
+function PrototypeLevel() {
+	//Player Ship should be a persistent global-esque variable
+	this.boss = function (game) {
+		return new Boss1(game);
+	};
+	//this only allows for one type of random spawn per level at the moment
+	this.random = function (x, y, game)  {
+		return new Scourge(game, AM.getAsset("./img/scourge.png"), x, y);
+	};
+	
+}
+
+//PrototypeLevel.prototype.randomSpawns = function () { //move this.random code to here with loop to add more random types}
+
+PrototypeLevel.prototype = new PlayGame();
+PrototypeLevel.prototype.constructor = PrototypeLevel;
+
 function LevelOne() {
 	//new level one code goes here
+	this.bossTimer = 1000;
+	this.spawnTimer = 0;
+	this.spawnNum = 1;
+	this.counter = 0;
 }
 

@@ -424,6 +424,8 @@ AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
 
+AM.queueDownload("./img/song.mp3");
+
 AM.downloadAll(function () {
 	console.log("starting up da sheild");
 	var cameraTrick = document.getElementById("gameWorld");
