@@ -253,6 +253,7 @@ Background.prototype.update = function () {
 
 };
 
+
 /* =========== General Effects ========= */
 function SpaceExplosion(game, shipXMid, shipYMid) {
   this.pWidth = 324;
@@ -267,6 +268,7 @@ function SpaceExplosion(game, shipXMid, shipYMid) {
   this.name = "Effect";
   this.xMid = shipXMid;
   this.yMid = shipYMid;
+  this.lifetime = 100;
   //console.log("middle explosion: " + this.xMid + ", " + this.yMid);
   this.x = this.xMid - ((this.pWidth * this.scale) / 2);
   this.y = this.yMid - ((this.pHeight * this.scale) / 2);
@@ -280,6 +282,10 @@ SpaceExplosion.prototype.draw = function () {
 }
 
 SpaceExplosion.prototype.update = function () {
+	this.lifetime--;
+	if (this.lifetime < 1){
+		this.removeFromWorld = true;
+	}
   /*if (this.animation.elapsedTime < this.animation.totalTime)
 	this.x += this.game.clockTick * this.speed;
   if (this.x > 800) this.x = -230;*/
@@ -292,6 +298,7 @@ function GroundExplosion(game, spritesheet, shipX, shipY) {
   this.ctx = game.ctx;
   this.x = shipX;
   this.y = shipY;
+  this.lifetime = 100;
 }
 
 GroundExplosion.prototype.draw = function () {
@@ -300,8 +307,47 @@ GroundExplosion.prototype.draw = function () {
 }
 
 GroundExplosion.prototype.update = function () {
+	this.lifetime--;
+	if (this.lifetime < 1){
+	this.removeFromWorld = true;
+	}
 
 }
+
+function BloodSplatter(game, shipXMid, shipYMid) {
+  this.pWidth = 32;
+  this.pHeight = 32;
+  this.scale = 2;
+  //spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
+  this.animation = new Animation(AM.getAsset("./img/BloodSplatter.png"),
+								 this.pWidth, this.pHeight,
+								 7,  0.1, 7, false, this.scale);
+  this.game = game;
+  this.ctx = game.ctx;
+  this.name = "Effect";
+  this.xMid = shipXMid;
+  this.yMid = shipYMid;
+  this.lifetime = 100;
+  //console.log("middle explosion: " + this.xMid + ", " + this.yMid);
+  this.x = this.xMid - ((this.pWidth * this.scale) / 2);
+  this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+  this.removeFromWorld = false; //need to remove from world when animation finishes.
+}
+
+BloodSplatter.prototype.draw = function () {
+  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+  //console.log("explosion: " + this.x + ", " + this.y);
+  Entity.prototype.draw.call(this);
+}
+
+BloodSplatter.prototype.update = function () {
+	this.lifetime--;
+	if (this.lifetime < 1){
+		this.removeFromWorld = true;
+	}
+
+}
+
 
 /* ========================================================================================================== */
 // Asset Manager aka Main
