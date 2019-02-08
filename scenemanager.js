@@ -65,7 +65,7 @@ PlayGame.prototype.update = function () {
 
 	if (this.game.ship.health < 1) {
 		var audio = document.createElement('audio');
-		audio.src = "./img/die.wav";
+		audio.src = "./img/Die.wav";
 		audio.play();
 		this.reset();
 	}
