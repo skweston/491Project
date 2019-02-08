@@ -1,7 +1,6 @@
 /* ========================================================================================================== */
 // Level Manager stuff
 /* ========================================================================================================== */
-
 function PlayGame(game) {
 	this.name = "Level";
 	this.bossTimer = 1000;
@@ -10,7 +9,7 @@ function PlayGame(game) {
 	this.counter = 0;
 	Entity.call(this, game);
 
-	this.currentLevel = new PrototypeLevel(this.game);
+	this.currentLevel = new PrototypeLevel(game);
 }
 
 PlayGame.prototype = new Entity();
@@ -64,7 +63,8 @@ PlayGame.prototype.update = function () {
 	this.spawnAtRandom();
 
 	if (this.game.ship.health < 1) {
-		var audio = AM.getAsset("./img/Die.wav")
+		//var audio = AM.getAsset("./img/Die.wav")
+		var audio = new Audio("./img/die.wav");
 		//audio.src = "./img/die.wav";
 		audio.play();
 		this.reset();
@@ -162,7 +162,7 @@ PlayGame.prototype.mainMenu = function (ctx) {
 function PrototypeLevel(game) {
 	this.game = game;
 	//Player Ship should be a persistent global-esque variable
-	this.boss = new Boss1(this.game);
+	this.boss = new Boss1(game);
 	//this only allows for one type of random spawn per level at the moment
 	this.random = function (x, y)  {
 		return new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
@@ -171,7 +171,6 @@ function PrototypeLevel(game) {
 
 //PrototypeLevel.prototype.randomSpawns = function () { //move this.random code to here with loop to add more random types}
 
-PrototypeLevel.prototype = new PlayGame();
 PrototypeLevel.prototype.constructor = PrototypeLevel;
 
 function LevelOne() {

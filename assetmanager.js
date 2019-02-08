@@ -3,7 +3,7 @@ function AssetManager() {
 	this.errorCount = 0;
 	this.cache = [];
 	this.downloadQueue = [];
-	this.audioQueue = [];
+	//this.audioQueue = [];
 }
 
 AssetManager.prototype.queueDownload = function (path) {
@@ -11,14 +11,15 @@ AssetManager.prototype.queueDownload = function (path) {
 	this.downloadQueue.push(path);
 }
 
-AssetManager.prototype.queueAudioDL = function (path) {
+/*AssetManager.prototype.queueAudioDL = function (path) {
 	console.log("Queueing " + path);
 	this.audioQueue.push(path);
-}
+}*/
 
 AssetManager.prototype.isDone = function () {
-	var length = this.downloadQueue.length + this.audioQueue.length;
-	return length === this.successCount + this.errorCount;
+	//var length = this.downloadQueue.length + this.audioQueue.length;
+	//return length === this.successCount + this.errorCount;
+	return this.downloadQueue.length === this.successCount + this.errorCount;
 }
 
 AssetManager.prototype.downloadAll = function (callback) {
@@ -45,7 +46,7 @@ AssetManager.prototype.downloadAll = function (callback) {
 		this.cache[path] = img;
 	}
 
-	for (var i = 0; i < this.audioQueue.length; i++) {
+	/*for (var i = 0; i < this.audioQueue.length; i++) {
 		var audio = document.createElement('audio');
 		console.log("audio created");
 
@@ -66,7 +67,7 @@ AssetManager.prototype.downloadAll = function (callback) {
 
 		audio.src = path;
 		this.cache[path] = audio;
-	}
+	}*/
 }
 
 AssetManager.prototype.getAsset = function (path) {
