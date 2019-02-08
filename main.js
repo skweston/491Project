@@ -424,7 +424,7 @@ AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
 
-AM.queueDownload("./img/Die.wav");
+//AM.queueDownload("./img/Die.wav");
 
 AM.downloadAll(function () {
 	console.log("starting up da sheild");
