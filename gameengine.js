@@ -223,6 +223,9 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "ShiftLeft") {
 			that.boost = false;
 		}
+		if (e.code === "AltLeft") {
+			that.gameStart = true;
+		}
 	}, false);
 
 	console.log('Input started');

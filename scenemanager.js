@@ -33,10 +33,11 @@ PlayGame.prototype.reset = function () {
 }
 
 PlayGame.prototype.update = function () {
-	if (!this.game.running && this.game.roll) {
+	if (!this.game.running && this.game.gameStart) {
 		this.game.ship.health = 100;
 		SCORE = 0;
 		this.game.running = true;
+		this.game.gameStart = false;
 	}
 	if (this.bossTimer > 0){
 		this.bossTimer--;
@@ -111,7 +112,7 @@ PlayGame.prototype.draw = function (ctx) {
 		ctx.fillText("Space to perform a roll", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 430);
 		ctx.fillText("Grab powerups to shoot more at once", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 460);
 		ctx.fillText("Survive as long as you can!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 490);
-		ctx.fillText("Press Space to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
+		ctx.fillText("Press Left Alt to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
 	}
 
 	ctx.font = "24pt Impact";
