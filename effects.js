@@ -1,5 +1,5 @@
 /* =========== General Effects ========= */
-function SpaceExplosion(game, shipXMid, shipYMid) {
+function SpaceExplosion(game, shipXMid, shipYMid, angle) {
   this.pWidth = 324;
   this.pHeight = 169;
   this.scale = 1;
@@ -12,6 +12,7 @@ function SpaceExplosion(game, shipXMid, shipYMid) {
   this.name = "Effect";
   this.xMid = shipXMid;
   this.yMid = shipYMid;
+  this.angle = angle;
   this.lifetime = 100;
   //console.log("middle explosion: " + this.xMid + ", " + this.yMid);
   this.x = this.xMid - ((this.pWidth * this.scale) / 2);
@@ -20,7 +21,9 @@ function SpaceExplosion(game, shipXMid, shipYMid) {
 }
 
 SpaceExplosion.prototype.draw = function () {
-  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	if(onCamera){
+  		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+  	}
   //console.log("explosion: " + this.x + ", " + this.y);
   Entity.prototype.draw.call(this);
 }
@@ -36,17 +39,25 @@ SpaceExplosion.prototype.update = function () {
 }
 
 function GroundExplosion(game, spritesheet, shipX, shipY) {
-  this.animation = new Animation(spritesheet, 32, 32, 2, 0.15, 6, true, 1);
-  this.game = game;
-  this.name = "Effect";
-  this.ctx = game.ctx;
-  this.x = shipX;
-  this.y = shipY;
-  this.lifetime = 100;
+	this.pWidth = 32;
+	this.pHeight = 32;
+	this.scale = 1;
+	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 2, 0.15, 6, true, this.scale);
+	this.game = game;
+	this.name = "Effect";
+	this.ctx = game.ctx;
+	this.x = shipX;
+	this.y = shipY;
+	this.angle = 0;
+	this.xMid = 0; //this is a placeholver value.
+	this.yMid = 0;
+	this.lifetime = 100;
 }
 
 GroundExplosion.prototype.draw = function () {
-  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	if(onCamera){
+  		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+  	}
   Entity.prototype.draw.call(this);
 }
 
@@ -72,6 +83,7 @@ function BloodSplatter(game, shipXMid, shipYMid) {
   this.xMid = shipXMid;
   this.yMid = shipYMid;
   this.lifetime = 100;
+  this.angle = 0;
   //console.log("middle explosion: " + this.xMid + ", " + this.yMid);
   this.x = this.xMid - ((this.pWidth * this.scale) / 2);
   this.y = this.yMid - ((this.pHeight * this.scale) / 2);
@@ -79,7 +91,9 @@ function BloodSplatter(game, shipXMid, shipYMid) {
 }
 
 BloodSplatter.prototype.draw = function () {
-  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	if(onCamera){
+  		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+  	}
   //console.log("explosion: " + this.x + ", " + this.y);
   Entity.prototype.draw.call(this);
 }
@@ -106,11 +120,13 @@ function BossExplosion(game, xIn, yIn, chain, boss) {
   this.name = "Effect";
   this.x = xIn;
   this.y = yIn;
+  this.xMid =
   this.boss = boss;
   this.speed = boss.speed;
   this.chain = chain - 1;
   this.lifetime = 150;
-
+  this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+  this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
   this.removeFromWorld = false; //need to remove from world when animation finishes.
 
   this.xExplosionAdjust = 200-this.pWidth;
@@ -118,7 +134,9 @@ function BossExplosion(game, xIn, yIn, chain, boss) {
 }
 
 BossExplosion.prototype.draw = function () {
-  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	if(onCamera){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
   //console.log("explosion: " + this.x + ", " + this.y);
   Entity.prototype.draw.call(this);
 }
@@ -126,6 +144,7 @@ BossExplosion.prototype.draw = function () {
 BossExplosion.prototype.update = function () {
 	this.y -= this.game.clockTick * this.speed;
 	this.lifetime--;
+	this.angle += 0.05
 	if (this.lifetime < 1){
 		this.removeFromWorld = true;
 	}

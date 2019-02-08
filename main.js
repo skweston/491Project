@@ -30,6 +30,26 @@ function Collide(a, b) {
 	//console.log("checking collision");
 	return distance(a, b) < a.radius + b.radius;
 }
+
+function onCamera(ent){
+	this.game = ent.game;
+	this.camera = this.game.camera;
+	this.camera.width = this.game.camera.ctx.canvas.width;
+	this.camera.height = this.game.camera.ctx.canvas.height;
+
+
+	if (this.camera.x < ent.x + ent.pWidth * ent.scale &&
+   this.camera.x + this.camera.width > ent.x &&
+   this.camera.y < ent.y + ent.pHeight * ent.scale &&
+   this.camera.y + this.camera.height > ent.y) {
+	    return true;// collision detected!
+	}
+
+
+
+
+	return false;
+}
 /* ========================================================================================================== */
 // Entity Template
 /* ========================================================================================================== */
@@ -40,20 +60,153 @@ this.pWidth
 this.pHeight
 this.scale
 this.animation
+this.name
+this.x
+this.y
+this.angle
 
-this.name = "EntityType";
-this.x = 0;
-this.y = 0;
-this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-this.speed = 0;
-this.angle = 0;
+If the entity is going to have collision detection it needs these
+this.xMid
+this.yMid
 this.radius
-this.weaponCooldown
 
-a list of powerups, things like multishot and such
+If it's going to move, it needs these
+this.speed
+
+
+
+Effects, like explosions and powerups should have:
+this.lifetime // a variable to decrement on their update so that when it goes negative we set their removeFromWorld = true;
+
+function sampleEntity(game, extraInputVarial, extraInputVarialTwo) {
+
+
+	this.pWidth = Interger width Of Single Frame of Animation;
+	this.pHeight = Interger height Of Single Frame of Animation;
+	this.scale = the scaling factor for this entity;
+
+  	Stuff gets passed into an animation object in this order:
+  	spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
+
+	this.animation = new Animation(AM.getAsset("./img/NameOfAsset.png"),
+								 this.pWidth, this.pHeight,
+								 width of spriteSheet,  Duration Each Frame Lasts, # of Frames,
+								 Boolean for looping, this.scale);
+
+
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Effect" XOR "Level" XOR "Background" XOR "Player" XOR "Enemy" XOR
+				"PlayerProjectile" XOR "EnemyProjectile" XOR "Extra" XOR "Effect";
+
+	this.x = 0;
+	this.y = 0;
+	this.removeFromWorld = false; //there needs to be SOME way to make this true;
+///////////Above this is MANDATORY for all entities////////////////////////
+//If it's killable
+	this.health = some magic number;
+
+//this is for collision
+	this.xMid = extraInputVarial;
+	this.yMid = extraInputVarialTwo;
+	this.radius = some magic number * this.scale;
+
+//this is for movement
+	this.speed = some magic number;
+
+//Add other variables to objects for whatever added functionality you need
+	this.sampleValue = sample Magic Number;
+
+
+}
+
+sampleEntity.prototype.draw = function () {
+	if(onCamera(this)){
+  		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+  	}
+	Entity.prototype.draw.call(this);
+}
+
+sampleEntity.prototype.update = function () {
+
+	//something likethis for an Effect
+	this.lifetime--;
+	if (this.lifetime < 1){
+		this.removeFromWorld = true;
+	}
+	// update angle if you want it to point at the ship
+	var dx = this.game.ship.xMid - this.xMid;
+	var dy = this.yMid - this.game.ship.yMid;
+	this.angle = -Math.atan2(dy,dx);
+
+	// move the thing
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	//update its hitbox
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+
+	// check collision with player projectiles
+	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
+		var ent = this.game.playerProjectiles[i];
+		if (Collide(this, ent)) {
+			this.health -= ent.damage;
+			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
+			this.game.addEntity (splatter);
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+	// check collision with ship if it matters
+	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
+		this.game.ship.health -= this.damage;
+		this.removeFromWorld = true;
+	}
+
+	// check health
+	if (this.health < 1) {
+		SCORE++; //how many points is it worth
+
+		//does it drop a powerup?
+		if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
+			var spreader = new Spreader(this.game);
+			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+			spreader.xMid = this.xMid;
+			spreader.yMid = this.yMid;
+
+			this.game.addEntity(spreader);
+		}
+
+		this.removeFromWorld = true;
+	}
+
+	//does it blow up when it dies?
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		this.game.addEntity(explosion);
+	}
+
+	Entity.prototype.update.call(this);
+
+
+}
+
+
+
+
+
 
 */
+/*a list of powerups, things like multishot and such
+
 
 /* ========================================================================================================== */
 // Animation
@@ -130,6 +283,9 @@ Animation.prototype.currentFrame = function () {
 Animation.prototype.isDone = function () {
 	return (this.elapsedTime >= this.totalTime);
 }
+
+
+
 /* ========================================================================================================== */
 // Camera
 /* ========================================================================================================== */

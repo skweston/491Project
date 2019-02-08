@@ -68,19 +68,28 @@ Boss1.prototype.update = function () {
 }
 
 Boss1.prototype.draw = function () {
-	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
 	if(!this.turret1.removeFromWorld){
-		this.turret1.animation.drawFrame(this.game.clockTick, this.ctx, this.turret1.x, this.turret1.y, this.turret1.angle);
+		if(onCamera(this.turret1)){
+			this.turret1.animation.drawFrame(this.game.clockTick, this.ctx, this.turret1.x, this.turret1.y, this.turret1.angle);
+		}
 	}
 	if(!this.turret2.removeFromWorld){
-		this.turret2.animation.drawFrame(this.game.clockTick, this.ctx, this.turret2.x, this.turret2.y, this.turret2.angle);
+		if(onCamera(this.turret2)){
+			this.turret2.animation.drawFrame(this.game.clockTick, this.ctx, this.turret2.x, this.turret2.y, this.turret2.angle);
+		}
 	}
 	if(!this.turret3.removeFromWorld){
-		this.turret3.animation.drawFrame(this.game.clockTick, this.ctx, this.turret3.x, this.turret3.y, this.turret3.angle);
+		if(onCamera(this.turret3)){
+			this.turret3.animation.drawFrame(this.game.clockTick, this.ctx, this.turret3.x, this.turret3.y, this.turret3.angle);
+		}
 	}
 	if(!this.turret4.removeFromWorld){
-		this.turret4.animation.drawFrame(this.game.clockTick, this.ctx, this.turret4.x, this.turret4.y, this.turret4.angle);
+		if(onCamera(this.turret4)){
+			this.turret4.animation.drawFrame(this.game.clockTick, this.ctx, this.turret4.x, this.turret4.y, this.turret4.angle);
+		}
 	}
 	Entity.prototype.draw.call(this);
 }
@@ -265,8 +274,9 @@ LaserBlast.prototype.update = function () {
   }
 
 LaserBlast.prototype.draw = function () {
-	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
 		this.ctx.strokeStyle = "Red";
@@ -290,7 +300,7 @@ function Scourge(game, spritesheet, xIn, yIn) {
 	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
 	this.angle = 0;
 	this.name = "Enemy";
-	this.speed = 0.7;
+	this.speed = 0.55;
 	this.x = xIn;
 	this.y = yIn;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -328,6 +338,7 @@ Scourge.prototype.update = function () {
 			this.health -= ent.damage;
 			ent.removeFromWorld = true;
 			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
 			this.game.addEntity (splatter);
 			if (this.health < 1) {
 				break;
@@ -349,6 +360,8 @@ Scourge.prototype.update = function () {
 			var spreader = new Spreader(this.game);
 			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
 			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+			spreader.xMid = this.xMid;
+			spreader.yMid = this.yMid;
 
 			this.game.addEntity(spreader);
 		}
@@ -365,15 +378,16 @@ Scourge.prototype.update = function () {
 }
 
 Scourge.prototype.draw = function () {
-  this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-
-  if (SHOW_HITBOX) {
-	  this.ctx.beginPath();
-	  this.ctx.strokeStyle = "Red";
-	  this.ctx.lineWidth = 1;
-	  this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
-	  this.ctx.stroke();
-	  this.ctx.closePath();
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
 	}
 
   Entity.prototype.draw.call(this);
@@ -451,11 +465,13 @@ Spawner.prototype.update = function () {
 }
 
 Spawner.prototype.draw = function () {
-	if(this.generateEnemy < 25) {
-    	this.openingAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-	}
-	else {
-		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	if(onCamera(this)){
+		if(this.generateEnemy < 25) {
+    		this.openingAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+		}
+		else {
+			this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+		}
 	}
     //Entity.prototype.draw.call(this);
 }

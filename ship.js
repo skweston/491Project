@@ -324,7 +324,9 @@ ShipPrimary.prototype.update = function () {
 }
 
 ShipPrimary.prototype.draw = function () {
-	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	if(onCamera){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
 
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
@@ -393,7 +395,9 @@ ShipSecondary.prototype.update = function () {
 }
 
 ShipSecondary.prototype.draw = function () {
-	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	if(onCamera){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
 
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
@@ -463,8 +467,8 @@ Spreader.prototype = new Entity();
 Spreader.prototype.constructor = Spreader;
 
 Spreader.prototype.update = function () {
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	// this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1; changed the way they spawn so it doesn't need to do this math constantly
+	// this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.ship)) {
 		this.game.ship.spreader = 1000;
@@ -481,8 +485,9 @@ Spreader.prototype.update = function () {
 }
 
 Spreader.prototype.draw = function () {
-	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
 		this.ctx.strokeStyle = "Red";
