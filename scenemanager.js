@@ -64,8 +64,8 @@ PlayGame.prototype.update = function () {
 	this.spawnAtRandom();
 
 	if (this.game.ship.health < 1) {
-		var audio = document.createElement('audio');
-		audio.src = "./img/die.wav";
+		var audio = AM.getAsset("./img/Die.wav")
+		//audio.src = "./img/die.wav";
 		audio.play();
 		this.reset();
 	}
