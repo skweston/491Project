@@ -24,11 +24,17 @@ PlayGame.prototype.reset = function () {
 	for (var i = 0; i < this.game.extras.length; i++) {
 		this.game.extras[i].removeFromWorld = true;
 	}
+	for (var i = 0; i < this.game.enemies.length; i++){
+		this.game.enemies[i].removeFromWorld = true;
+	}
+	for(var i = 0; i< this.game.enemyProjectiles.lenght; i++){
+		this.game.enemyProjectiles[i].removeFromWorld = true;
+	}
 
 	var ship = new TheShip(this.game);
-	var reticle = new Reticle(this.game);
+	// var reticle = new Reticle(this.game);
 	this.game.addEntity(ship);
-	this.game.addEntity(reticle);
+	// this.game.addEntity(reticle);
 	this.game.ship = ship;
 }
 
