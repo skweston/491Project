@@ -27,6 +27,7 @@ Timer.prototype.tick = function () {
 
 function GameEngine() {
 	// this.entities = [];
+	this.levels = [];
 	this.background = [];
 	this.player = [];
 	this.enemies = [];
@@ -35,8 +36,11 @@ function GameEngine() {
 	this.extras = [];
 	this.effects = [];
 
+	// start the game
+	this.mouse = false;
+	this.clicked = false;
+
 	// player input
-	this.wasclicked = false;
 	this.mouseX = 0;
 	this.mouseY = 0;
 	this.firePrimary = false;
@@ -50,12 +54,15 @@ function GameEngine() {
 	this.roll = false;
 
 	this.ctx = null;
+	this.camera = null;
+	this.cameraCtx = null;
 	this.surfaceWidth = null;
 	this.surfaceHeight = null;
 }
 
-GameEngine.prototype.init = function (ctx) {
+GameEngine.prototype.init = function (ctx, cameraCtx) {
 	this.ctx = ctx;
+	this.cameraCtx = cameraCtx;
 	this.surfaceWidth = this.ctx.canvas.width;
 	this.surfaceHeight = this.ctx.canvas.height;
 	this.timer = new Timer();
@@ -68,7 +75,7 @@ GameEngine.prototype.start = function () {
 	var that = this;
 	(function gameLoop() {
 		that.loop();
-		requestAnimFrame(gameLoop, that.ctx.canvas);
+		requestAnimFrame(gameLoop, that.cameraCtx.canvas);
 	})();
 }
 
@@ -77,8 +84,8 @@ GameEngine.prototype.startInput = function () {
 	var that = this;
 
 	var getXandY = function (e) {
-		var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left + 100;
-		var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top + 100;
+		var x = e.clientX - that.cameraCtx.canvas.getBoundingClientRect().left + 100;
+		var y = e.clientY - that.cameraCtx.canvas.getBoundingClientRect().top + 100;
 
 		return { x: x, y: y};
 	}
@@ -87,22 +94,28 @@ GameEngine.prototype.startInput = function () {
 
 	// event listeners are added here
 
-	this.ctx.canvas.addEventListener("click", function (e) {
-		that.click = getXandY(e);
+	this.cameraCtx.canvas.addEventListener("click", function (e) {
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		that.wasclicked = true;
 		// console.log(e);
 		// console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
 	}, false);
 
-	this.ctx.canvas.addEventListener("contextmenu", function (e) {
-		that.click = getXandY(e);
+	this.cameraCtx.canvas.addEventListener("contextmenu", function (e) {
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		// console.log(e);
 		// console.log("Right Click Event - X,Y " + e.clientX + ", " + e.clientY);
 		e.preventDefault();
 	}, false);
 
-	this.ctx.canvas.addEventListener("mousedown", function (e) {
-		that.click = getXandY(e);
+	this.cameraCtx.canvas.addEventListener("mousedown", function (e) {
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		// console.log(e);
 		if (e.which === 1) {
 			that.firePrimary = true;
@@ -114,8 +127,10 @@ GameEngine.prototype.startInput = function () {
 		}
 	}, false);
 
-	this.ctx.canvas.addEventListener("mouseup", function (e) {
-		that.click = getXandY(e);
+	this.cameraCtx.canvas.addEventListener("mouseup", function (e) {
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		// console.log(e);
 		if (e.which === 1) {
 			that.firePrimary = false;
@@ -127,21 +142,34 @@ GameEngine.prototype.startInput = function () {
 		}
 	}, false);
 
-	this.ctx.canvas.addEventListener("mousemove", function (e) {
+	this.cameraCtx.canvas.addEventListener("mousemove", function (e) {
 		//console.log(e);
-		that.mouse = getXandY(e);
-		that.mouseX = (e.x - 7);
-		that.mouseY = (e.y - 7);
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
 		//console.log("Current mouse x: " + that.mousex + " current mouse y: " + that.mousey );
 	}, false);
 
-	this.ctx.canvas.addEventListener("mousewheel", function (e) {
-		// console.log(e);
-		that.wheel = e;
-		// console.log("Click Event - X,Y " + e.clientX + ", " + e.clientY + " Delta " + e.deltaY);
+	this.cameraCtx.canvas.addEventListener("mouseover", function (e) {
+		//console.log(e);
+		that.mouse = true;
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
+		//console.log("Current mouse x: " + that.mousex + " current mouse y: " + that.mousey );
 	}, false);
 
-	this.ctx.canvas.addEventListener("keydown", function (e) {
+	this.cameraCtx.canvas.addEventListener("mouseleave", function (e) {
+
+		that.mouseX = (e.x - 7 + that.camera.x);
+		that.mouseY = (e.y - 7 + that.camera.y);
+		that.mouse = false;
+	}, false);
+
+	this.cameraCtx.canvas.addEventListener("mousewheel", function (e) {
+		that.wheel = e;
+	}, false);
+
+	this.cameraCtx.canvas.addEventListener("keydown", function (e) {
 		e.preventDefault();
 		if (e.code === "KeyW") {
 			that.moveUp = true;
@@ -165,13 +193,16 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "Space") {
 			that.roll = true;
 		}
+		if (e.code === "Enter") {
+			that.clicked = true;
+		}
 	}, false);
 
-	this.ctx.canvas.addEventListener("keypress", function (e) {
+	this.cameraCtx.canvas.addEventListener("keypress", function (e) {
 		e.preventDefault();
 	}, false);
 
-	this.ctx.canvas.addEventListener("keyup", function (e) {
+	this.cameraCtx.canvas.addEventListener("keyup", function (e) {
 		e.preventDefault();
 		if (e.code === "KeyW") {
 			that.moveUp = false;
@@ -192,6 +223,9 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "ShiftLeft") {
 			that.boost = false;
 		}
+		if (e.code === "AltLeft") {
+			that.gameStart = true;
+		}
 	}, false);
 
 	console.log('Input started');
@@ -200,6 +234,9 @@ GameEngine.prototype.startInput = function () {
 GameEngine.prototype.addEntity = function (entity) {
 	// console.log('added entity');
 	// this.entities.push(entity);
+	if (entity.name === "Level") {
+		this.levels.push(entity);
+	}
 	if (entity.name === "Background") {
 		this.background.push(entity);
 	}
@@ -226,12 +263,17 @@ GameEngine.prototype.addEntity = function (entity) {
 GameEngine.prototype.draw = function () {
 	this.ctx.clearRect(0, 0, this.surfaceWidth, this.surfaceHeight);
 	this.ctx.save();
+	this.cameraCtx.clearRect(0,0,800,800);
+	this.cameraCtx.save();
 	// for (var i = 0; i < this.entities.length; i++) {
 		//     this.entities[i].draw(this.ctx);
 	// }
 
 	for (var i = 0; i < this.background.length; i++) {
 		this.background[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.levels.length; i++) {
+		this.levels[i].draw(this.ctx);
 	}
 	for (var i = 0; i < this.playerProjectiles.length; i++) {
 		this.playerProjectiles[i].draw(this.ctx);
@@ -242,17 +284,19 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.extras.length; i++) {
 		this.extras[i].draw(this.ctx);
 	}
-	for (var i = 0; i < this.effects.length; i++) {
-		this.effects[i].draw(this.ctx);
-	}
 	for (var i = 0; i < this.enemies.length; i++) {
 		this.enemies[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.effects.length; i++) {
+		this.effects[i].draw(this.ctx);
 	}
 	for (var i = 0; i < this.player.length; i++) {
 		this.player[i].draw(this.ctx);
 	}
 
 	this.ctx.restore();
+	this.camera.draw(this.cameraCtx);
+	this.cameraCtx.restore();
 }
 
 GameEngine.prototype.update = function () {
@@ -270,11 +314,12 @@ GameEngine.prototype.update = function () {
 	// 	}
 	// }
 
-	var count = this.player.length;
+	this.camera.update();
+	var count = this.background.length;
 	for (var i = 0; i < count; i++) {
-		var entity = this.player[i];
+		var entity = this.background[i];
 		if (entity.removeFromWorld) {
-			this.player.splice(i, 1);
+			this.background.splice(i, 1);
 			count--;
 			i--;
 		}
@@ -282,12 +327,12 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
-	// console.log("there are currently: " + this.enemies.length);
-	count = this.enemies.length;
+
+	count = this.levels.length;
 	for (var i = 0; i < count; i++) {
-		var entity = this.enemies[i];
+		var entity = this.levels[i];
 		if (entity.removeFromWorld) {
-			this.enemies.splice(i, 1);
+			this.levels.splice(i, 1);
 			count--;
 			i--;
 		}
@@ -345,6 +390,33 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
+
+	count = this.enemies.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.enemies[i];
+		if (entity.removeFromWorld) {
+			this.enemies.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
+	count = this.player.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.player[i];
+		if (entity.removeFromWorld) {
+			this.player.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+	this.camera.update();
 
 	this.wasclicked = false;
 	this.roll = false;
