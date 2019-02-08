@@ -107,23 +107,29 @@ PlayGame.prototype.update = function () {
 }
 
 PlayGame.prototype.draw = function (ctx) {
-	if (!this.game.running) {
-		ctx.font = "24pt Impact";
-		ctx.fillStyle = "Red";
-		if (this.game.mouse) {
-			ctx.fillStyle = "Pink";
-		}
 
-		ctx.textAlign = "center";
-		ctx.fillText("WASD to move", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 340);
-		ctx.fillText("LClick and RClick to shoot", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 370);
-		ctx.fillText("LShift to boost", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400);
-		ctx.fillText("Space to perform a roll", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 430);
-		ctx.fillText("Grab powerups to shoot more at once", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 460);
-		ctx.fillText("Survive as long as you can!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 490);
-		ctx.fillText("Press Left Alt to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
+	if(!this.game.running) {
+		this.mainMenu(ctx);
 	}
 
+	this.hud(ctx);
+}
+
+
+//make function of PlayGame - ALL
+PlayGame.prototype.spawnAtRandom = function () {
+
+}
+
+//PlayGame.prototype.clearAllEnemies = function ()
+
+
+
+function PrototypeLevel() {
+	//move prototype level build to here
+}
+
+PlayGame.prototype.hud = function (ctx) {
 	ctx.font = "24pt Impact";
 	ctx.fillStyle = "Red";
 	ctx.textAlign = "left";
@@ -134,3 +140,27 @@ PlayGame.prototype.draw = function (ctx) {
 	ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
 	ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
 }
+
+PlayGame.prototype.mainMenu = function (ctx) {
+	//SPACEFIGHT Logo
+	//Press Start or menu options
+	ctx.font = "24pt Impact";
+	ctx.fillStyle = "Red";
+	if (this.game.mouse) {
+		ctx.fillStyle = "Pink";
+	}
+
+	ctx.textAlign = "center";
+	ctx.fillText("WASD to move", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 340);
+	ctx.fillText("LClick and RClick to shoot", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 370);
+	ctx.fillText("LShift to boost", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400);
+	ctx.fillText("Space to perform a roll", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 430);
+	ctx.fillText("Grab powerups to shoot more at once", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 460);
+	ctx.fillText("Survive as long as you can!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 490);
+	ctx.fillText("Press Left Alt to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
+}
+
+function LevelOne() {
+	//new level one code goes here
+}
+
