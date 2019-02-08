@@ -1,3 +1,4 @@
+
 /* ========================================================================================================== */
 // Boss 1
 /* ========================================================================================================== */
@@ -5,14 +6,18 @@ function Boss1(game){
 	this.pWidth = 200;
 	this.pHeight = 450;
 	this.scale = 1;
-    this.animation = new Animation(AM.getAsset("./img/Boss1.png"), 200, 450, 1200, 0.175, 6, true, 1);
-    this.name = "Enemy";
-    this.x = Math.random() *800;
-    this.y = 2000;
-    this.angle = 0;
-    this.speed = 100;
     this.game = game;
     this.ctx = game.ctx;
+    this.animation = new Animation(AM.getAsset("./img/Boss1.png"), 200, 450, 1200, 0.175, 6, true, 1);
+    this.name = "Enemy";
+    this.x = Math.random() * (this.ctx.canvas.width-200);
+    this.y = this.ctx.canvas.height + 500;
+	this.xMid = this.x - this.pWidth/2;
+	this.yMid = this.y - this.pHeight/2;
+    this.angle = 0;
+    this.speed = 100;
+	this.deathTimer = 150;
+	this.dying = false;
     this.removeFromWorld = false;
 	this.turret1 = new BossTurret(this.game, this, 70, 125);
 	this.turret2 = new BossTurret(this.game, this, 70, 195);
@@ -33,10 +38,24 @@ Boss1.prototype.update = function () {
 	//console.log("boss is updating");
 	this.y -= this.game.clockTick * this.speed;
 
-	if (this.turretsRemaining === 0){
-		this.removeFromWorld = true;
+	this.xMid = this.x - this.pWidth/2;
+	this.yMid = this.y - this.pHeight/2;
+
+	if (this.turretsRemaining === 0) {
+
+		this.deathTimer--;
+		if (!this.dying){
+			var explosion = new BossExplosion(this.game, this.x, this.y, 7, this);
+			this.game.addEntity(explosion);
+			SCORE += 5;
+		}
+		if (this.deathTimer < 1){
+			this.removeFromWorld = true;
+		}
+		this.dying = true;
 	}
-	if(this.y < -2000){
+
+	if(!this.game.running || this.y === -500) {
 		this.turret1.removeFromWorld = true;
 		this.turret2.removeFromWorld = true;
 		this.turret3.removeFromWorld = true;
@@ -108,9 +127,13 @@ BossTurret.prototype.update = function () {
 	this.yMid = this.y + (this.pHeight * this.scale) / 2;
 
 	this.shootCooldown--;
-	if(this.health < 1){
-		this.boss.turretsRemaining--;
 
+	if(this.health < 1) {
+		SCORE += 3;
+
+		this.boss.turretsRemaining--;
+		var explosion = new BossExplosion(this.game, this.x - this.pWidth, this.y, 0, this.boss);
+		this.game.addEntity(explosion);
         this.removeFromWorld = true;
     }
 	for (var i = 0; i<this.game.playerProjectiles.length; i++){
@@ -228,11 +251,9 @@ LaserBlast.prototype.update = function () {
 
 
 	  var ent = this.game.ship;
-	  if(Collide(this, ent)) {
-          if(!ent.invincible) {
-		            ent.health -= this.damage;
-          }
-          this.removeFromWorld = true;
+	  if(!ent.rolling && Collide(this, ent)) {
+		  ent.health -= this.damage;
+		  this.removeFromWorld = true;
 	  }
 
 	  this.lifetime -= 1;
@@ -306,6 +327,8 @@ Scourge.prototype.update = function () {
 		if (Collide(this, ent)) {
 			this.health -= ent.damage;
 			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			this.game.addEntity (splatter);
 			if (this.health < 1) {
 				break;
 			}
@@ -313,15 +336,15 @@ Scourge.prototype.update = function () {
 	}
 
 	// check collision with ship
-	if (Collide(this, this.game.ship)) {
-        if(!this.game.ship.invincible) {
-                  this.game.ship.health -= this.damage;
-        }
+	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
+		this.game.ship.health -= this.damage;
 		this.removeFromWorld = true;
 	}
 
 	// check health
 	if (this.health < 1) {
+		SCORE++;
+
 		if (Math.random() * 100 < 20) {
 			var spreader = new Spreader(this.game);
 			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
@@ -355,7 +378,6 @@ Scourge.prototype.draw = function () {
 
   Entity.prototype.draw.call(this);
 }
-
 /* ========================================================================================================== */
 // Spawner - Enemy
 /* ========================================================================================================== */
