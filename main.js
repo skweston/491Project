@@ -54,30 +54,6 @@ function onCamera(ent){
 // Entity Template
 /* ========================================================================================================== */
 /*
-
-Every entity must have the following variables:
-this.pWidth
-this.pHeight
-this.scale
-this.animation
-this.name
-this.x
-this.y
-this.angle
-
-If the entity is going to have collision detection it needs these
-this.xMid
-this.yMid
-this.radius
-
-If it's going to move, it needs these
-this.speed
-
-
-
-Effects, like explosions and powerups should have:
-this.lifetime // a variable to decrement on their update so that when it goes negative we set their removeFromWorld = true;
-
 function sampleEntity(game, extraInputVarial, extraInputVarialTwo) {
 
 
@@ -115,8 +91,12 @@ function sampleEntity(game, extraInputVarial, extraInputVarialTwo) {
 //this is for movement
 	this.speed = some magic number;
 
+//this is for if it needs to decay off the lists, like an explostion
+this.lifetime = 100; //when this reaches 0, it is removed from world
+
 //Add other variables to objects for whatever added functionality you need
 	this.sampleValue = sample Magic Number;
+
 
 
 }
