@@ -424,7 +424,7 @@ function Reticle(game) {
 	this.name = "Extra";
 	this.game = game;
 	this.ctx = game.ctx;
-	
+
 	this.removeFromWorld = false;
 }
 
@@ -436,7 +436,7 @@ Reticle.prototype.update = function () {
 }
 
 Reticle.prototype.draw = function () {
-	this.reticleAnimation.drawFrame(this.game.clockTick, this.game.cameraCtx,
+	this.reticleAnimation.drawFrame(this.game.clockTick, this.game.ctx,
 								   (this.game.mouseX - (this.pWidth * this.scale / 2) - 1),
 								   (this.game.mouseY - (this.pHeight * this.scale / 2) - 1), 0);
 
