@@ -10,7 +10,7 @@ function PlayGame(game) {
 	this.counter = 0;
 	Entity.call(this, game);
 
-	this.currentLevel = new PrototypeLevel();
+	this.currentLevel = new PrototypeLevel(this.game);
 }
 
 PlayGame.prototype = new Entity();
@@ -56,6 +56,8 @@ PlayGame.prototype.update = function () {
 	if (this.game.running && this.bossTimer === 0) {
 		this.bossTimer = 1000;
 		//this.game.addEntity(new Boss1(this.game));
+		//console.log(this.currentLevel);
+		//console.log(this.currentLevel.boss.name);
 		this.game.addEntity(this.currentLevel.boss);
 	}
 
@@ -115,7 +117,7 @@ PlayGame.prototype.spawnAtRandom = function () {
 			}
 
 			//this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
-			this.game.addEntity(this.currentLevel.random(x, y, this.game));
+			this.game.addEntity(this.currentLevel.random(x, y));
 
 			this.counter++;
 		}
@@ -157,16 +159,14 @@ PlayGame.prototype.mainMenu = function (ctx) {
 	ctx.fillText("Press Left Alt to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
 }
 
-function PrototypeLevel() {
+function PrototypeLevel(game) {
+	this.game = game;
 	//Player Ship should be a persistent global-esque variable
-	this.boss = function (game) {
-		return new Boss1(game);
-	};
+	this.boss = new Boss1(this.game);
 	//this only allows for one type of random spawn per level at the moment
-	this.random = function (x, y, game)  {
-		return new Scourge(game, AM.getAsset("./img/scourge.png"), x, y);
+	this.random = function (x, y)  {
+		return new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
 	};
-	
 }
 
 //PrototypeLevel.prototype.randomSpawns = function () { //move this.random code to here with loop to add more random types}
@@ -175,10 +175,17 @@ PrototypeLevel.prototype = new PlayGame();
 PrototypeLevel.prototype.constructor = PrototypeLevel;
 
 function LevelOne() {
-	//new level one code goes here
+	/*//new level one code goes here
 	this.bossTimer = 1000;
 	this.spawnTimer = 0;
 	this.spawnNum = 1;
 	this.counter = 0;
+	*/
+
+	//Boss needs level specific x and y and maybe other factors
+	//this.boss;
+	/*this.random = function(x, y, game) {
+s
+	}*/
 }
 
