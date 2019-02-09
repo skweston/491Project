@@ -434,7 +434,8 @@ AM.downloadAll(function () {
 	var ctx = canvas.getContext("2d");
 
 	var gameEngine = new GameEngine();
-
+	//danny fiddling:
+	gameEngine.ctx = ctx;
 	gameEngine.init(ctx, cameraCtx);
 
 

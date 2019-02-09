@@ -86,8 +86,8 @@ TheShip.prototype.update = function () {
 	var yMove = 0;
 	if (this.game.moveUp) {
 		if (this.yMid - this.radius > 0){
-		yMove -= 10 * this.speed;
-	}
+			yMove -= 10 * this.speed;
+		}
 	}
 	if (this.game.moveLeft) {
 		if (this.xMid - this.radius > 0) {
@@ -324,9 +324,7 @@ ShipPrimary.prototype.update = function () {
 }
 
 ShipPrimary.prototype.draw = function () {
-	if(onCamera){
-		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-	}
+	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
@@ -395,9 +393,7 @@ ShipSecondary.prototype.update = function () {
 }
 
 ShipSecondary.prototype.draw = function () {
-	if(onCamera){
-		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-	}
+	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
@@ -424,7 +420,6 @@ function Reticle(game) {
 	this.name = "Extra";
 	this.game = game;
 	this.ctx = game.ctx;
-
 	this.removeFromWorld = false;
 }
 
@@ -436,7 +431,7 @@ Reticle.prototype.update = function () {
 }
 
 Reticle.prototype.draw = function () {
-	this.reticleAnimation.drawFrame(this.game.clockTick, this.game.ctx,
+	this.reticleAnimation.drawFrame(this.game.clockTick, this.ctx,
 								   (this.game.mouseX - (this.pWidth * this.scale / 2) - 1),
 								   (this.game.mouseY - (this.pHeight * this.scale / 2) - 1), 0);
 
@@ -468,8 +463,8 @@ Spreader.prototype = new Entity();
 Spreader.prototype.constructor = Spreader;
 
 Spreader.prototype.update = function () {
-	// this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1; changed the way they spawn so it doesn't need to do this math constantly
-	// this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.ship)) {
 		this.game.ship.spreader = 1000;
@@ -486,9 +481,8 @@ Spreader.prototype.update = function () {
 }
 
 Spreader.prototype.draw = function () {
-	if(onCamera(this)){
-		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-	}
+	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
 		this.ctx.strokeStyle = "Red";

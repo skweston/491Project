@@ -150,7 +150,7 @@ BossTurret.prototype.update = function () {
 		var ent = this.game.playerProjectiles[i];
 		if(Collide(this, ent)){
 
-			this.health -= ent.damage;
+			this.takeDamage(ent.damage);
 			ent.removeFromWorld = true;
 		}
 	}
@@ -261,7 +261,7 @@ LaserBlast.prototype.update = function () {
 
 	  var ent = this.game.ship;
 	  if(!ent.rolling && Collide(this, ent)) {
-		  ent.health -= this.damage;
+		  ent.takeDamage(this.damage);
 		  this.removeFromWorld = true;
 	  }
 
@@ -335,7 +335,7 @@ Scourge.prototype.update = function () {
 	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
 		var ent = this.game.playerProjectiles[i];
 		if (Collide(this, ent)) {
-			this.health -= ent.damage;
+			this.takeDamage(ent.damage);
 			ent.removeFromWorld = true;
 			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
 			splatter.angle = this.angle;
@@ -348,7 +348,7 @@ Scourge.prototype.update = function () {
 
 	// check collision with ship
 	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
-		this.game.ship.health -= this.damage;
+		this.game.ship.takeDamage(this.damage);
 		this.removeFromWorld = true;
 	}
 

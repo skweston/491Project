@@ -465,3 +465,26 @@ Entity.prototype.rotateAndCache = function (image, angle) {
 	//offscreenCtx.strokeRect(0,0,size,size);
 	return offscreenCanvas;
 }
+
+/*
+Any Entity being assigned damage can just use this function,
+which can be updated as needed. i.e: The player is checked for
+I frames when collision is detected, perhaps a weakspot damage =9999
+for a powerup that sets all targets to 0 health.
+*/
+Entity.prototype.takeDamage = function(damage) {
+
+	// The entity taking damage is relevant?
+	//console.log("This:");
+	if (this.name === 'Player' || this.name === 'Enemy') {
+
+		// Is it a Player? if so make sure its not invincible
+		//console.log(`if: ${this.name}`);
+		if(!this.name === 'Player' || !this.invincible) {
+
+			// Whatever it is, hurt it. With
+			//console.log("got hurt");
+			this.health -= damage;
+		}
+	}
+}
