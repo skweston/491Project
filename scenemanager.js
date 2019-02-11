@@ -166,6 +166,7 @@ function PrototypeLevel(game) {
 	//this only allows for one type of random spawn per level at the moment
 	this.random = function (x, y)  {
 		return new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
+		return new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);//swapped x and y
 	};
 }
 
@@ -188,4 +189,3 @@ function LevelOne() {
 s
 	}*/
 }
-

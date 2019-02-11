@@ -418,6 +418,7 @@ AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
 AM.queueDownload("./img/BossExplosion.png");
+AM.queueDownload("./img/Leech.png");
 
 AM.queueDownload("./img/scourge.png");
 AM.queueDownload("./img/SpawnDoor.png");

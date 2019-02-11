@@ -289,6 +289,136 @@ LaserBlast.prototype.draw = function () {
 	Entity.prototype.draw.call(this);
 }
 
+
+/* ========================================================================================================== */
+// Leech - Enemy
+/* ========================================================================================================== */
+function Leech(game, spritesheet, xIn, yIn) {
+
+	this.pWidth = 32;
+	this.pHeight = 32;
+	this.scale = 1;
+	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight,448, 0.1, 14, true, this.scale);
+	this.angle = 0;
+	this.name = "Enemy";
+	this.speed = 0.1;
+	this.maxSpeed = 0.1; // For resetting after ship rolls
+	this.x = xIn;
+	this.y = yIn;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.radius = 20 * this.scale;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+	this.health = 50;
+	this.damage = 5;
+
+	this.maxDamageCooldown = 50;
+	this.damageCooldown = 0;
+	//console.log("starting health: " + this.health);
+	Entity.call(this, game, this.x, this.y);
+}
+
+Leech.prototype = new Entity();
+Leech.prototype.constructor = Leech;
+
+Leech.prototype.update = function () {
+	// update angle
+	var dx = this.game.ship.xMid - this.xMid;
+	var dy = this.yMid - this.game.ship.yMid;
+	this.angle = -Math.atan2(dy,dx);
+
+	// moves like Scourge
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	// check collision with player projectiles
+	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
+		var ent = this.game.playerProjectiles[i];
+		if (Collide(this, ent)) {
+			this.takeDamage(ent.damage);
+			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
+			this.game.addEntity (splatter);
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+	// check collision with ship
+	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
+		this.damageCooldown--;
+		this.speed = this.game.ship.speed;
+		if(this.damageCooldown < 0) {
+			this.damageCooldown = this.maxDamageCooldown;
+			this.game.ship.takeDamage(this.damage);
+		}
+	} else if (this.game.ship.rolling && Collide(this, this.game.ship)) {
+		//if 4 then stay attached this frame 80% to
+		var stayStuck = Math.floor(Math.random() * 100);
+		this.damageCooldown = this.maxDamageCooldown;
+		if (stayStuck > 96) {
+			this.speed = this.maxSpeed;
+			if ((this.game.moveDown || this.game.moveUp) && !this.game.moveRight) {
+				this.x++;
+			} else {
+				this.x--;
+			}
+			if ((this.game.moveLeft || this.game.moveRight) && !this.game.moveDown)  {
+				this.y++;
+			} else {
+				this.y--;
+			}
+		}
+	}
+
+	// check health
+	if (this.health < 1) {
+		SCORE++;
+
+		if (Math.random() * 100 < 20) {
+			var spreader = new Spreader(this.game);
+			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+			spreader.xMid = this.xMid;
+			spreader.yMid = this.yMid;
+
+			this.game.addEntity(spreader);
+		}
+
+		this.removeFromWorld = true;
+	}
+
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+		this.game.addEntity(explosion);
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+Leech.prototype.draw = function () {
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+  Entity.prototype.draw.call(this);
+}
+
 /* ========================================================================================================== */
 // Scourge - Enemy
 /* ========================================================================================================== */
