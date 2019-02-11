@@ -58,7 +58,7 @@ PlayGame.prototype.update = function () {
 		//this.game.addEntity(new Boss1(this.game));
 		//console.log(this.currentLevel);
 		//console.log(this.currentLevel.boss.name);
-		this.game.addEntity(this.currentLevel.boss);
+		this.game.addEntity(new Boss1(this.game));
 	}
 
 	this.spawnAtRandom();
@@ -165,8 +165,11 @@ function PrototypeLevel(game) {
 	this.boss = new Boss1(this.game);
 	//this only allows for one type of random spawn per level at the moment
 	this.random = function (x, y)  {
-		return new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
-		return new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);//swapped x and y
+		if(Math.random()*100<50){
+			return new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
+		}else{
+			return new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);//swapped x and y
+		}
 	};
 }
 

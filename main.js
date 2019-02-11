@@ -411,6 +411,8 @@ AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary1.png");
 AM.queueDownload("./img/shipSecondary1.png");
 
+//drops and powerups
+AM.queueDownload("./img/RepairDrop.png");
 AM.queueDownload("./img/spreader.png");
 
 // enemies

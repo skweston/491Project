@@ -481,8 +481,71 @@ Spreader.prototype.update = function () {
 }
 
 Spreader.prototype.draw = function () {
-	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
 
+	Entity.prototype.draw.call(this);
+}
+
+
+function RepairDrop(game) {
+	this.pWidth = 32;
+	this.pHeight = 32;
+	this.scale = 1.5;
+	this.animation = new Animation(AM.getAsset("./img/RepairDrop.png"), this.pWidth, this.pHeight, 64, 0.25, 2, true, this.scale);
+
+	this.name = "Extra";
+	this.x = 0;
+	this.y = 0;
+	this.xMid = 0;
+	this.yMid = 0;
+	this.radius = this.scale * 32;
+	this.angle = 0;
+
+	this.lifetime = 500;
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+}
+
+RepairDrop.prototype = new Entity();
+RepairDrop.prototype.constructor = RepairDrop;
+
+RepairDrop.prototype.update = function () {
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	if (Collide(this, this.game.ship)) {
+		if(this.game.ship.health <= 90){
+			this.game.ship.health += 10;
+		}else {
+			this.game.ship.health = 100;
+		}
+		this.removeFromWorld = true;
+	}
+
+	this.lifetime -= 1;
+	if (this.lifetime < 0) {
+		this.removeFromWorld = true;
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+RepairDrop.prototype.draw = function () {
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
 		this.ctx.strokeStyle = "Red";

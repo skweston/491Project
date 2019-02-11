@@ -381,15 +381,25 @@ Leech.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
+		var dice = Math.random()*100;
+		if (dice < 35) {
+			if(dice < 25){
+				var repair = new RepairDrop(this.game);
+				repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
+				repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
+				repair.xMid = this.xMid;
+				repair.yMid = this.yMid;
+				this.game.addEntity(repair);
 
-		if (Math.random() * 100 < 20) {
-			var spreader = new Spreader(this.game);
-			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			spreader.xMid = this.xMid;
-			spreader.yMid = this.yMid;
+			}else{
+				var spreader = new Spreader(this.game);
+				spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+				spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+				spreader.xMid = this.xMid;
+				spreader.yMid = this.yMid;
 
-			this.game.addEntity(spreader);
+				this.game.addEntity(spreader);
+			}
 		}
 
 		this.removeFromWorld = true;
