@@ -498,17 +498,17 @@ Spreader.prototype.draw = function () {
 
 
 function RepairDrop(game) {
-	this.pWidth = 32;
-	this.pHeight = 32;
-	this.scale = 1.5;
-	this.animation = new Animation(AM.getAsset("./img/RepairDrop.png"), this.pWidth, this.pHeight, 64, 0.25, 2, true, this.scale);
+	this.pWidth = 256;
+	this.pHeight = 256;
+	this.scale = .25;
+	this.animation = new Animation(AM.getAsset("./img/RepairDrop.png"), this.pWidth, this.pHeight, 1536, 0.15, 6, true, this.scale);
 
 	this.name = "Extra";
 	this.x = 0;
 	this.y = 0;
 	this.xMid = 0;
 	this.yMid = 0;
-	this.radius = this.scale * 32;
+	this.radius = this.scale * 42;
 	this.angle = 0;
 
 	this.lifetime = 500;
