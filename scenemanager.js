@@ -163,6 +163,7 @@ function PrototypeLevel(game) {
 	this.game = game;
 	//Player Ship should be a persistent global-esque variable
 	this.boss = new Boss1(this.game);
+	this.game.addEntity(this.boss);
 	//this only allows for one type of random spawn per level at the moment
 	this.random = function (x, y)  {
 		if(Math.random()*100<50){

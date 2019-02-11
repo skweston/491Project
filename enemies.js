@@ -51,6 +51,29 @@ Boss1.prototype.update = function () {
 		}
 		if (this.deathTimer < 1){
 			this.removeFromWorld = true;
+			var dice = Math.random()*100;
+			if (dice < 100) { //the boss always drops something
+				if(dice < 85){
+					var repair = new RepairDrop(this.game);
+					repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
+					repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
+					repair.xMid = this.xMid;
+					repair.yMid = this.yMid;
+					this.game.addEntity(repair);
+
+				}else{
+					var spreader = new Spreader(this.game);
+					spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+					spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+					spreader.xMid = this.xMid;
+					spreader.yMid = this.yMid;
+
+					this.game.addEntity(spreader);
+				}
+			}
+
+
+
 		}
 		this.dying = true;
 	}
@@ -143,6 +166,26 @@ BossTurret.prototype.update = function () {
 		this.boss.turretsRemaining--;
 		var explosion = new BossExplosion(this.game, this.x - this.pWidth, this.y, 0, this.boss);
 		this.game.addEntity(explosion);
+		var dice = Math.random()*100;
+		if (true) {
+			if(dice < 50){
+				var repair = new RepairDrop(this.game);
+				repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
+				repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
+				repair.xMid = this.xMid;
+				repair.yMid = this.yMid;
+				this.game.addEntity(repair);
+
+			}else{
+				var spreader = new Spreader(this.game);
+				spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+				spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+				spreader.xMid = this.xMid;
+				spreader.yMid = this.yMid;
+
+				this.game.addEntity(spreader);
+			}
+		}
         this.removeFromWorld = true;
     }
 	for (var i = 0; i<this.game.playerProjectiles.length; i++){
