@@ -408,8 +408,10 @@ AM.queueDownload("./img/shipBoost.png");
 AM.queueDownload("./img/shipRoll.png");
 AM.queueDownload("./img/shipBoostRoll.png");
 AM.queueDownload("./img/shipReticle.png");
-AM.queueDownload("./img/shipPrimary1.png");
-AM.queueDownload("./img/shipSecondary1.png");
+AM.queueDownload("./img/shipPrimary0.png");
+AM.queueDownload("./img/shipSecondary0.png");
+AM.queueDownload("./img/shipSecondary1Idle.png");
+AM.queueDownload("./img/shipSecondary1Homing.png");
 
 //drops and powerups
 AM.queueDownload("./img/RepairDrop.png");
