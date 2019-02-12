@@ -56,6 +56,7 @@ SceneManager.prototype.update = function () {
 		this.game.addEntity(this.currentScene.boss);
 	}
 
+
 	this.spawnAtRandom();
 
 	if (this.game.ship.health < 1) {
@@ -75,11 +76,13 @@ SceneManager.prototype.changeScenes = function (newScene) {
 }
 
 SceneManager.prototype.spawnAtRandom = function () {
+	//console.log("spawnAtRandom");
 	if (this.spawnTimer > 0) {
 		this.spawnTimer--;
 	}
 	if (this.game.running && this.spawnTimer === 0) {
 		this.spawnTimer = 100;
+		console.log("spawnAtRandom");
 
 		for (var i = 0; i < this.spawnNum; i++) {
 			var border = 0;
@@ -220,6 +223,11 @@ function PrototypeLevel(game) {
 	this.game = game;
 	this.boss = new Boss1(game);
 	//this only allows for one type of random spawn per level at the moment
+
+	this.bossTimer = 1000;
+	this.spawnNum = 0;
+	this.spawnTimer = 0;
+	
 
 	this.entities = [];
 	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
