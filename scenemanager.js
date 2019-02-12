@@ -3,13 +3,14 @@
 /* ========================================================================================================== */
 function PlayGame(game) {
 	this.name = "Level";
+	this.game = game;
 	this.bossTimer = 1000;
 	this.spawnTimer = 0;
 	this.spawnNum = 1;
 	this.counter = 0;
 	Entity.call(this, game);
 
-	this.currentLevel = new PrototypeLevel(game);
+	this.currentLevel = null;
 }
 
 PlayGame.prototype = new Entity();
@@ -57,7 +58,8 @@ PlayGame.prototype.update = function () {
 		//this.game.addEntity(new Boss1(this.game));
 		//console.log(this.currentLevel);
 		//console.log(this.currentLevel.boss.name);
-		this.game.addEntity(new Boss1(this.game));
+		//this.game.addEntity(new Boss1(this.game));
+		this.game.addEntity(this.currentScene.boss);
 	}
 
 	this.spawnAtRandom();
@@ -72,7 +74,8 @@ PlayGame.prototype.update = function () {
 
 PlayGame.prototype.draw = function (ctx) {
 	if(!this.game.running) {
-		this.mainMenu(ctx);
+		//this.mainMenu(ctx);
+		this.currentScene = new SplashScene(this.game);
 	}
 
 	this.hud(ctx);
@@ -139,6 +142,7 @@ PlayGame.prototype.hud = function (ctx) {
 	ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
 }
 
+/*
 PlayGame.prototype.mainMenu = function (ctx) {
 	//SPACEFIGHT Logo
 	//Press Start or menu options
@@ -157,10 +161,72 @@ PlayGame.prototype.mainMenu = function (ctx) {
 	ctx.fillText("Survive as long as you can!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 490);
 	ctx.fillText("Press Left Alt to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
 }
+*/
+
+//SPACEFIGHT title object for SplashScreen
+function TitleEffect(game) {
+	this.name = "Level"; //maybe we need a new list for scene elements?
+	this.pWidth = 800;
+	this.pHeight = 538;
+	this.scale = 1;
+
+	this.animation = new Animation(AM.getAsset("./img/SPACEFIGHT.png"),
+								 this.pWidth, this.pHeight,
+								 1600, 2, 12,
+								 true, this.scale);
+
+	this.game = game;
+	this.ctx = game.ctx;
+
+	this.x = (this.game.cameraCtx.canvas.width / 2) - (this.pWidth / 2);
+	this.y = (this.game.cameraCtx.canvas.height / 3) - (this.pHeight / 2);
+	//this.x = 0;
+	//this.y = 0;
+	this.angle = 0;
+	this.removeFromWorld = false; //there needs to be SOME way to make this true;
+
+	Entity.call(this, this.game, this.x, this.y);
+}
+TitleEffect.prototype.draw = function () {
+	if(onCamera(this)){
+		//console.log("draw")
+		//console.log(this.animation.currentFrame());
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+
+	Entity.prototype.draw.call(this);
+}
+
+TitleEffect.prototype.update = function () {
+
+	Entity.prototype.update.call(this);
+}
+
+function SplashScene(game) {
+	this.game = game;
+	var ctx = this.game.ctx;
+	ctx.font = "24pt Impact";
+	game.ctx.fillStyle = "Red";
+	if (game.mouse) {
+		ctx.fillStyle = "Pink";
+	}
+
+	ctx.textAlign = "center";
+	/*ctx.fillText("WASD to move", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 340);
+	ctx.fillText("LClick and RClick to shoot", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 370);
+	ctx.fillText("LShift to boost", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400);
+	ctx.fillText("Space to perform a roll", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 430);
+	ctx.fillText("Grab powerups to shoot more at once", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 460);
+	ctx.fillText("Survive as long as you can!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 490);
+	ctx.fillText("Press Left Alt to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
+	*/
+	
+	this.title = new TitleEffect(game);
+	this.game.addEntity(this.title);
+}
 
 function PrototypeLevel(game) {
 	this.game = game;
-	//Player Ship should be a persistent global-esque variable
 	this.boss = new Boss1(game);
 	//this only allows for one type of random spawn per level at the moment
 	this.random = function (x, y)  {
