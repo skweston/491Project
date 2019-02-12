@@ -1,27 +1,16 @@
 /* ========================================================================================================== */
 // Level Manager stuff
 /* ========================================================================================================== */
-function PlayGame(game) {
-	this.name = "Level";
+function SceneManager(game) {
 	this.game = game;
-	this.bossTimer = 1000;
-	this.spawnTimer = 0;
-	this.spawnNum = 1;
-	this.counter = 0;
-	Entity.call(this, game);
-
-	this.currentLevel = null;
+	this.currentScene = new SplashScene(this.game);
 }
 
-PlayGame.prototype = new Entity();
-PlayGame.prototype.constructor = PlayGame;
+SceneManager.prototype.constructor = SceneManager;
 
-PlayGame.prototype.reset = function () {
+SceneManager.prototype.reset = function () {
 	this.game.running = false;
 	this.game.clicked = false;
-	this.spawnNum = 1;
-	this.counter = 0;
-	this.bossTimer = 1000;
 
 	for (var i = 0; i < this.game.extras.length; i++) {
 		this.game.extras[i].removeFromWorld = true;
@@ -41,10 +30,15 @@ PlayGame.prototype.reset = function () {
 	this.game.addEntity(ship);
 	this.game.addEntity(reticle);
 	this.game.ship = ship;
+
+	this.currentScene = new SplashScene(this.game);
 }
 
-PlayGame.prototype.update = function () {
+SceneManager.prototype.update = function () {
+	//console.log("scene update");
 	if (!this.game.running && this.game.gameStart) {
+		console.log("switch");
+		this.changeScenes(new PrototypeLevel(this.game));
 		this.game.ship.health = 100;
 		SCORE = 0;
 		this.game.running = true;
@@ -72,16 +66,15 @@ PlayGame.prototype.update = function () {
 	}
 }
 
-PlayGame.prototype.draw = function (ctx) {
-	if(!this.game.running) {
-		//this.mainMenu(ctx);
-		this.currentScene = new SplashScene(this.game);
+SceneManager.prototype.changeScenes = function (newScene) {
+	for(var i = 0; i < this.currentScene.entities.length; i++) {
+		this.currentScene.entities[i].removeFromWorld = true;
 	}
 
-	this.hud(ctx);
+	this.currentScene = newScene;
 }
 
-PlayGame.prototype.spawnAtRandom = function () {
+SceneManager.prototype.spawnAtRandom = function () {
 	if (this.spawnTimer > 0) {
 		this.spawnTimer--;
 	}
@@ -119,7 +112,9 @@ PlayGame.prototype.spawnAtRandom = function () {
 			}
 
 			//this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
-			this.game.addEntity(this.currentLevel.random(x, y));
+			//this.game.addEntity(this.currentLevel.random(x, y));
+			console.log("asking for random");
+			this.currentScene.randomwSpawns();
 
 			this.counter++;
 		}
@@ -130,49 +125,43 @@ PlayGame.prototype.spawnAtRandom = function () {
 	}
 }
 
-PlayGame.prototype.hud = function (ctx) {
-	ctx.font = "24pt Impact";
-	ctx.fillStyle = "Red";
-	ctx.textAlign = "left";
-	ctx.fillText("Health: " + this.game.ship.health,  this.game.camera.x + 10, this.game.camera.y + 40);
-	ctx.fillText("Score: " + SCORE, this.game.camera.x + 10, this.game.camera.y + 70);
+//Every playable level needs a hud.
+function HUD(game) {
+	this.name = "Element";
+	this.game = game;
+	console.log(this.game);
+	console.log("hud");
+}
+
+HUD.prototype.draw = function() {
+	//console.log("draw");
+	this.game.ctx.font = "24pt Impact";
+	this.game.ctx.fillStyle = "Red";
+	this.game.ctx.textAlign = "left";
+	this.game.ctx.fillText("Health: " + this.game.ship.health,  this.game.camera.x + 10, this.game.camera.y + 40);
+	this.game.ctx.fillText("Score: " + SCORE, this.game.camera.x + 10, this.game.camera.y + 70);
 	//Boost meter
-	ctx.fillText("Boost Meter: ",  this.game.camera.x + 10, this.game.camera.y + 100);
-	ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
-	ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
+	this.game.ctx.fillText("Boost Meter: ",this.game.camera.x + 10, this.game.camera.y + 100);
+	this.game.ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
+	this.game.ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
+
+	Entity.prototype.draw.call(this);
 }
 
-/*
-PlayGame.prototype.mainMenu = function (ctx) {
-	//SPACEFIGHT Logo
-	//Press Start or menu options
-	ctx.font = "24pt Impact";
-	ctx.fillStyle = "Red";
-	if (this.game.mouse) {
-		ctx.fillStyle = "Pink";
-	}
-
-	ctx.textAlign = "center";
-	ctx.fillText("WASD to move", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 340);
-	ctx.fillText("LClick and RClick to shoot", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 370);
-	ctx.fillText("LShift to boost", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400);
-	ctx.fillText("Space to perform a roll", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 430);
-	ctx.fillText("Grab powerups to shoot more at once", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 460);
-	ctx.fillText("Survive as long as you can!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 490);
-	ctx.fillText("Press Left Alt to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
+HUD.prototype.update = function () {
+	Entity.prototype.update.call(this);
 }
-*/
 
 //SPACEFIGHT title object for SplashScreen
 function TitleEffect(game) {
-	this.name = "Level"; //maybe we need a new list for scene elements?
+	this.name = "Element"; //maybe we need a new list for scene elements?
 	this.pWidth = 800;
 	this.pHeight = 538;
 	this.scale = 1;
 
 	this.animation = new Animation(AM.getAsset("./img/SPACEFIGHT.png"),
 								 this.pWidth, this.pHeight,
-								 1600, 2, 12,
+								 2, 0.1, 12,
 								 true, this.scale);
 
 	this.game = game;
@@ -180,19 +169,27 @@ function TitleEffect(game) {
 
 	this.x = (this.game.cameraCtx.canvas.width / 2) - (this.pWidth / 2);
 	this.y = (this.game.cameraCtx.canvas.height / 3) - (this.pHeight / 2);
-	//this.x = 0;
-	//this.y = 0;
 	this.angle = 0;
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 
 	Entity.call(this, this.game, this.x, this.y);
 }
+
 TitleEffect.prototype.draw = function () {
 	if(onCamera(this)){
 		//console.log("draw")
 		//console.log(this.animation.currentFrame());
 		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 	}
+
+	var ctx = this.game.ctx;
+	ctx.font = "24pt Impact";
+	this.game.ctx.fillStyle = "Blue";
+
+	this.game.ctx.textAlign = "center";
+	//console.log(game);
+	this.game.ctx.fillText("Super Plutonian Ace Command Earth Fighting Inter-Galactic Hero Team", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400, 500);
+	//this.game.ctx.draw();
 
 	Entity.prototype.draw.call(this);
 }
@@ -203,56 +200,52 @@ TitleEffect.prototype.update = function () {
 }
 
 function SplashScene(game) {
+	//console.log("here: " + game.currentScene);
 	this.game = game;
-	var ctx = this.game.ctx;
-	ctx.font = "24pt Impact";
-	game.ctx.fillStyle = "Red";
-	if (game.mouse) {
-		ctx.fillStyle = "Pink";
-	}
+	this.entities = [];
 
-	ctx.textAlign = "center";
-	/*ctx.fillText("WASD to move", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 340);
-	ctx.fillText("LClick and RClick to shoot", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 370);
-	ctx.fillText("LShift to boost", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400);
-	ctx.fillText("Space to perform a roll", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 430);
-	ctx.fillText("Grab powerups to shoot more at once", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 460);
-	ctx.fillText("Survive as long as you can!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 490);
-	ctx.fillText("Press Left Alt to start", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 520);
-	*/
-	
+	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
+	this.game.addEntity(this.background);
+	this.entities.push(this.background);
+
 	this.title = new TitleEffect(game);
 	this.game.addEntity(this.title);
-}
+	this.entities.push(this.title);
+}	
+
+SplashScene.prototype.constructor = SplashScene;
+
 
 function PrototypeLevel(game) {
 	this.game = game;
 	this.boss = new Boss1(game);
 	//this only allows for one type of random spawn per level at the moment
-	this.random = function (x, y)  {
-		if(Math.random()*100<50){
-			return new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
-		}else{
-			return new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);//swapped x and y
-		}
-	};
+
+	this.entities = [];
+	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
+	this.game.addEntity(this.background);
+	this.entities.push(this.background);
+
+	this.hud = new HUD(this.game);
+	this.game.addEntity(this.hud);
+	this.entities.push(this.hud);
 }
 
-//PrototypeLevel.prototype.randomSpawns = function () { //move this.random code to here with loop to add more random types}
+PrototypeLevel.prototype.randomSpawns = function () {
+	var newSpawn;
+	if(Math.random()*100<50){
+		newSpawn = new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
+		console.log("scourge")
+	}else{
+		newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
+		console.log("leech");
+	}
+	this.entities.push(newSpawn);
+	this.game.addEntity(newSpawn);
+}
 
 PrototypeLevel.prototype.constructor = PrototypeLevel;
 
 function LevelOne() {
-	/*//new level one code goes here
-	this.bossTimer = 1000;
-	this.spawnTimer = 0;
-	this.spawnNum = 1;
-	this.counter = 0;
-	*/
 
-	//Boss needs level specific x and y and maybe other factors
-	//this.boss;
-	/*this.random = function(x, y, game) {
-s
-	}*/
 }

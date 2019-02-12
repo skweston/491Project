@@ -35,6 +35,7 @@ function GameEngine() {
 	this.enemyProjectiles = [];
 	this.extras = [];
 	this.effects = [];
+	this.elements = [];
 
 	// start the game
 	this.mouse = false;
@@ -223,7 +224,11 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "ShiftLeft") {
 			that.boost = false;
 		}
-		if (e.code === "AltLeft") {
+		/*if (e.code === "AltLeft") {
+			that.gameStart = true;
+		}*/
+		if(e.code === "KeyV") {
+			console.log("V detected");
 			that.gameStart = true;
 		}
 	}, false);
@@ -234,6 +239,11 @@ GameEngine.prototype.startInput = function () {
 GameEngine.prototype.addEntity = function (entity) {
 	// console.log('added entity');
 	// this.entities.push(entity);
+
+	if(entity.name == "Element") {
+		this.elements.push(entity);
+	}
+
 	if (entity.name === "Level") {
 		this.levels.push(entity);
 	}
@@ -275,6 +285,11 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].draw(this.ctx);
 	}
+	
+	for(var i = 0; i < this.elements.length; i++) {
+		this.elements[i].draw(this.ctx);
+	}
+
 	for (var i = 0; i < this.playerProjectiles.length; i++) {
 		this.playerProjectiles[i].draw(this.ctx);
 	}
@@ -314,6 +329,8 @@ GameEngine.prototype.update = function () {
 	// 	}
 	// }
 
+	this.sceneManager.update();
+
 	this.camera.update();
 	var count = this.background.length;
 	for (var i = 0; i < count; i++) {
@@ -328,6 +345,7 @@ GameEngine.prototype.update = function () {
 		}
 	}
 
+
 	count = this.levels.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.levels[i];
@@ -340,6 +358,19 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
+
+	count = this.elements.length;
+	for(var i = 0; i < count; i++) {
+		var entity = this.elements[i];
+		if(entity.removeFromWorld) {
+			this.elements.splice(i, 1);
+			count--;
+			i--;
+		} else {
+			entity.update();
+		}
+	}
+
 
 	count = this.playerProjectiles.length;
 	for (var i = 0; i < count; i++) {
