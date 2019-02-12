@@ -345,7 +345,7 @@ GameEngine.prototype.update = function () {
 		}
 	}
 
-
+/*
 	count = this.levels.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.levels[i];
@@ -357,20 +357,21 @@ GameEngine.prototype.update = function () {
 		else {
 			entity.update();
 		}
-	}
+	}*/
+
 
 	count = this.elements.length;
-	for(var i = 0; i < count; i++) {
+	for (var i = 0; i < count; i++) {
 		var entity = this.elements[i];
-		if(entity.removeFromWorld) {
+		if (entity.removeFromWorld) {
 			this.elements.splice(i, 1);
 			count--;
 			i--;
-		} else {
+		}
+		else {
 			entity.update();
 		}
 	}
-
 
 	count = this.playerProjectiles.length;
 	for (var i = 0; i < count; i++) {

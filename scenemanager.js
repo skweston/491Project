@@ -31,13 +31,11 @@ SceneManager.prototype.reset = function () {
 	this.game.addEntity(reticle);
 	this.game.ship = ship;
 
-	this.currentScene = new SplashScene(this.game);
+	this.changeScenes(new SplashScene(this.game));
 }
 
 SceneManager.prototype.update = function () {
-	//console.log("scene update");
 	if (!this.game.running && this.game.gameStart) {
-		//console.log("switch");
 		this.changeScenes(new PrototypeLevel(this.game));
 		this.game.ship.health = 100;
 		SCORE = 0;
@@ -49,9 +47,8 @@ SceneManager.prototype.update = function () {
 	}
 	if (this.game.running && this.currentScene.bossTimer === 0) {
 		this.currentScene.bossTimer = this.currentScene.bossTimerStart;
-		this.game.addEntity(this.currentScene.boss);
+		this.currentScene.addBoss();
 	}
-
 
 	this.spawnAtRandom();
 
@@ -65,6 +62,7 @@ SceneManager.prototype.update = function () {
 
 SceneManager.prototype.changeScenes = function (newScene) {
 	for(var i = 0; i < this.currentScene.entities.length; i++) {
+		//console.log("length: " + this.currentScene.entities.length);
 		this.currentScene.entities[i].removeFromWorld = true;
 	}
 
@@ -72,13 +70,11 @@ SceneManager.prototype.changeScenes = function (newScene) {
 }
 
 SceneManager.prototype.spawnAtRandom = function () {
-	//console.log("spawnAtRandom");
 	if (this.currentScene.spawnTimer > 0) {
 		this.currentScene.spawnTimer--;
 	}
 	if (this.game.running && this.currentScene.spawnTimer === 0) {
 		this.currentScene.spawnTimer = this.currentScene.spawnTimerStart;
-		//console.log("spawnAtRandom");
 
 		for (var i = 0; i < this.currentScene.spawnNum; i++) {
 			var border = 0;
@@ -110,11 +106,7 @@ SceneManager.prototype.spawnAtRandom = function () {
 				}
 			}
 
-			//this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
-			//this.game.addEntity(this.currentLevel.random(x, y));
-			//console.log("asking for random");
 			this.currentScene.randomSpawns(x, y);
-
 			this.currentScene.counter++;
 		}
 
@@ -167,8 +159,8 @@ function TitleEffect(game) {
 	this.game = game;
 	this.ctx = game.ctx;
 
-	this.x = (this.game.cameraCtx.canvas.width / 2) - (this.pWidth / 2);
-	this.y = (this.game.cameraCtx.canvas.height / 3) - (this.pHeight / 2);
+	this.x = this.game.ctx.canvas.width/2 - this.pWidth/2;
+	this.y = this.game.ctx.canvas.height/2 - this.pHeight/2 - 150;
 	this.angle = 0;
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 
@@ -207,7 +199,7 @@ function SplashScene(game) {
 	this.game = game;
 	this.entities = [];
 
-	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
+	this.background = new Background(this.game, AM.getAsset("./img/splash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 
@@ -221,10 +213,9 @@ SplashScene.prototype.constructor = SplashScene;
 
 function PrototypeLevel(game) {
 	this.game = game;
-	this.boss = new Boss1(game);
 	//this only allows for one type of random spawn per level at the moment
 	this.bossTimerStart = 1000;
-	this.bossTimer = this.bossTimeStart;
+	this.bossTimer = 0;
 	this.spawnNum = 1;
 	this.spawnTimerStart = 100;
 	this.spawnTimer = this.spawnTimerStart;
@@ -238,6 +229,10 @@ function PrototypeLevel(game) {
 	this.hud = new HUD(this.game);
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
+
+	
+
+	//console.log(this.boss);
 }
 
 PrototypeLevel.prototype.randomSpawns = function (x, y) {
@@ -251,6 +246,13 @@ PrototypeLevel.prototype.randomSpawns = function (x, y) {
 	}
 	this.entities.push(newSpawn);
 	this.game.addEntity(newSpawn);
+}
+
+PrototypeLevel.prototype.addBoss = function () {
+	//console.log("boss");
+	this.boss = new Boss1(game);
+	this.game.addEntity(this.boss);
+	this.entities.push(this.boss);
 }
 
 PrototypeLevel.prototype.constructor = PrototypeLevel;

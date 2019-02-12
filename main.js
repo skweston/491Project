@@ -425,7 +425,8 @@ AM.queueDownload("./img/scourge.png");
 AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
-AM.queueDownload("./img/SPACEFIGHT.png")
+AM.queueDownload("./img/SPACEFIGHT.png");
+AM.queueDownload("./img/splash.png")
 
 AM.downloadAll(function () {
 	console.log("starting up da sheild");
