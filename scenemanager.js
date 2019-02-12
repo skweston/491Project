@@ -37,22 +37,18 @@ SceneManager.prototype.reset = function () {
 SceneManager.prototype.update = function () {
 	//console.log("scene update");
 	if (!this.game.running && this.game.gameStart) {
-		console.log("switch");
+		//console.log("switch");
 		this.changeScenes(new PrototypeLevel(this.game));
 		this.game.ship.health = 100;
 		SCORE = 0;
 		this.game.running = true;
 		this.game.gameStart = false;
 	}
-	if (this.bossTimer > 0){
-		this.bossTimer--;
+	if (this.currentScene.bossTimer > 0){
+		this.currentScene.bossTimer--;
 	}
-	if (this.game.running && this.bossTimer === 0) {
-		this.bossTimer = 1000;
-		//this.game.addEntity(new Boss1(this.game));
-		//console.log(this.currentLevel);
-		//console.log(this.currentLevel.boss.name);
-		//this.game.addEntity(new Boss1(this.game));
+	if (this.game.running && this.currentScene.bossTimer === 0) {
+		this.currentScene.bossTimer = this.currentScene.bossTimerStart;
 		this.game.addEntity(this.currentScene.boss);
 	}
 
@@ -77,14 +73,14 @@ SceneManager.prototype.changeScenes = function (newScene) {
 
 SceneManager.prototype.spawnAtRandom = function () {
 	//console.log("spawnAtRandom");
-	if (this.spawnTimer > 0) {
-		this.spawnTimer--;
+	if (this.currentScene.spawnTimer > 0) {
+		this.currentScene.spawnTimer--;
 	}
-	if (this.game.running && this.spawnTimer === 0) {
-		this.spawnTimer = 100;
-		console.log("spawnAtRandom");
+	if (this.game.running && this.currentScene.spawnTimer === 0) {
+		this.currentScene.spawnTimer = this.currentScene.spawnTimerStart;
+		//console.log("spawnAtRandom");
 
-		for (var i = 0; i < this.spawnNum; i++) {
+		for (var i = 0; i < this.currentScene.spawnNum; i++) {
 			var border = 0;
 			var x = Math.random() * this.game.ctx.canvas.width;
 			var y = 0;
@@ -116,14 +112,14 @@ SceneManager.prototype.spawnAtRandom = function () {
 
 			//this.game.addEntity(new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y));
 			//this.game.addEntity(this.currentLevel.random(x, y));
-			console.log("asking for random");
-			this.currentScene.randomwSpawns();
+			//console.log("asking for random");
+			this.currentScene.randomSpawns(x, y);
 
-			this.counter++;
+			this.currentScene.counter++;
 		}
 
-		if (this.counter % 10 === 0) {
-			this.spawnNum++;
+		if (this.currentScene.counter % 10 === 0) {
+			this.currentScene.spawnNum++;
 		}
 	}
 }
@@ -132,8 +128,9 @@ SceneManager.prototype.spawnAtRandom = function () {
 function HUD(game) {
 	this.name = "Element";
 	this.game = game;
-	console.log(this.game);
-	console.log("hud");
+	this.removeFromWorld = false;
+	//console.log(this.game);
+	//console.log("hud");
 }
 
 HUD.prototype.draw = function() {
@@ -192,6 +189,9 @@ TitleEffect.prototype.draw = function () {
 	this.game.ctx.textAlign = "center";
 	//console.log(game);
 	this.game.ctx.fillText("Super Plutonian Ace Command Earth Fighting Inter-Galactic Hero Team", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400, 500);
+
+	//This neds to flicker
+	this.game.ctx.fillText("Press V to Play", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
 	//this.game.ctx.draw();
 
 	Entity.prototype.draw.call(this);
@@ -223,11 +223,12 @@ function PrototypeLevel(game) {
 	this.game = game;
 	this.boss = new Boss1(game);
 	//this only allows for one type of random spawn per level at the moment
-
-	this.bossTimer = 1000;
-	this.spawnNum = 0;
-	this.spawnTimer = 0;
-	
+	this.bossTimerStart = 1000;
+	this.bossTimer = this.bossTimeStart;
+	this.spawnNum = 1;
+	this.spawnTimerStart = 100;
+	this.spawnTimer = this.spawnTimerStart;
+	this.counter = 0;
 
 	this.entities = [];
 	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
@@ -239,14 +240,14 @@ function PrototypeLevel(game) {
 	this.entities.push(this.hud);
 }
 
-PrototypeLevel.prototype.randomSpawns = function () {
+PrototypeLevel.prototype.randomSpawns = function (x, y) {
 	var newSpawn;
 	if(Math.random()*100<50){
 		newSpawn = new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
-		console.log("scourge")
+		//console.log("scourge")
 	}else{
 		newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
-		console.log("leech");
+		//console.log("leech");
 	}
 	this.entities.push(newSpawn);
 	this.game.addEntity(newSpawn);
@@ -255,5 +256,8 @@ PrototypeLevel.prototype.randomSpawns = function () {
 PrototypeLevel.prototype.constructor = PrototypeLevel;
 
 function LevelOne() {
-
+	this.bossTimer = 1000;
+	this.spawnTimer = 0;
+	this.spawnNum = 1;
+	this.counter = 0;
 }

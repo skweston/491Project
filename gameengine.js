@@ -228,7 +228,7 @@ GameEngine.prototype.startInput = function () {
 			that.gameStart = true;
 		}*/
 		if(e.code === "KeyV") {
-			console.log("V detected");
+			//console.log("V detected");
 			that.gameStart = true;
 		}
 	}, false);
