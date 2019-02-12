@@ -153,7 +153,7 @@ function TitleEffect(game) {
 
 	this.animation = new Animation(AM.getAsset("./img/SPACEFIGHT.png"),
 								 this.pWidth, this.pHeight,
-								 2, 0.1, 12,
+								 2, 0.155, 12,
 								 true, this.scale);
 
 	this.game = game;
