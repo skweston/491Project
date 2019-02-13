@@ -3,7 +3,8 @@
 /* ========================================================================================================== */
 function SceneManager(game) {
 	this.game = game;
-	this.currentScene = new SplashScene(this.game);
+	//this.currentScene = new SplashScene(this.game);
+	this.currentScene = new StoryScrollScene(this.game);
 }
 
 SceneManager.prototype.constructor = SceneManager;
@@ -126,12 +127,12 @@ function HUD(game) {
 }
 
 HUD.prototype.draw = function() {
-	//console.log("draw");
 	this.game.ctx.font = "24pt Impact";
 	this.game.ctx.fillStyle = "Red";
 	this.game.ctx.textAlign = "left";
 	this.game.ctx.fillText("Health: " + this.game.ship.health,  this.game.camera.x + 10, this.game.camera.y + 40);
 	this.game.ctx.fillText("Score: " + SCORE, this.game.camera.x + 10, this.game.camera.y + 70);
+
 	//Boost meter
 	this.game.ctx.fillText("Boost Meter: ",this.game.camera.x + 10, this.game.camera.y + 100);
 	this.game.ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
@@ -146,7 +147,7 @@ HUD.prototype.update = function () {
 
 //SPACEFIGHT title object for SplashScreen
 function TitleEffect(game) {
-	this.name = "Element"; //maybe we need a new list for scene elements?
+	this.name = "Element";
 	this.pWidth = 800;
 	this.pHeight = 538;
 	this.scale = 1;
@@ -162,15 +163,13 @@ function TitleEffect(game) {
 	this.x = this.game.ctx.canvas.width/2 - this.pWidth/2;
 	this.y = this.game.ctx.canvas.height/2 - this.pHeight/2 - 150;
 	this.angle = 0;
-	this.removeFromWorld = false; //there needs to be SOME way to make this true;
+	this.removeFromWorld = false;
 
 	Entity.call(this, this.game, this.x, this.y);
 }
 
 TitleEffect.prototype.draw = function () {
 	if(onCamera(this)){
-		//console.log("draw")
-		//console.log(this.animation.currentFrame());
 		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 	}
 
@@ -179,12 +178,10 @@ TitleEffect.prototype.draw = function () {
 	this.game.ctx.fillStyle = "Blue";
 
 	this.game.ctx.textAlign = "center";
-	//console.log(game);
 	this.game.ctx.fillText("Super Plutonian Ace Command Earth Fighting Inter-Galactic Hero Team", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400, 500);
 
-	//This neds to flicker
+	//This needs to flicker
 	this.game.ctx.fillText("Press V to Play", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
-	//this.game.ctx.draw();
 
 	Entity.prototype.draw.call(this);
 }
@@ -195,7 +192,6 @@ TitleEffect.prototype.update = function () {
 }
 
 function SplashScene(game) {
-	//console.log("here: " + game.currentScene);
 	this.game = game;
 	this.entities = [];
 
@@ -210,10 +206,62 @@ function SplashScene(game) {
 
 SplashScene.prototype.constructor = SplashScene;
 
+function StoryScrollScene(game) {
+	this.game = game;
+	this.entities = [];
+	this.background = new Background(this.game, AM.getAsset("./img/splash.png"));
+	this.game.addEntity(this.background);
+	this.entities.push(this.background);
+	this.scroll = new StoryScroll(this.game);
+	this.entities.push(this.scroll);
+	this.game.addEntity(this.scroll);
+}
+
+function StoryScroll(game) {
+	//is an entity but doesn't contain an animation
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Element";
+	this.x = 0;
+	this.y = 0;
+	this.removeFromWorld = false;
+
+	Entity.call(this, this.game, this.x, this.y);
+}
+
+StoryScroll.prototype.draw = function () {
+	var ctx = this.game.ctx;
+	ctx.font = "24pt Impact";
+	this.game.ctx.fillStyle = "Yellow";
+
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Episode IV Pluto’s Revenge", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 100, 650);
+
+	this.game.ctx.fillText("Since the fateful year of 2006, Plutonian civilization has been in upheaval. The demotion of", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 200, 650);
+	this.game.ctx.fillText("Pluto from planet to mere dwarf planet threw its entire culture into shock. Gone were the", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 250, 650);
+	this.game.ctx.fillText("halcyon days of old where their home planet sat as an equal among a council of nine.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 300, 650);
+
+
+	this.game.ctx.fillText("Years of bloody civil war ravaged the Plutonians, threatening their very extinction, yet from", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400, 650);
+	this.game.ctx.fillText("amongst the warring factions of Pluto emerged a single victor, an Empress who unified her", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 450, 650);
+	this.game.ctx.fillText("people with a singular and abiding message “Earth will pay.”", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 500, 650);
+
+	this.game.ctx.fillText("From her palace complex on Pluto she has hired heroic space captains and equipped them with", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 650);
+	this.game.ctx.fillText("Pluto’s finest craft. Now is the time to restore Pluto to her rightful status as a Planet, now is the", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 650, 650);
+	this.game.ctx.fillText("time for Pluto’s Revenge…", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 700, 650);
+
+
+
+	Entity.prototype.draw.call(this);
+}
+
+StoryScroll.prototype.update = function () {
+	Entity.prototype.update.call(this);
+}
+
 
 function PrototypeLevel(game) {
 	this.game = game;
-	//this only allows for one type of random spawn per level at the moment
 	this.bossTimerStart = 1000;
 	this.bossTimer = 0;
 	this.spawnNum = 1;
@@ -229,27 +277,21 @@ function PrototypeLevel(game) {
 	this.hud = new HUD(this.game);
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
-
-	
-
-	//console.log(this.boss);
 }
 
 PrototypeLevel.prototype.randomSpawns = function (x, y) {
 	var newSpawn;
 	if(Math.random()*100<50){
 		newSpawn = new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
-		//console.log("scourge")
 	}else{
 		newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
-		//console.log("leech");
 	}
+
 	this.entities.push(newSpawn);
 	this.game.addEntity(newSpawn);
 }
 
 PrototypeLevel.prototype.addBoss = function () {
-	//console.log("boss");
 	this.boss = new Boss1(game);
 	this.game.addEntity(this.boss);
 	this.entities.push(this.boss);
