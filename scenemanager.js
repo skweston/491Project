@@ -224,9 +224,11 @@ function StoryScrollScene(game) {
 	this.background = new Background(this.game, AM.getAsset("./img/splash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
-	this.scroll = new StoryScroll1(this.game);
+	this.level = level;
+	this.scroll = new StoryScroll1(this.game, this.leve);
 	this.entities.push(this.scroll);
 	this.game.addEntity(this.scroll);
+	
 }
 
 function StoryScroll1(game) {
@@ -277,6 +279,7 @@ StoryScroll1.prototype.update = function () {
 	if(this.lift === -1400) {
 		console.log("done");
 		this.isDone = true;
+		//this.game.SceneManager.changeScenes(level);
 	}
 	Entity.prototype.update.call(this);
 }
