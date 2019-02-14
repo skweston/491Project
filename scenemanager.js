@@ -3,8 +3,8 @@
 /* ========================================================================================================== */
 function SceneManager(game) {
 	this.game = game;
-	//this.currentScene = new SplashScene(this.game);
-	this.currentScene = new StoryScrollScene(this.game);
+	this.currentScene = new SplashScene(this.game);
+	//this.currentLevel = new PrototypeLevel(this.game);
 }
 
 SceneManager.prototype.constructor = SceneManager;
@@ -32,16 +32,26 @@ SceneManager.prototype.reset = function () {
 	this.game.addEntity(reticle);
 	this.game.ship = ship;
 
+	//back to title screen on death
 	this.changeScenes(new SplashScene(this.game));
 }
 
 SceneManager.prototype.update = function () {
+	console.log("update");
 	if (!this.game.running && this.game.gameStart) {
+		//this.changeScenes(new PrototypeLevel(this.game));
+		//console.log(this.currentScene.scroll.isDone);
+		this.changeScenes(new StoryScrollScene(this.game));
+		this.game.gameStart = false;
+	}
+	//console.log(this.currentScene.scroll.isDone);
+	if(this.currentScene.isDone) {
+		console.log("new scene");
 		this.changeScenes(new PrototypeLevel(this.game));
 		this.game.ship.health = 100;
 		SCORE = 0;
+		
 		this.game.running = true;
-		this.game.gameStart = false;
 	}
 	if (this.currentScene.bossTimer > 0){
 		this.currentScene.bossTimer--;
@@ -202,6 +212,8 @@ function SplashScene(game) {
 	this.title = new TitleEffect(game);
 	this.game.addEntity(this.title);
 	this.entities.push(this.title);
+
+	this.scroll = null;
 }	
 
 SplashScene.prototype.constructor = SplashScene;
@@ -230,6 +242,7 @@ function StoryScroll1(game) {
 	this.start = 800;
 	this.offset = 50;
 	this.removeFromWorld = false;
+	this.isDone = false;
 
 	Entity.call(this, this.game, this.x, this.y);
 }
@@ -238,32 +251,35 @@ StoryScroll1.prototype.draw = function () {
 	var ctx = this.game.ctx;
 	ctx.font = "24pt Impact";
 	this.game.ctx.fillStyle = "Yellow";
-	var line = 0;
+	this.line = 0;
 
 	this.game.ctx.textAlign = "center";
-	this.game.ctx.fillText("Episode IV Pluto’s Revenge", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650 + this.narrow);
-	line++;
-	this.game.ctx.fillText("Since the fateful year of 2006, Plutonian civilization has been in upheaval. The demotion of", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650 + this.narrow);
-	this.game.ctx.fillText("Pluto from planet to mere dwarf planet threw its entire culture into shock. Gone were the", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650 + this.narrow);
-	this.game.ctx.fillText("halcyon days of old where their home planet sat as an equal among a council of nine.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650 + this.narrow);
-	line++;
-	this.game.ctx.fillText("Years of bloody civil war ravaged the Plutonians, threatening their very extinction, yet from", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650);
-	this.game.ctx.fillText("amongst the warring factions of Pluto emerged a single victor, an Empress who unified her", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650);
-	this.game.ctx.fillText("people with a singular and abiding message “Earth will pay.”", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650);
-	line++;
-	this.game.ctx.fillText("From her palace complex on Pluto she has hired heroic space captains and equipped them with", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650);
-	this.game.ctx.fillText("Pluto’s finest craft. Now is the time to restore Pluto to her rightful status as a Planet,", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650);
-	this.game.ctx.fillText("now is the time for Pluto’s Revenge…", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * line++) + this.lift, 650);
+	this.game.ctx.fillText("Episode IV Pluto’s Revenge", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.line++;
+	this.game.ctx.fillText("Since the fateful year of 2006, Plutonian civilization has been in upheaval. The demotion of", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("Pluto from planet to mere dwarf planet threw its entire culture into shock. Gone were the", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("halcyon days of old where their home planet sat as an equal among a council of nine.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.line++;
+	this.game.ctx.fillText("Years of bloody civil war ravaged the Plutonians, threatening their very extinction, yet from", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("amongst the warring factions of Pluto emerged a single victor, an Empress who unified her", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("people with a singular and abiding message “Earth will pay.”", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.line++;
+	this.game.ctx.fillText("From her palace complex on Pluto she has hired heroic space captains and equipped them with", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Pluto’s finest craft. Now is the time to restore Pluto to her rightful status as a Planet,", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("now is the time for Pluto’s Revenge…", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
 
 	Entity.prototype.draw.call(this);
 }
 
 StoryScroll1.prototype.update = function () {
-	this.lift += -0.5; //negative makes it go up
+	this.lift += -1; //negative makes it go up
 	//this.narrow *= 2;
+	if(this.lift === -1400) {
+		console.log("done");
+		this.isDone = true;
+	}
 	Entity.prototype.update.call(this);
 }
-
 
 function PrototypeLevel(game) {
 	this.game = game;
@@ -274,6 +290,8 @@ function PrototypeLevel(game) {
 	this.spawnTimer = this.spawnTimerStart;
 	this.counter = 0;
 
+	this.died = false;
+
 	this.entities = [];
 	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
 	this.game.addEntity(this.background);
@@ -282,6 +300,7 @@ function PrototypeLevel(game) {
 	this.hud = new HUD(this.game);
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
+	this.scroll = null;
 }
 
 PrototypeLevel.prototype.randomSpawns = function (x, y) {
