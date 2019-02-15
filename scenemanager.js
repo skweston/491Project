@@ -3,8 +3,8 @@
 /* ========================================================================================================== */
 function SceneManager(game) {
 	this.game = game;
+	//Always starts at title scene
 	this.currentScene = new SplashScene(this.game);
-	//this.currentLevel = new PrototypeLevel(this.game);
 }
 
 SceneManager.prototype.constructor = SceneManager;
@@ -37,21 +37,9 @@ SceneManager.prototype.reset = function () {
 }
 
 SceneManager.prototype.update = function () {
-	console.log("update");
 	if (!this.game.running && this.game.gameStart) {
-		//this.changeScenes(new PrototypeLevel(this.game));
-		//console.log(this.currentScene.scroll.isDone);
-		this.changeScenes(new StoryScrollScene(this.game));
+		this.changeScenes(new StoryScrollScene(game));
 		this.game.gameStart = false;
-	}
-	//console.log(this.currentScene.scroll.isDone);
-	if(this.currentScene.isDone) {
-		console.log("new scene");
-		this.changeScenes(new PrototypeLevel(this.game));
-		this.game.ship.health = 100;
-		SCORE = 0;
-		
-		this.game.running = true;
 	}
 	if (this.currentScene.bossTimer > 0){
 		this.currentScene.bossTimer--;
@@ -71,9 +59,14 @@ SceneManager.prototype.update = function () {
 	}
 }
 
+SceneManager.prototype.loadPlayer = function () {
+	this.game.running = true;
+	this.game.ship.health = 100;
+	SCORE = 0;
+}
+
 SceneManager.prototype.changeScenes = function (newScene) {
 	for(var i = 0; i < this.currentScene.entities.length; i++) {
-		//console.log("length: " + this.currentScene.entities.length);
 		this.currentScene.entities[i].removeFromWorld = true;
 	}
 
@@ -132,8 +125,6 @@ function HUD(game) {
 	this.name = "Element";
 	this.game = game;
 	this.removeFromWorld = false;
-	//console.log(this.game);
-	//console.log("hud");
 }
 
 HUD.prototype.draw = function() {
@@ -156,6 +147,7 @@ HUD.prototype.update = function () {
 }
 
 //SPACEFIGHT title object for SplashScreen
+//Needs a pretty star
 function TitleEffect(game) {
 	this.name = "Element";
 	this.pWidth = 800;
@@ -218,17 +210,16 @@ function SplashScene(game) {
 
 SplashScene.prototype.constructor = SplashScene;
 
+
 function StoryScrollScene(game) {
 	this.game = game;
 	this.entities = [];
 	this.background = new Background(this.game, AM.getAsset("./img/splash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
-	this.level = level;
 	this.scroll = new StoryScroll1(this.game, this.leve);
 	this.entities.push(this.scroll);
 	this.game.addEntity(this.scroll);
-	
 }
 
 function StoryScroll1(game) {
@@ -236,13 +227,19 @@ function StoryScroll1(game) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Element";
+
+	this.entities = [];
+	this.background = new Background(this.game, AM.getAsset("./img/splash.png"));
+	this.game.addEntity(this.background);
+	this.entities.push(this.background);
+
 	this.x = 0;
 	this.y = 0;
 	this.width = 650; //max pixel width printed per line
-	this.lift = 0;
-	this.narrow = -1;
-	this.start = 800;
-	this.offset = 50;
+	this.lift = 0; //vertical lift factor
+	this.narrow = -1; //width scaler to send text into screen later
+	this.start = 800; //text starts off the bottom of the screen
+	this.offset = 50; //line height
 	this.removeFromWorld = false;
 	this.isDone = false;
 
@@ -256,6 +253,7 @@ StoryScroll1.prototype.draw = function () {
 	this.line = 0;
 
 	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Press Enter to Skip", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 50 + this.offset + this.lift, 650);
 	this.game.ctx.fillText("Episode IV Pluto’s Revenge", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
 	this.line++;
 	this.game.ctx.fillText("Since the fateful year of 2006, Plutonian civilization has been in upheaval. The demotion of", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
@@ -275,11 +273,11 @@ StoryScroll1.prototype.draw = function () {
 
 StoryScroll1.prototype.update = function () {
 	this.lift += -1; //negative makes it go up
-	//this.narrow *= 2;
-	if(this.lift === -1400) {
-		console.log("done");
+	//this.narrow *= 2; //adjust to allow for in-to-screen scroll
+	if(this.lift === -1400 || this.game.clicked) {
 		this.isDone = true;
-		//this.game.SceneManager.changeScenes(level);
+		//To test new level, swap level here.
+		this.game.sceneManager.changeScenes(new PrototypeLevel(this.game)); 
 	}
 	Entity.prototype.update.call(this);
 }
@@ -293,22 +291,20 @@ function PrototypeLevel(game) {
 	this.spawnTimer = this.spawnTimerStart;
 	this.counter = 0;
 
-	this.died = false;
-
-	this.entities = [];
+	this.entities = []; 
 	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 
-	this.hud = new HUD(this.game);
+	this.hud = new HUD(this.game); //mandatory
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
-	this.scroll = null;
+	this.game.sceneManager.loadPlayer(); //mandatory
 }
 
 PrototypeLevel.prototype.randomSpawns = function (x, y) {
 	var newSpawn;
-	if(Math.random()*100<50){
+	if(Math.random() * 100 < 50){
 		newSpawn = new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
 	}else{
 		newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
@@ -331,4 +327,14 @@ function LevelOne() {
 	this.spawnTimer = 0;
 	this.spawnNum = 1;
 	this.counter = 0;
+
+	//background - or whatever background image we want
+	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
+	this.hud = new HUD(this.game); //mandatory
+	this.game.sceneManager.loadPlayer(); //mandatory
+
 }
+
+//LevelOne.prototype.randomSpawns = function (x, y) {
+
+//LevelOne.prototype.addBoss = function () {
