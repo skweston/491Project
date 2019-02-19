@@ -363,7 +363,7 @@ ShipPrimary0.prototype.update = function () {
 	// if (this.xMid < -50 || this.xMid > 850 || this.yMid < -50 || this.yMid > 850) {
 	// 	this.removeFromWorld = true;
 	// }
-
+	
 	this.x += this.velocity.x * this.game.clockTick;
 	this.y += this.velocity.y * this.game.clockTick;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
