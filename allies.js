@@ -7,8 +7,8 @@ function PurpleChroma(game) {
 	this.angle = 0;
 	this.name = "Ally";
 	this.speed = 0.65;
-	this.x = xIn;
-	this.y = yIn;
+	this.x = 0;
+	this.y = 0;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 	this.radius = 41 * this.scale;

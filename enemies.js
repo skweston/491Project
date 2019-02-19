@@ -717,7 +717,8 @@ function BiologicalResourceGatherer(game) {
 
 
 }
-
+BiologicalResourceGatherer.prototype = new Entity();
+BiologicalResourceGatherer.prototype.constructor = BiologicalResourceGatherer;
 BiologicalResourceGatherer.prototype.draw = function () {
 	if(onCamera(this)){
   		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
