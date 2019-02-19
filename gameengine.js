@@ -36,6 +36,9 @@ function GameEngine() {
 	this.extras = [];
 	this.effects = [];
 	this.elements = [];
+	this.resources = [];
+	this.playerResources = 0;
+	this.enemyResources = 0;
 
 	// start the game
 	this.mouse = false;
@@ -247,6 +250,9 @@ GameEngine.prototype.addEntity = function (entity) {
 	if (entity.name === "Level") {
 		this.levels.push(entity);
 	}
+	if (entity.name === "Resource") {
+		this.resources.push(entity);
+	}
 	if (entity.name === "Background") {
 		this.background.push(entity);
 	}
@@ -285,7 +291,11 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].draw(this.ctx);
 	}
-	
+
+	for (var i = 0; i < this.resources.length; i++) {
+		this.resources[i].draw(this.ctx);
+	}
+
 	for(var i = 0; i < this.elements.length; i++) {
 		this.elements[i].draw(this.ctx);
 	}
@@ -358,7 +368,18 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}*/
-
+	count = this.resources.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.resources[i];
+		if (entity.removeFromWorld) {
+			this.resources.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
 
 	count = this.elements.length;
 	for (var i = 0; i < count; i++) {

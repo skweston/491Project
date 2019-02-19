@@ -206,7 +206,7 @@ function SplashScene(game) {
 	this.entities.push(this.title);
 
 	this.scroll = null;
-}	
+}
 
 SplashScene.prototype.constructor = SplashScene;
 
@@ -277,7 +277,7 @@ StoryScroll1.prototype.update = function () {
 	if(this.lift === -1400 || this.game.clicked) {
 		this.isDone = true;
 		//To test new level, swap level here.
-		this.game.sceneManager.changeScenes(new PrototypeLevel(this.game)); 
+		this.game.sceneManager.changeScenes(new PrototypeLevel(this.game));
 	}
 	Entity.prototype.update.call(this);
 }
@@ -291,7 +291,7 @@ function PrototypeLevel(game) {
 	this.spawnTimer = this.spawnTimerStart;
 	this.counter = 0;
 
-	this.entities = []; 
+	this.entities = [];
 	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
@@ -315,9 +315,9 @@ PrototypeLevel.prototype.randomSpawns = function (x, y) {
 }
 
 PrototypeLevel.prototype.addBoss = function () {
-	this.boss = new Boss1(game);
-	this.game.addEntity(this.boss);
-	this.entities.push(this.boss);
+	var boss = new Boss1(this.game);
+	this.game.addEntity(boss);
+	this.entities.push(boss);
 }
 
 PrototypeLevel.prototype.constructor = PrototypeLevel;

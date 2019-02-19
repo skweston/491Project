@@ -410,9 +410,17 @@ AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary1.png");
 AM.queueDownload("./img/shipSecondary1.png");
 
+//Allies
+AM.queueDownload("./img/GreenChroma.png");
+AM.queueDownload("./img/PurpleChroma.png");
+AM.queueDownload("./img/RedChroma.png");
+AM.queueDownload("./img/black_whiteChroma.png");
+
+
 //drops and powerups
 AM.queueDownload("./img/RepairDrop.png");
 AM.queueDownload("./img/spreader.png");
+AM.queueDownload("./img/scrap.png");
 
 // enemies
 AM.queueDownload("./img/Boss1.png");
@@ -447,15 +455,15 @@ AM.downloadAll(function () {
 	var reticle = new Reticle(gameEngine);
 	//var background = new Background(gameEngine, AM.getAsset("./img/4kBackground1.png"));
 	//var pg = new PlayGame(gameEngine);
-	
+
 	//pg.loadGame();
-	
+
 
 
 	gameEngine.addEntity(ship);
 	gameEngine.addEntity(reticle);
 	//gameEngine.addEntity(background);
-	
+
 
 	gameEngine.ship = ship;
 	gameEngine.cameraTrick = cameraTrick;
@@ -466,6 +474,6 @@ AM.downloadAll(function () {
 	//console.log(gameEngine);
 	//var pg = new PlayGame(gameEngine);
 	//gameEngine.addEntity(pg);
-	
+
 	console.log("All Done!");
 });

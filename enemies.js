@@ -548,7 +548,14 @@ Scourge.prototype.update = function () {
 
 			this.game.addEntity(spreader);
 		}
-
+		for(var i = 0; i< 5; i++){
+			var scrap = new Scrap(this.game);
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
+			this.game.addEntity(scrap);
+		}
 		this.removeFromWorld = true;
 	}
 
@@ -606,7 +613,8 @@ function Spawner(game) {
 	this.spawns = [
                             new Scourge(this.game, AM.getAsset("./img/scourge.png"), this.x+this.pWidth, this.y+this.pHeight),
                             new Scourge(this.game, AM.getAsset("./img/scourge.png"), this.x+this.pWidth, this.y+this.pHeight)
-                            //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 30, y + 30),
+							new BiologicalResourceGatherer(this.game);
+							//new Scourge(game, AM.getAsset("./img/scourge.png"), x + 30, y + 30),
                             //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 40, y + 40),
                             //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 50, y + 50),
     ];
@@ -657,4 +665,154 @@ Spawner.prototype.draw = function () {
 		}
 	}
     //Entity.prototype.draw.call(this);
+}
+
+
+/* ========================================================================================================== */
+// Resource Gatherer Enemy
+/* ========================================================================================================== */
+function BiologicalResourceGatherer(game) {
+
+
+	this.pWidth = 54;
+	this.pHeight = 51;
+	this.scale = 1;
+
+  	// Stuff gets passed into an animation object in this order:
+  	// spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
+
+	this.animation = new Animation(AM.getAsset("./img/BiologicalResourceGatherer.png"),
+								 this.pWidth, this.pHeight,
+								 324, .125, 6,
+								 true, this.scale);
+
+
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Enemy";
+
+	this.x = 0;
+	this.y = 0;
+	this.removeFromWorld = false; //there needs to be SOME way to make this true;
+///////////Above this is MANDATORY for all entities////////////////////////
+//If it's killable
+	this.health = 55;
+
+//this is for collision
+	this.xMid = this.x + (this.pWidth * this.scale) / 2;
+	this.yMid = this.y + (this.pHeight * this.scale) / 2;
+	this.radius = 40 * this.scale;
+
+//this is for movement
+	this.speed = 7;
+
+//this is for if it needs to decay off the lists, like an explostion
+	//this.lifetime = 100; //when this reaches 0, it is removed from world
+
+//Add other variables to objects for whatever added functionality you need
+	//this.sampleValue = sample Magic Number;
+
+	this.target = null;
+
+
+}
+
+BiologicalResourceGatherer.prototype.draw = function () {
+	if(onCamera(this)){
+  		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+  	}
+	Entity.prototype.draw.call(this);
+}
+
+BiologicalResourceGatherer.prototype.update = function () {
+
+	//something likethis for an Effect
+	//this.lifetime--;
+	if (this.health < 1){
+		this.removeFromWorld = true;
+		return;
+	}
+
+	//if it hasn't found its target yet, or its target has become undefined
+	if (this.target == null){
+		var dist = 100000000;
+
+		//find the closest resource node to gather from
+		for (var i = 0; i<this.game.resources.length; i++){
+			var ent = this.game.resources[i];
+			var d = distance(this, ent);
+			if(d < distance){
+				dist = d;
+				this.target = ent;
+			}
+		}
+	}
+	if (Collide(this,target)){
+		target.removeFromWorld = true;
+		this.game.enemyResources += target.value;
+		this.target = null;
+	}
+
+	// update angle if you want it to point at the ship
+	if(this.target != null){
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.angle = -Math.atan2(dy,dx);
+	}
+
+	// move the thing
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	//update its hitbox
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+
+	// check collision with player projectiles
+	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
+		var ent = this.game.playerProjectiles[i];
+		if (Collide(this, ent)) {
+			this.health -= ent.damage;
+			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
+			this.game.addEntity (splatter);
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+
+
+
+	// check health
+	if (this.health < 1) {
+		SCORE++; //how many points is it worth
+
+		//does it drop a powerup?
+		if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
+			var spreader = new Spreader(this.game);
+			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+			spreader.xMid = this.xMid;
+			spreader.yMid = this.yMid;
+
+			this.game.addEntity(spreader);
+		}
+
+		this.removeFromWorld = true;
+	}
+
+	//does it blow up when it dies?
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		this.game.addEntity(explosion);
+	}
+
+	Entity.prototype.update.call(this);
+
+
 }
