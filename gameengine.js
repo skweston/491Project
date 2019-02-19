@@ -31,6 +31,7 @@ function GameEngine() {
 	this.background = [];
 	this.player = [];
 	this.enemies = [];
+	this.allies = [];
 	this.playerProjectiles = [];
 	this.enemyProjectiles = [];
 	this.extras = [];
@@ -246,6 +247,9 @@ GameEngine.prototype.addEntity = function (entity) {
 	if(entity.name == "Element") {
 		this.elements.push(entity);
 	}
+	if(entity.name == "Ally") {
+		this.allies.push(entity);
+	}
 
 	if (entity.name === "Level") {
 		this.levels.push(entity);
@@ -294,6 +298,9 @@ GameEngine.prototype.draw = function () {
 
 	for (var i = 0; i < this.resources.length; i++) {
 		this.resources[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.allies.length; i++) {
+		this.allies[i].draw(this.ctx);
 	}
 
 	for(var i = 0; i < this.elements.length; i++) {
@@ -373,6 +380,19 @@ GameEngine.prototype.update = function () {
 		var entity = this.resources[i];
 		if (entity.removeFromWorld) {
 			this.resources.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
+	count = this.allies.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.allies[i];
+		if (entity.removeFromWorld) {
+			this.allies.splice(i, 1);
 			count--;
 			i--;
 		}
