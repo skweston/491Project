@@ -25,6 +25,9 @@ SceneManager.prototype.reset = function () {
 	for(var i = 0; i< this.game.playerProjectiles.length; i++){
 		this.game.playerProjectiles[i].removeFromWorld = true;
 	}
+	for(var i = 0; i< this.game.resources.length; i++){
+		this.game.resources[i].removeFromWorld = true;
+	}
 
 	var ship = new TheShip(this.game);
 	var reticle = new Reticle(this.game);
@@ -307,7 +310,9 @@ PrototypeLevel.prototype.randomSpawns = function (x, y) {
 	if(Math.random() * 100 < 50){
 		newSpawn = new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
 	}else{
-		newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
+		console.log("Spawning a resource gatherer");
+		newSpawn = new BiologicalResourceGatherer(this.game);
+		//newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
 	}
 
 	this.entities.push(newSpawn);
@@ -315,9 +320,9 @@ PrototypeLevel.prototype.randomSpawns = function (x, y) {
 }
 
 PrototypeLevel.prototype.addBoss = function () {
-	var boss = new Boss1(this.game);
-	this.game.addEntity(boss);
-	this.entities.push(boss);
+	this.boss = new Boss1(game);
+	this.game.addEntity(this.boss);
+	this.entities.push(this.boss);
 }
 
 PrototypeLevel.prototype.constructor = PrototypeLevel;

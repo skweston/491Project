@@ -414,7 +414,9 @@ AM.queueDownload("./img/shipSecondary1.png");
 AM.queueDownload("./img/GreenChroma.png");
 AM.queueDownload("./img/PurpleChroma.png");
 AM.queueDownload("./img/RedChroma.png");
-AM.queueDownload("./img/black_whiteChroma.png");
+AM.queueDownload("./img/BlackWhiteChroma.png");
+AM.queueDownload("./img/MechanicalResourceGatherer.png");
+
 
 
 //drops and powerups
@@ -429,6 +431,7 @@ AM.queueDownload("./img/LaserBlast.png");
 AM.queueDownload("./img/BossExplosion.png");
 AM.queueDownload("./img/Leech.png");
 
+AM.queueDownload("./img/BiologicalResourceGatherer.png");
 AM.queueDownload("./img/scourge.png");
 AM.queueDownload("./img/SpawnDoor.png");
 

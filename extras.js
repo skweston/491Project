@@ -173,7 +173,7 @@ function Scrap(game) {
 	this.radius = this.scale * 42;
 	this.angle = Math.random() * Math.PI * 2;
 	this.value = 10;
-	this.speed = 10;
+	this.speed = 1;
 
 	this.lifetime = 500;
 
@@ -198,7 +198,7 @@ Scrap.prototype.update = function () {
 
 	}
 
-	
+
 
 
 	// this.lifetime -= 1;
