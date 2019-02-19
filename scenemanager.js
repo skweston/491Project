@@ -12,9 +12,14 @@ SceneManager.prototype.constructor = SceneManager;
 SceneManager.prototype.reset = function () {
 	this.game.running = false;
 	this.game.clicked = false;
+	this.game.playerResources = 0;
+	this.game.enemyResources = 0;
 
 	for (var i = 0; i < this.game.extras.length; i++) {
 		this.game.extras[i].removeFromWorld = true;
+	}
+	for (var i = 0; i < this.game.allies.length; i++) {
+		this.game.allies[i].removeFromWorld = true;
 	}
 	for (var i = 0; i < this.game.enemies.length; i++){
 		this.game.enemies[i].removeFromWorld = true;
@@ -27,6 +32,9 @@ SceneManager.prototype.reset = function () {
 	}
 	for(var i = 0; i< this.game.resources.length; i++){
 		this.game.resources[i].removeFromWorld = true;
+	}
+	for (var i = 0; i < this.game.effects.length; i++) {
+		this.game.effects[i].removeFromWorld = true;
 	}
 
 	var ship = new TheShip(this.game);
@@ -294,15 +302,23 @@ function PrototypeLevel(game) {
 	this.spawnTimer = this.spawnTimerStart;
 	this.counter = 0;
 
+
+
 	this.entities = [];
 	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 
+	this.playerSpaceStation = new SpaceStation(this.game);
+	this.game.addEntity(this.playerSpaceStation);
+	this.entities.push(this.playerSpaceStation);
+
 	this.hud = new HUD(this.game); //mandatory
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
 	this.game.sceneManager.loadPlayer(); //mandatory
+
+
 }
 
 PrototypeLevel.prototype.randomSpawns = function (x, y) {
@@ -310,7 +326,7 @@ PrototypeLevel.prototype.randomSpawns = function (x, y) {
 	if(Math.random() * 100 < 50){
 		newSpawn = new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
 	}else{
-		console.log("Spawning a resource gatherer");
+		// console.log("Spawning a resource gatherer");
 		newSpawn = new BiologicalResourceGatherer(this.game);
 		//newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
 	}

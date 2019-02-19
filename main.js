@@ -416,6 +416,7 @@ AM.queueDownload("./img/PurpleChroma.png");
 AM.queueDownload("./img/RedChroma.png");
 AM.queueDownload("./img/BlackWhiteChroma.png");
 AM.queueDownload("./img/MechanicalResourceGatherer.png");
+AM.queueDownload("./img/SpaceStation.png");
 
 
 

@@ -12,8 +12,8 @@ function Boss1(game){
     this.name = "Enemy";
     this.x = Math.random() * (this.ctx.canvas.width-200);
     this.y = this.ctx.canvas.height + 500;
-	this.xMid = this.x - this.pWidth/2;
-	this.yMid = this.y - this.pHeight/2;
+	this.xMid = this.x + (this.pWidth * this.scale) / 2;
+	this.yMid = this.y + (this.pHeight * this.scale) / 2;
     this.angle = 0;
     this.speed = 100;
 	this.deathTimer = 150;
@@ -38,8 +38,8 @@ Boss1.prototype.update = function () {
 	//console.log("boss is updating");
 	this.y -= this.game.clockTick * this.speed;
 
-	this.xMid = this.x - this.pWidth/2;
-	this.yMid = this.y - this.pHeight/2;
+	this.xMid = this.x + (this.pWidth * this.scale) / 2;
+	this.yMid = this.y + (this.pHeight * this.scale) / 2;
 
 	if (this.turretsRemaining === 0) {
 
@@ -48,11 +48,22 @@ Boss1.prototype.update = function () {
 			var explosion = new BossExplosion(this.game, this.x, this.y, 7, this);
 			this.game.addEntity(explosion);
 			SCORE += 5;
+
 		}
 		if (this.deathTimer < 1){
+			for(var i = 0; i < 10; i++){
+				var scrap = new Scrap(this.game);
+				scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+				scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+				scrap.xMid = this.xMid;
+				scrap.yMid = this.yMid;
+
+				this.game.addEntity(scrap);
+			}
 			this.removeFromWorld = true;
 			var dice = Math.random()*100;
 			if (dice < 100) { //the boss always drops something
+
 				if(dice < 85){
 					var repair = new RepairDrop(this.game);
 					repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
@@ -168,6 +179,15 @@ BossTurret.prototype.update = function () {
 		this.game.addEntity(explosion);
 		var dice = Math.random()*100;
 		if (true) {
+			for(var i = 0; i< 2; i++){
+				var scrap = new Scrap(this.game);
+				scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+				scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+				scrap.xMid = this.xMid;
+				scrap.yMid = this.yMid;
+
+				this.game.addEntity(scrap);
+			}
 			if(dice < 50){
 				var repair = new RepairDrop(this.game);
 				repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
@@ -424,6 +444,15 @@ Leech.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
+		for(var i = 0; i< 2; i++){
+			var scrap = new Scrap(this.game);
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
+
+			this.game.addEntity(scrap);
+		}
 		var dice = Math.random()*100;
 		if (dice < 35) {
 			if(dice < 25){
@@ -548,7 +577,7 @@ Scourge.prototype.update = function () {
 
 			this.game.addEntity(spreader);
 		}
-		for(var i = 0; i< 5; i++){
+		for(var i = 0; i< 3; i++){
 			var scrap = new Scrap(this.game);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
@@ -737,7 +766,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 	//if it hasn't found its target yet, or its target has become undefined
 	if (!this.target){
 		var closest = 100000000;
-		
+
 		//find the closest resource node to gather from
 		for (var i = 0; i<this.game.resources.length; i++){
 			var ent = this.game.resources[i];
@@ -793,6 +822,15 @@ BiologicalResourceGatherer.prototype.update = function () {
 	if (this.health < 1) {
 		SCORE++; //how many points is it worth
 
+		for(var i = 0; i < 1; i++){
+			var scrap = new Scrap(this.game);
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
+
+			this.game.addEntity(scrap);
+		}
 		//does it drop a powerup?
 		// if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
 		// 	var spreader = new Spreader(this.game);

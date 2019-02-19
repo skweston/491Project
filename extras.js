@@ -191,7 +191,7 @@ Scrap.prototype.update = function () {
 	if (this.speed > 0){
 		this.x += Math.cos(this.angle) * 10 * this.speed;
 		this.y += Math.sin(this.angle) * 10 * this.speed;
-		this.speed -= .05;
+		this.speed -= .0325;
 		//update hitbox
 		this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 		this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;

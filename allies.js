@@ -6,89 +6,152 @@ function PurpleChroma(game) {
 	this.animation = new Animation(AM.getAsset("./img/PurpleChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
 	this.angle = 0;
 	this.name = "Ally";
-	this.speed = 0.65;
+	this.maxSpeed = 0.65;
+	this.speed = this.maxSpeed;
 	this.x = 0;
 	this.y = 0;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 41 * this.scale;
+	this.radius = 30 * this.scale;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
 	this.health = 75;
 	this.damage = 20;
+	this.target = null;
+	this.shootCooldown = 100;
 	//console.log("starting health: " + this.health);
 	Entity.call(this, game, this.x, this.y);
 }
 
 PurpleChroma.prototype = new Entity();
 PurpleChroma.prototype.constructor = PurpleChroma;
+PurpleChroma.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
+	var angle = this.angle + adjustAngle;
+	if (type === "Primary") {
+		var projectile = new ShipPrimary(this.game);
+	}
+	if (type === "Secondary") {
+		var projectile = new ShipSecondary(this.game);
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(target, this);
 
+	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset));
+	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset));
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
+}
 PurpleChroma.prototype.update = function () {
-	// update angle
-	var dx = this.game.ship.xMid - this.xMid;
-	var dy = this.yMid - this.game.ship.yMid;
-	this.angle = -Math.atan2(dy,dx);
 
-	// move the scourge
-	this.x += Math.cos(this.angle) * 10 * this.speed;
-	this.y += Math.sin(this.angle) * 10 * this.speed;
+		this.shootCooldown--;
 
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+		//something likethis for an Effect
+		//this.lifetime--;
+		if (this.health < 1){
+			this.removeFromWorld = true;
+			return;
+		}
 
-	// check collision with player projectiles
-	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
-		var ent = this.game.playerProjectiles[i];
-		if (Collide(this, ent)) {
-			this.takeDamage(ent.damage);
-			ent.removeFromWorld = true;
-			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-			splatter.angle = this.angle;
-			this.game.addEntity (splatter);
-			if (this.health < 1) {
-				break;
+		//if it hasn't found its target yet, or its target has become undefined
+		if (!this.target){
+			var closest = 100000000;
+
+			//find the closest resource node to gather from
+			for (var i = 0; i<this.game.enemies.length; i++){
+				var ent = this.game.enemies[i];
+				var d = distance(this, ent);
+				if(d < closest){
+					closest = d;
+					this.target = ent;
+
+				}
 			}
 		}
-	}
 
-	// check collision with ship
-	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
-		this.game.ship.takeDamage(this.damage);
-		this.removeFromWorld = true;
-	}
 
-	// check health
-	if (this.health < 1) {
-		SCORE++;
-
-		if (Math.random() * 100 < 20) {
-			var spreader = new Spreader(this.game);
-			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			spreader.xMid = this.xMid;
-			spreader.yMid = this.yMid;
-
-			this.game.addEntity(spreader);
+		// update angle
+		if(this.target){
+			var dx = this.target.xMid - this.xMid;
+			var dy = this.yMid - this.target.yMid;
+			this.angle = -Math.atan2(dy,dx);
 		}
-		for(var i = 0; i< 5; i++){
-			var scrap = new Scrap(this.game);
-			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-			scrap.xMid = this.xMid;
-			scrap.yMid = this.yMid;
-			this.game.addEntity(scrap);
+		if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
+			this.createProjectile("Primary", 0, 0);
+			this.shootCooldown = 100;
 		}
-		this.removeFromWorld = true;
-	}
+		// move the thing
+		this.x += Math.cos(this.angle) * 10 * this.speed;
+		this.y += Math.sin(this.angle) * 10 * this.speed;
 
-	if (this.removeFromWorld) {
-		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
-		this.game.addEntity(explosion);
-	}
+		//update its hitbox
+		this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+		this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
-	Entity.prototype.update.call(this);
-}
+
+		// check collision with player projectiles
+		for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
+			var ent = this.game.enemyProjectiles[i];
+			if (Collide(this, ent)) {
+				this.takeDamage(end.damage);
+				ent.removeFromWorld = true;
+				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+				splatter.angle = this.angle;
+				this.game.addEntity (splatter);
+				if (this.health < 1) {
+					break;
+				}
+			}
+		}
+
+
+
+
+		// check health
+		if (this.health < 1) {
+			//SCORE++; //how many points is it worth
+
+			for(var i = 0; i < 1; i++){
+				var scrap = new Scrap(this.game);
+				scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+				scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+				scrap.xMid = this.xMid;
+				scrap.yMid = this.yMid;
+
+				this.game.addEntity(scrap);
+			}
+			//does it drop a powerup?
+			// if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
+			// 	var spreader = new Spreader(this.game);
+			// 	spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+			// 	spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+			// 	spreader.xMid = this.xMid;
+			// 	spreader.yMid = this.yMid;
+			//
+			// 	this.game.addEntity(spreader);
+			// }
+
+			this.removeFromWorld = true;
+		}
+
+		//does it blow up when it dies?
+		if (this.removeFromWorld) {
+			var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+			this.game.addEntity(explosion);
+		}
+
+		Entity.prototype.update.call(this);
+
+
+	}
 
 PurpleChroma.prototype.draw = function () {
 	if(onCamera(this)){
@@ -133,13 +196,7 @@ function SpaceStation(game) {
 
 
 	//the spawns that the spawner 'owns'
-	this.spawns = [
-                            new PurpleChroma(this.game);
-
-                            //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 30, y + 30),
-                            //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 40, y + 40),
-                            //new Scourge(game, AM.getAsset("./img/scourge.png"), x + 50, y + 50),
-    ];
+	this.spawns = 0;
 }
 SpaceStation.prototype = new Entity();
 SpaceStation.prototype.constructor = SpaceStation;
@@ -149,7 +206,10 @@ SpaceStation.prototype.update = function () {
     if(this.health < 1){
       this.removeFromWorld = true;
 	}
-	this.health += 0.5;
+	if(this.health < 5000){
+		this.health += 0.5;
+	}
+
 /* Dont need this as the spawner should remain stationary
     //this.x += this.game.clockTick * this.speed;
     //if (this.x > 800) this.x = -230;
@@ -163,22 +223,23 @@ SpaceStation.prototype.update = function () {
 	//timer reaches 0 Enter
 	if(this.generateGatherer <1){
 		var ent = new MechanicalResourceGatherer(this.game);
-		ent.x =
+
+		ent.x = this.x + (this.pWidth * this.scale) / 2;
+		ent.y = this.y + (this.pHeight * this.scale) / 2;
+		this.game.addEntity(ent);
+		this.generateGatherer = 1000;
 	}
-    if (this.game.playerResources > 100 ){
-		//checks all spawns if they are alive, once one is found that isn't it tips flag and inserts it to game
-        for (let i = 0, flag = true; i < this.maxSpawn && flag; i++) {
+    if (this.spawns < this.maxSpawn && this.game.playerResources > 100 ){
+		var ent = new PurpleChroma(this.game);
+		ent.x = this.x + (this.pWidth * this.scale) / 2;
+		ent.y = this.y + (this.pHeight * this.scale) / 2;
+		this.game.addEntity(ent);
+		this.spawns++;
+		this.game.playerResources -=100;
 
-            if (this.spawns[i].removeFromWorld === false) {
-                flag = false;
-                this.game.addEntity(this.spawns[i], this.x, this.y);
-            }
-        }
-		//set the timer back, even if nothing is released because of max being reached.
-        this.generateEnemy = this.timerReset;
     }
-
-	this.angle += 0.05;
+	this.generateGatherer -= 1;
+	this.angle += 0.01;
     Entity.prototype.update.call(this);
 }
 
@@ -196,8 +257,8 @@ SpaceStation.prototype.draw = function () {
 function MechanicalResourceGatherer(game) {
 
 
-	this.pWidth = 54;
-	this.pHeight = 51;
+	this.pWidth = 40;
+	this.pHeight = 40;
 	this.scale = 1;
 
   	// Stuff gets passed into an animation object in this order:
@@ -205,7 +266,7 @@ function MechanicalResourceGatherer(game) {
 
 	this.animation = new Animation(AM.getAsset("./img/MechanicalResourceGatherer.png"),
 								 this.pWidth, this.pHeight,
-								 324, .125, 2, true, this.scale);
+								 80, .125, 2, true, this.scale);
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Ally";
@@ -292,9 +353,9 @@ MechanicalResourceGatherer.prototype.update = function () {
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 
-	// check collision with player projectiles
-	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
-		var ent = this.game.playerProjectiles[i];
+	// check collision with enemy projectiles
+	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
+		var ent = this.game.enemyProjectiles[i];
 		if (Collide(this, ent)) {
 			this.health -= ent.damage;
 			ent.removeFromWorld = true;
@@ -312,8 +373,17 @@ MechanicalResourceGatherer.prototype.update = function () {
 
 	// check health
 	if (this.health < 1) {
-		SCORE++; //how many points is it worth
+		//SCORE++; //how many points is it worth
 
+		for(var i = 0; i< 3; i++){
+			var scrap = new Scrap(this.game);
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
+
+			this.game.addEntity(scrap);
+		}
 		//does it drop a powerup?
 		// if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
 		// 	var spreader = new Spreader(this.game);
