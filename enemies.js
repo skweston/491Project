@@ -65,7 +65,9 @@ AlienSpaceStation.prototype.update = function () {
 	}
     if (this.spawns < this.maxSpawn && this.game.enemyResources > 10 ){
 		var dice = Math.random()*100;
+		console.log("the value of dice:" + dice);
 		if(dice > 50){
+			console.log("spawning a scourge");
 			var ent = new Scourge(this.game, this.xMid, this.yMid, this);
 		} else{
 			var ent = new Leech(this.game, this.xMid, this.yMid, this);
@@ -595,7 +597,7 @@ Leech.prototype.draw = function () {
 /* ========================================================================================================== */
 // Scourge - Enemy
 /* ========================================================================================================== */
-function Scourge(game, spritesheet, xIn, yIn, spawner) {
+function Scourge(game, xIn, yIn, spawner) {
 
 	this.pWidth = 128;
 	this.pHeight = 128;

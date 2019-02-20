@@ -7,7 +7,7 @@ function PurpleChroma(game, spawner) {
 	this.angle = 0;
 	this.spawner = spawner
 	this.name = "Ally";
-	this.maxSpeed = 0.65;
+	this.maxSpeed = 0.5;
 	this.speed = this.maxSpeed;
 	this.x = 0;
 	this.y = 0;
