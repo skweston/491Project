@@ -531,6 +531,7 @@ AM.downloadAll(function () {
 	gameEngine.cameraTrick = cameraTrick;
 	gameEngine.camera = new Camera(gameEngine);
 	gameEngine.sceneManager = pg;
+	//gameEngine.sceneManager = new SceneManager(gameEngine);
 	gameEngine.start();
 
 	//console.log(gameEngine);

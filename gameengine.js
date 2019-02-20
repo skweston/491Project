@@ -231,6 +231,10 @@ GameEngine.prototype.startInput = function () {
 			//console.log("V detected");
 			that.gameStart = true;
 		}
+		if(e.code === "KeyV") {
+			//console.log("V detected");
+			that.gameStart = true;
+		}
 	}, false);
 
 	console.log('Input started');
@@ -285,6 +289,7 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].draw(this.ctx);
 	}
+
 
 	for(var i = 0; i < this.elements.length; i++) {
 		this.elements[i].draw(this.ctx);
