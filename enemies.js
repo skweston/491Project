@@ -381,17 +381,6 @@ Leech.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
-
-		if (Math.random() * 100 < 20) {
-			var spreader = new Spreader(this.game);
-			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			spreader.xMid = this.xMid;
-			spreader.yMid = this.yMid;
-
-			this.game.addEntity(spreader);
-		}
-
 		this.removeFromWorld = true;
 	}
 
@@ -485,17 +474,6 @@ Scourge.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
-
-		if (Math.random() * 100 < 20) {
-			var spreader = new Spreader(this.game);
-			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			spreader.xMid = this.xMid;
-			spreader.yMid = this.yMid;
-
-			this.game.addEntity(spreader);
-		}
-
 		this.removeFromWorld = true;
 	}
 

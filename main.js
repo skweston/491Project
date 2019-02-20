@@ -332,12 +332,12 @@ Camera.prototype.update = function () {
 		this.y = this.game.ctx.canvas.height - this.ctx.canvas.height;
 	}
 
-
+	//console.log(`${this.x} = x ${this.y} = y`);
 
 };
 
 /* ========================================================================================================== */
-// Background
+// Background - parent of MainBackground and BackgroundLayer
 /* ========================================================================================================== */
 function Background(game, spritesheet) {
 
@@ -346,6 +346,39 @@ function Background(game, spritesheet) {
 	this.spritesheet = spritesheet;
 	this.game = game;
 	this.ctx = game.ctx;
+	this.frameWidth;
+	this.frameHeight;
+	this.dWidth;
+	this.dHeight;
+	this.sx;
+	this.sy;
+	// This is the location to draw the background
+	this.dx = 0;
+	this.dy = 0;
+
+
+};
+
+Background.prototype.draw = function () {
+
+	//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+	this.ctx.drawImage(this.spritesheet,
+					this.sx, this.sy,
+					this.frameWidth, this.frameHeight,
+					this.dx, this.dy,
+					this.dWidth, this.dHeight);
+};
+
+Background.prototype.update = function () {
+
+
+};
+
+/* ========================================================================================================== */
+// MainBackground
+/* ========================================================================================================== */
+function MainBackground(game, spritesheet) {
+	Background.call(this, game, spritesheet);
 	this.ctx.canvas.width = this.spritesheet.naturalWidth;
 	this.ctx.canvas.height = this.spritesheet.naturalHeight;
 
@@ -372,24 +405,85 @@ function Background(game, spritesheet) {
 	this.dWidth = this.frameWidth;
 	this.dHeight = this.frameHeight;
 
-
 };
 
-Background.prototype.draw = function () {
-	this.ctx.drawImage(this.spritesheet,
-		   this.sx, this.sy,
-		   this.frameWidth, this.frameHeight,
-				   this.dx, this.dy,
-		   this.dWidth, this.dHeight);
+MainBackground.prototype = Object.create(Background.prototype);
+MainBackground.prototype.constructor = MainBackground;
+Object.defineProperty(MainBackground.prototype, 'constructor', {
+    value: MainBackground,
+    enumerable: false, // so that it does not appear in 'for in' loop
+    writable: true }
+);
+
+/* ========================================================================================================== */
+// BackgroundLayer
+/* ========================================================================================================== */
+function BackgroundLayer(game, spritesheet) {
+	Background.call(this, game, spritesheet);
+
+	// Where the frame starts for the background. Divide image in half then subract the half the canvas,
+	// for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
+	this.sx = 0;//spritesheet.naturalWidth / 2 - this.ctx.canvas.width / 2;
+	this.sy = 0;//spritesheet.naturalHeight / 2 - this.ctx.canvas.height / 2;
+	//console.log(`${this.ctx.canvas.width} = CW ${spritesheet.naturalWidth} = SNW
+			//${this.ctx.canvas.height} = CH ${spritesheet.naturalHeight} = SNH`);
+	// This is the location to draw the background
+	this.dx = (this.ctx.canvas.width - spritesheet.naturalWidth) / 2;
+	this.dy = (this.ctx.canvas.height - spritesheet.naturalHeight) / 2;
+
+	this.frameWidth = this.ctx.canvas.width;
+	this.frameHeight = this.ctx.canvas.height;
+
+	if (spritesheet.width - this.sx < this.frameWidth) {
+		this.frameWidth = this.spritesheet.width - this.sx;
+	}
+	if (spritesheet.height - this.sy < this.frameHeight) {
+		this.frameHeight = this.spritesheet.height - this.sy;
+	}
+
+	this.dWidth = this.frameWidth;
+	this.dHeight = this.frameHeight;
+	this.oldX = this.dx;
+	this.oldY = this.dy;
+	/*
+	This logic determines the scroll rate of the layer being applied.
+	if the rate is less than 0, the image is greater in size than the
+	actual background and needs more pixels to be covered in each update.
+	*/
+	this.xScrollRate = Number.parseFloat(this.ctx.canvas.width / spritesheet.naturalWidth).toFixed(4);
+	this.yScrollRate = Number.parseFloat(this.ctx.canvas.height / spritesheet.naturalHeight).toFixed(4);
+	if(this.xScrollRate < 1) {
+		this.xScrollRate = spritesheet.naturalWidth / this.ctx.canvas.width;
+	}
+	if(this.yScrollRate < 1) {
+		this.yScrollRate = spritesheet.naturalHeight / this.ctx.canvas.Height;
+	}
 };
 
-Background.prototype.update = function () {
+BackgroundLayer.prototype = Object.create(Background.prototype);
+BackgroundLayer.prototype.constructor = BackgroundLayer;
+Object.defineProperty(BackgroundLayer.prototype, 'constructor', {
+    value: BackgroundLayer,
+    enumerable: false, // so that it does not appear in 'for in' loop
+    writable: true }
+);
 
+BackgroundLayer.prototype.update = function () {
 
+    var differenceX = this.game.camera.x - this.oldX;
+	var differenceY = this.game.camera.y - this.oldY;
+
+	//assign the current camera values for next update.
+	this.oldX = this.game.camera.x;
+	this.oldY = this.game.camera.y;
+
+	//change image position.
+	this.dx += differenceX / this.xScrollRate;
+	this.dy += differenceY / this.yScrollRate;
+	//console.log(`${(differenceX / this.xScrollRate)} =(${differenceX} / ${this.xScrollRate})`);
+	//console.log(`${(differenceY / this.yScrollRate)} =(${differenceY} / ${this.yScrollRate})`);
 
 };
-
-
 
 /* ========================================================================================================== */
 // Asset Manager aka Main
@@ -397,10 +491,14 @@ Background.prototype.update = function () {
 
 var AM = new AssetManager();
 
-AM.queueDownload("./img/space1-1.png");
+AM.queueDownload("./img/PScroll1/space.png");
 AM.queueDownload("./img/Uberspace.png");
 AM.queueDownload("./img/4kBackground1.png");
 AM.queueDownload("./img/4kBackground2.png");
+AM.queueDownload("./img/PScroll1/cloud.png");
+AM.queueDownload("./img/PScroll1/comet.png");
+AM.queueDownload("./img/PScroll1/planet1.png");
+AM.queueDownload("./img/PScroll1/planet2.png");
 AM.queueDownload("./img/BloodSplatter.png");
 // ship stuff
 AM.queueDownload("./img/shipIdle.png");
@@ -444,12 +542,16 @@ AM.downloadAll(function () {
 
 	var ship = new TheShip(gameEngine);
 	var reticle = new Reticle(gameEngine);
-	var background = new Background(gameEngine, AM.getAsset("./img/4kBackground1.png"));
+	var background = new MainBackground(gameEngine, AM.getAsset("./img/4kBackground1.png"));
 	var pg = new PlayGame(gameEngine);
 
 	gameEngine.addEntity(ship);
 	gameEngine.addEntity(reticle);
 	gameEngine.addEntity(background);
+	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/cloud.png")));
+	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/comet.png")));
+	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/planet1.png")));
+	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/planet2.png")));
 	gameEngine.addEntity(pg);
 
 	gameEngine.ship = ship;

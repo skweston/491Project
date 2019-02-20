@@ -395,6 +395,7 @@ GameEngine.prototype.update = function () {
 	for (var i = 0; i < count; i++) {
 		var entity = this.enemies[i];
 		if (entity.removeFromWorld) {
+			entity.generateItem();
 			this.enemies.splice(i, 1);
 			count--;
 			i--;
@@ -486,5 +487,22 @@ Entity.prototype.takeDamage = function(damage) {
 			//console.log("got hurt");
 			this.health -= damage;
 		}
+	}
+}
+
+Entity.prototype.generateItem = function() {
+	//can use this.name to check for enemy or boss to change odds or item drop potential
+	var genItem = Math.random() * 100;
+	//console.log(`${genItem} ${this.name}`);
+	if (genItem < 20) {
+		var spreader = new Spreader(this.game);
+		spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+		spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+		spreader.xMid = this.xMid;
+		spreader.yMid = this.yMid;
+
+		this.game.addEntity(spreader);
+	} else if (genItem >= 80 && genItem < 100) {
+		//new powerup here
 	}
 }
