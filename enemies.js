@@ -34,7 +34,7 @@ AlienSpaceStation.prototype = new Entity();
 AlienSpaceStation.prototype.constructor = AlienSpaceStation;
 
 AlienSpaceStation.prototype.update = function () {
-
+	// this.game.enemyResources++;
     if(this.health < 1){
       this.removeFromWorld = true;
 	  return;
@@ -63,11 +63,9 @@ AlienSpaceStation.prototype.update = function () {
 		this.generateGatherer = this.timerReset;
 		this.gatherers++;
 	}
-    if (this.spawns < this.maxSpawn && this.game.enemyResources > 10 ){
+    if (this.spawns < this.maxSpawn && this.game.enemyResources >= 10 ){
 		var dice = Math.random()*100;
-		console.log("the value of dice:" + dice);
 		if(dice > 50){
-			console.log("spawning a scourge");
 			var ent = new Scourge(this.game, this.xMid, this.yMid, this);
 		} else{
 			var ent = new Leech(this.game, this.xMid, this.yMid, this);
@@ -536,6 +534,7 @@ Leech.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
+		this.spawner.spawns--;
 		for(var i = 0; i< 2; i++){
 			var scrap = new Scrap(this.game);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
@@ -572,7 +571,7 @@ Leech.prototype.update = function () {
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
 		this.game.addEntity(explosion);
-		this.spawner.spawns--;
+
 	}
 
 	Entity.prototype.update.call(this);
@@ -661,7 +660,7 @@ Scourge.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
-
+		this.spawner.spawns--;
 		if (Math.random() * 100 < 20) {
 			var spreader = new Spreader(this.game);
 			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
