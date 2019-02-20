@@ -35,6 +35,7 @@ function GameEngine() {
 	this.enemyProjectiles = [];
 	this.extras = [];
 	this.effects = [];
+	this.elements = [];
 
 	// start the game
 	this.mouse = false;
@@ -226,6 +227,10 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "AltLeft") {
 			that.gameStart = true;
 		}
+		if(e.code === "KeyV") {
+			//console.log("V detected");
+			that.gameStart = true;
+		}
 	}, false);
 
 	console.log('Input started');
@@ -234,6 +239,11 @@ GameEngine.prototype.startInput = function () {
 GameEngine.prototype.addEntity = function (entity) {
 	// console.log('added entity');
 	// this.entities.push(entity);
+
+	if(entity.name == "Element") {
+		this.elements.push(entity);
+	}
+
 	if (entity.name === "Level") {
 		this.levels.push(entity);
 	}
@@ -275,6 +285,11 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].draw(this.ctx);
 	}
+
+	for(var i = 0; i < this.elements.length; i++) {
+		this.elements[i].draw(this.ctx);
+	}
+
 	for (var i = 0; i < this.playerProjectiles.length; i++) {
 		this.playerProjectiles[i].draw(this.ctx);
 	}
@@ -314,6 +329,8 @@ GameEngine.prototype.update = function () {
 	// 	}
 	// }
 
+	this.sceneManager.update();
+
 	this.camera.update();
 	var count = this.background.length;
 	for (var i = 0; i < count; i++) {
@@ -328,11 +345,26 @@ GameEngine.prototype.update = function () {
 		}
 	}
 
+/*
 	count = this.levels.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.levels[i];
 		if (entity.removeFromWorld) {
 			this.levels.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}*/
+
+
+	count = this.elements.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.elements[i];
+		if (entity.removeFromWorld) {
+			this.elements.splice(i, 1);
 			count--;
 			i--;
 		}
@@ -395,6 +427,7 @@ GameEngine.prototype.update = function () {
 	for (var i = 0; i < count; i++) {
 		var entity = this.enemies[i];
 		if (entity.removeFromWorld) {
+			entity.generateItem();
 			this.enemies.splice(i, 1);
 			count--;
 			i--;
@@ -486,5 +519,22 @@ Entity.prototype.takeDamage = function(damage) {
 			//console.log("got hurt");
 			this.health -= damage;
 		}
+	}
+}
+
+Entity.prototype.generateItem = function() {
+	//can use this.name to check for enemy or boss to change odds or item drop potential
+	var genItem = Math.random() * 100;
+	//console.log(`${genItem} ${this.name}`);
+	if (genItem < 20) {
+		var spreader = new Spreader(this.game);
+		spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+		spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+		spreader.xMid = this.xMid;
+		spreader.yMid = this.yMid;
+
+		this.game.addEntity(spreader);
+	} else if (genItem >= 80 && genItem < 100) {
+		//new powerup here
 	}
 }

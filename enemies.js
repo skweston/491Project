@@ -381,17 +381,6 @@ Leech.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
-
-		if (Math.random() * 100 < 20) {
-			var spreader = new Spreader(this.game);
-			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			spreader.xMid = this.xMid;
-			spreader.yMid = this.yMid;
-
-			this.game.addEntity(spreader);
-		}
-
 		this.removeFromWorld = true;
 	}
 
@@ -486,7 +475,7 @@ Scourge.prototype.update = function () {
 	if (this.health < 1) {
 		SCORE++;
 
-		if (Math.random() * 100 < 20) {
+		/*if (Math.random() * 100 < 20) {
 			var spreader = new Spreader(this.game);
 			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
 			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
@@ -494,7 +483,7 @@ Scourge.prototype.update = function () {
 			spreader.yMid = this.yMid;
 
 			this.game.addEntity(spreader);
-		}
+		}*/
 
 		this.removeFromWorld = true;
 	}
@@ -604,4 +593,120 @@ Spawner.prototype.draw = function () {
 		}
 	}
     //Entity.prototype.draw.call(this);
+}
+
+/* ========================================================================================================== */
+// Undetermined Name
+/* ========================================================================================================== */
+
+function Undetermined(game, spritesheet, xIn, yIn){
+    this.pWidth = 32;
+    this.pHeight = 32;
+    this.scale = 1.5;
+    this.animation = new Animation(AM.getAsset("./img/undetermined.png"), this.pWidth, this.pHeight, 675, 0.2, 21, true, this.scale);
+    this.name = "Enemy";
+	this.x = xIn;
+    this.y = yIn;
+    this.xMid = this.x + (this.pWidth * this.scale) / 2;
+    this.yMid = this.y + (this.pHeight * this.scale) / 2;
+    this.radius = 8 * this.scale;
+    this.speed = 0;
+    this.angle = 0;
+    this.game = game;
+    this.ctx = game.ctx;
+    this.removeFromWorld = false;
+    this.health = 5;
+	this.shootCooldown = 30;
+	this.missleCooldown = 1500;
+	this.shotCount = 0;
+	this.boss = boss;
+
+
+}
+BossTurret.prototype = new Entity();
+BossTurret.prototype.constructor = Boss1;
+
+BossTurret.prototype.update = function () {
+
+	this.x = this.boss.x + this.xOffset;
+	this.y = this.boss.y + this.yOffset;
+
+	this.xMid = this.x + (this.pWidth * this.scale) / 2;
+	this.yMid = this.y + (this.pHeight * this.scale) / 2;
+
+	this.shootCooldown--;
+
+	if(this.health < 1) {
+		SCORE += 3;
+
+		this.boss.turretsRemaining--;
+		var explosion = new BossExplosion(this.game, this.x - this.pWidth, this.y, 0, this.boss);
+		this.game.addEntity(explosion);
+        this.removeFromWorld = true;
+    }
+	for (var i = 0; i<this.game.playerProjectiles.length; i++){
+
+		var ent = this.game.playerProjectiles[i];
+		if(Collide(this, ent)){
+
+			this.takeDamage(ent.damage);
+			ent.removeFromWorld = true;
+		}
+	}
+    var dx = this.game.ship.xMid - this.xMid-1;
+    var dy = (this.yMid - this.game.ship.yMid)-1;
+    // this should be the angle in radians
+    this.angle = -Math.atan2(dy,dx);
+
+	if (this.shootCooldown < 1){
+		if (this.shotCount >= 2){
+			this.shootCooldown = 150;
+			this.createProjectile("LaserBlast", 0, -Math.PI/2)
+			this.shotCount = 0;
+		}else{
+			this.shootCooldown = 75;
+			this.createProjectile("LaserBlast", 0, -Math.PI/2)
+			this.shotCount++;
+		}
+        // this.createProjectile("LaserBlast", 0, -Math.PI/2);
+	}
+
+
+	Entity.prototype.update.call(this);
+}
+BossTurret.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.game.ship.xMid, yMid: this.game.ship.YMid});
+	var angle = this.angle + adjustAngle;
+	if (type === "LaserBlast") {
+		var projectile = new LaserBlast(this.game, this.angle);
+	}
+	if (type === "BossMissle") {
+		var projectile = new BossMissle(this.game, this.angle);
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(this.game.ship, this);
+
+	projectile.x = this.xMid;
+	projectile.y = this.yMid;
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
+}
+BossTurret.prototype.draw = function () {
+	//this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+	Entity.prototype.draw.call(this);
 }

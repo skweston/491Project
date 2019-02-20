@@ -55,61 +55,43 @@ function onCamera(ent){
 /* ========================================================================================================== */
 /*
 function sampleEntity(game, extraInputVarial, extraInputVarialTwo) {
-
-
 	this.pWidth = Interger width Of Single Frame of Animation;
 	this.pHeight = Interger height Of Single Frame of Animation;
 	this.scale = the scaling factor for this entity;
-
   	Stuff gets passed into an animation object in this order:
   	spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
-
 	this.animation = new Animation(AM.getAsset("./img/NameOfAsset.png"),
 								 this.pWidth, this.pHeight,
 								 width of spriteSheet,  Duration Each Frame Lasts, # of Frames,
 								 Boolean for looping, this.scale);
-
-
-
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Effect" XOR "Level" XOR "Background" XOR "Player" XOR "Enemy" XOR
 				"PlayerProjectile" XOR "EnemyProjectile" XOR "Extra" XOR "Effect";
-
 	this.x = 0;
 	this.y = 0;
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 ///////////Above this is MANDATORY for all entities////////////////////////
 //If it's killable
 	this.health = some magic number;
-
 //this is for collision
 	this.xMid = extraInputVarial;
 	this.yMid = extraInputVarialTwo;
 	this.radius = some magic number * this.scale;
-
 //this is for movement
 	this.speed = some magic number;
-
 //this is for if it needs to decay off the lists, like an explostion
 this.lifetime = 100; //when this reaches 0, it is removed from world
-
 //Add other variables to objects for whatever added functionality you need
 	this.sampleValue = sample Magic Number;
-
-
-
 }
-
 sampleEntity.prototype.draw = function () {
 	if(onCamera(this)){
   		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
   	}
 	Entity.prototype.draw.call(this);
 }
-
 sampleEntity.prototype.update = function () {
-
 	//something likethis for an Effect
 	this.lifetime--;
 	if (this.lifetime < 1){
@@ -119,16 +101,12 @@ sampleEntity.prototype.update = function () {
 	var dx = this.game.ship.xMid - this.xMid;
 	var dy = this.yMid - this.game.ship.yMid;
 	this.angle = -Math.atan2(dy,dx);
-
 	// move the thing
 	this.x += Math.cos(this.angle) * 10 * this.speed;
 	this.y += Math.sin(this.angle) * 10 * this.speed;
-
 	//update its hitbox
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-
-
 	// check collision with player projectiles
 	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
 		var ent = this.game.playerProjectiles[i];
@@ -143,17 +121,14 @@ sampleEntity.prototype.update = function () {
 			}
 		}
 	}
-
 	// check collision with ship if it matters
 	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
 		this.game.ship.health -= this.damage;
 		this.removeFromWorld = true;
 	}
-
 	// check health
 	if (this.health < 1) {
 		SCORE++; //how many points is it worth
-
 		//does it drop a powerup?
 		if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
 			var spreader = new Spreader(this.game);
@@ -161,33 +136,19 @@ sampleEntity.prototype.update = function () {
 			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
 			spreader.xMid = this.xMid;
 			spreader.yMid = this.yMid;
-
 			this.game.addEntity(spreader);
 		}
-
 		this.removeFromWorld = true;
 	}
-
 	//does it blow up when it dies?
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
 	}
-
 	Entity.prototype.update.call(this);
-
-
 }
-
-
-
-
-
-
 */
 /*a list of powerups, things like multishot and such
-
-
 /* ========================================================================================================== */
 // Animation
 /* ========================================================================================================== */
@@ -252,8 +213,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle, game) {
 
 
 	ctx.drawImage(offscreenCanvas, x-(xOffset/2), y- (yOffset/2));
-
-
+	//offscreenCtx.clearRect(0,0, size, size);
 }
 
 Animation.prototype.currentFrame = function () {
@@ -286,7 +246,7 @@ Camera.prototype.draw = function (cameraCtx) {
 		 				0, 0,
 						this.ctx.canvas.width, this.ctx.canvas.height);
 
-
+	this.game.ctx.clearRect(0,0, this.game.ctx.canvas.width, this.game.ctx.canvas.height);
 };
 
 Camera.prototype.update = function () {
@@ -332,12 +292,12 @@ Camera.prototype.update = function () {
 		this.y = this.game.ctx.canvas.height - this.ctx.canvas.height;
 	}
 
-
+	//console.log(`${this.x} = x ${this.y} = y`);
 
 };
 
 /* ========================================================================================================== */
-// Background
+// Background - parent of MainBackground and BackgroundLayer
 /* ========================================================================================================== */
 function Background(game, spritesheet) {
 
@@ -346,6 +306,39 @@ function Background(game, spritesheet) {
 	this.spritesheet = spritesheet;
 	this.game = game;
 	this.ctx = game.ctx;
+	this.frameWidth;
+	this.frameHeight;
+	this.dWidth;
+	this.dHeight;
+	this.sx;
+	this.sy;
+	// This is the location to draw the background
+	this.dx = 0;
+	this.dy = 0;
+
+
+};
+
+Background.prototype.draw = function () {
+
+	//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+	this.ctx.drawImage(this.spritesheet,
+					this.sx, this.sy,
+					this.frameWidth, this.frameHeight,
+					this.dx, this.dy,
+					this.dWidth, this.dHeight);
+};
+
+Background.prototype.update = function () {
+
+
+};
+
+/* ========================================================================================================== */
+// MainBackground
+/* ========================================================================================================== */
+function MainBackground(game, spritesheet) {
+	Background.call(this, game, spritesheet);
 	this.ctx.canvas.width = this.spritesheet.naturalWidth;
 	this.ctx.canvas.height = this.spritesheet.naturalHeight;
 
@@ -372,24 +365,85 @@ function Background(game, spritesheet) {
 	this.dWidth = this.frameWidth;
 	this.dHeight = this.frameHeight;
 
-
 };
 
-Background.prototype.draw = function () {
-	this.ctx.drawImage(this.spritesheet,
-		   this.sx, this.sy,
-		   this.frameWidth, this.frameHeight,
-				   this.dx, this.dy,
-		   this.dWidth, this.dHeight);
+MainBackground.prototype = Object.create(Background.prototype);
+MainBackground.prototype.constructor = MainBackground;
+Object.defineProperty(MainBackground.prototype, 'constructor', {
+    value: MainBackground,
+    enumerable: false, // so that it does not appear in 'for in' loop
+    writable: true }
+);
+
+/* ========================================================================================================== */
+// BackgroundLayer
+/* ========================================================================================================== */
+function BackgroundLayer(game, spritesheet) {
+	Background.call(this, game, spritesheet);
+
+	// Where the frame starts for the background. Divide image in half then subract the half the canvas,
+	// for both sx and sy. (i.e: 5600 / 2 - 800 / 2 = 2400) Allowing ship to fit to the exact middle.
+	this.sx = 0;//spritesheet.naturalWidth / 2 - this.ctx.canvas.width / 2;
+	this.sy = 0;//spritesheet.naturalHeight / 2 - this.ctx.canvas.height / 2;
+	//console.log(`${this.ctx.canvas.width} = CW ${spritesheet.naturalWidth} = SNW
+			//${this.ctx.canvas.height} = CH ${spritesheet.naturalHeight} = SNH`);
+	// This is the location to draw the background
+	this.dx = (this.ctx.canvas.width - spritesheet.naturalWidth) / 2;
+	this.dy = (this.ctx.canvas.height - spritesheet.naturalHeight) / 2;
+
+	this.frameWidth = this.ctx.canvas.width;
+	this.frameHeight = this.ctx.canvas.height;
+
+	if (spritesheet.width - this.sx < this.frameWidth) {
+		this.frameWidth = this.spritesheet.width - this.sx;
+	}
+	if (spritesheet.height - this.sy < this.frameHeight) {
+		this.frameHeight = this.spritesheet.height - this.sy;
+	}
+
+	this.dWidth = this.frameWidth;
+	this.dHeight = this.frameHeight;
+	this.oldX = this.dx;
+	this.oldY = this.dy;
+	/*
+	This logic determines the scroll rate of the layer being applied.
+	if the rate is less than 0, the image is greater in size than the
+	actual background and needs more pixels to be covered in each update.
+	*/
+	this.xScrollRate = Number.parseFloat(this.ctx.canvas.width / spritesheet.naturalWidth).toFixed(4);
+	this.yScrollRate = Number.parseFloat(this.ctx.canvas.height / spritesheet.naturalHeight).toFixed(4);
+	if(this.xScrollRate < 1) {
+		this.xScrollRate = spritesheet.naturalWidth / this.ctx.canvas.width;
+	}
+	if(this.yScrollRate < 1) {
+		this.yScrollRate = spritesheet.naturalHeight / this.ctx.canvas.Height;
+	}
 };
 
-Background.prototype.update = function () {
+BackgroundLayer.prototype = Object.create(Background.prototype);
+BackgroundLayer.prototype.constructor = BackgroundLayer;
+Object.defineProperty(BackgroundLayer.prototype, 'constructor', {
+    value: BackgroundLayer,
+    enumerable: false, // so that it does not appear in 'for in' loop
+    writable: true }
+);
 
+BackgroundLayer.prototype.update = function () {
 
+    var differenceX = this.game.camera.x - this.oldX;
+	var differenceY = this.game.camera.y - this.oldY;
+
+	//assign the current camera values for next update.
+	this.oldX = this.game.camera.x;
+	this.oldY = this.game.camera.y;
+
+	//change image position.
+	this.dx += differenceX / this.xScrollRate;
+	this.dy += differenceY / this.yScrollRate;
+	//console.log(`${(differenceX / this.xScrollRate)} =(${differenceX} / ${this.xScrollRate})`);
+	//console.log(`${(differenceY / this.yScrollRate)} =(${differenceY} / ${this.yScrollRate})`);
 
 };
-
-
 
 /* ========================================================================================================== */
 // Asset Manager aka Main
@@ -397,10 +451,14 @@ Background.prototype.update = function () {
 
 var AM = new AssetManager();
 
-AM.queueDownload("./img/space1-1.png");
+AM.queueDownload("./img/PScroll1/space.png");
 AM.queueDownload("./img/Uberspace.png");
 AM.queueDownload("./img/4kBackground1.png");
 AM.queueDownload("./img/4kBackground2.png");
+AM.queueDownload("./img/PScroll1/cloud.png");
+AM.queueDownload("./img/PScroll1/comet.png");
+AM.queueDownload("./img/PScroll1/planet1.png");
+AM.queueDownload("./img/PScroll1/planet2.png");
 AM.queueDownload("./img/BloodSplatter.png");
 // ship stuff
 AM.queueDownload("./img/shipIdle.png");
@@ -411,6 +469,8 @@ AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary1.png");
 AM.queueDownload("./img/shipSecondary1.png");
 
+//drops and powerups
+AM.queueDownload("./img/RepairDrop.png");
 AM.queueDownload("./img/spreader.png");
 
 // enemies
@@ -424,8 +484,8 @@ AM.queueDownload("./img/scourge.png");
 AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
-
-//AM.queueDownload("./img/Die.wav");
+AM.queueDownload("./img/SPACEFIGHT.png");
+AM.queueDownload("./img/splash.png")
 
 AM.downloadAll(function () {
 	console.log("starting up da sheild");
@@ -444,17 +504,38 @@ AM.downloadAll(function () {
 
 	var ship = new TheShip(gameEngine);
 	var reticle = new Reticle(gameEngine);
-	var background = new Background(gameEngine, AM.getAsset("./img/4kBackground1.png"));
+	var background = new MainBackground(gameEngine, AM.getAsset("./img/4kBackground1.png"));
 	var pg = new PlayGame(gameEngine);
 
 	gameEngine.addEntity(ship);
 	gameEngine.addEntity(reticle);
 	gameEngine.addEntity(background);
+	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/cloud.png")));
+	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/comet.png")));
+	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/planet1.png")));
+	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/planet2.png")));
 	gameEngine.addEntity(pg);
+	//var background = new Background(gameEngine, AM.getAsset("./img/4kBackground1.png"));
+	//var pg = new PlayGame(gameEngine);
+
+	//pg.loadGame();
+
+
+
+	gameEngine.addEntity(ship);
+	gameEngine.addEntity(reticle);
+	//gameEngine.addEntity(background);
+
 
 	gameEngine.ship = ship;
 	gameEngine.cameraTrick = cameraTrick;
 	gameEngine.camera = new Camera(gameEngine);
+	gameEngine.sceneManager = pg;
 	gameEngine.start();
+
+	//console.log(gameEngine);
+	//var pg = new PlayGame(gameEngine);
+	//gameEngine.addEntity(pg);
+
 	console.log("All Done!");
 });
