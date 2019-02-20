@@ -252,8 +252,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle, game) {
 
 
 	ctx.drawImage(offscreenCanvas, x-(xOffset/2), y- (yOffset/2));
-
-
+	//offscreenCtx.clearRect(0,0, size, size);
 }
 
 Animation.prototype.currentFrame = function () {
@@ -286,7 +285,7 @@ Camera.prototype.draw = function (cameraCtx) {
 		 				0, 0,
 						this.ctx.canvas.width, this.ctx.canvas.height);
 
-
+	this.game.ctx.clearRect(0,0, this.game.ctx.canvas.width, this.game.ctx.canvas.height);
 };
 
 Camera.prototype.update = function () {
@@ -509,6 +508,8 @@ AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary1.png");
 AM.queueDownload("./img/shipSecondary1.png");
 
+//drops and powerups
+AM.queueDownload("./img/RepairDrop.png");
 AM.queueDownload("./img/spreader.png");
 
 // enemies
@@ -522,8 +523,8 @@ AM.queueDownload("./img/scourge.png");
 AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
-
-//AM.queueDownload("./img/Die.wav");
+AM.queueDownload("./img/SPACEFIGHT.png");
+AM.queueDownload("./img/splash.png")
 
 AM.downloadAll(function () {
 	console.log("starting up da sheild");
@@ -553,10 +554,27 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/planet1.png")));
 	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/planet2.png")));
 	gameEngine.addEntity(pg);
+	//var background = new Background(gameEngine, AM.getAsset("./img/4kBackground1.png"));
+	//var pg = new PlayGame(gameEngine);
+	
+	//pg.loadGame();
+	
+
+
+	gameEngine.addEntity(ship);
+	gameEngine.addEntity(reticle);
+	//gameEngine.addEntity(background);
+	
 
 	gameEngine.ship = ship;
 	gameEngine.cameraTrick = cameraTrick;
 	gameEngine.camera = new Camera(gameEngine);
+	gameEngine.sceneManager = new SceneManager(gameEngine);
 	gameEngine.start();
+
+	//console.log(gameEngine);
+	//var pg = new PlayGame(gameEngine);
+	//gameEngine.addEntity(pg);
+	
 	console.log("All Done!");
 });
