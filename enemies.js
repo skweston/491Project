@@ -1,4 +1,93 @@
+/* ========================================================================================================== */
+// Spawner - alien space station
+/* ========================================================================================================== */
+function AlienSpaceStation(game, x, y) {
+    //Specific to spawners:
+    this.timerReset = 100;
+    this.generateGatherer = this.timerReset;
+    this.maxSpawn = 15; // maybe make this a difficulty variable.
 
+    this.pWidth = 260;
+    this.pHeight = 260;
+    this.scale = 1.5;
+	this.animation = new Animation(AM.getAsset("./img/AlienSpaceStation.png"), this.pWidth, this.pHeight, 780, 0.175, 3, true, this.scale);
+    this.name = "Enemy";
+    this.x = x;
+    this.y = y;
+    this.xMid = this.x + (this.pWidth * this.scale) / 2;
+    this.yMid = this.y + (this.pHeight * this.scale) / 2;
+    this.radius = 260 * this.scale;
+    this.speed = 0;
+    this.angle = 0;
+    this.game = game;
+    this.ctx = game.ctx;
+    this.removeFromWorld = false;
+    this.health = 5000;
+
+
+	//the spawns that the spawner 'owns'
+	this.spawns = 0;
+	this.maxGatherers = 10;
+	this.gatherers = 0;
+}
+AlienSpaceStation.prototype = new Entity();
+AlienSpaceStation.prototype.constructor = AlienSpaceStation;
+
+AlienSpaceStation.prototype.update = function () {
+
+    if(this.health < 1){
+      this.removeFromWorld = true;
+	  return;
+	}
+	if(this.health < 5000){
+		this.health += 0.5;
+	}
+
+/* Dont need this as the spawner should remain stationary
+    //this.x += this.game.clockTick * this.speed;
+    //if (this.x > 800) this.x = -230;
+    var dx = this.game.mouseX - this.xMid-1;
+    var dy = (this.yMid - this.game.mouseY)-1;
+    // this should be the angle in radians
+    this.angle = -Math.atan2(dy,dx);
+    //if we want it in degrees
+    //this.angle *= 180 / Math.PI;
+*/
+	//timer reaches 0 Enter
+	if(this.gatherers < this.maxGatherers && this.generateGatherer <1){
+		var ent = new BiologicalResourceGatherer(this.game, this);
+
+		ent.x = this.x + (this.pWidth * this.scale) / 2;
+		ent.y = this.y + (this.pHeight * this.scale) / 2;
+		this.game.addEntity(ent);
+		this.generateGatherer = this.timerReset;
+		this.gatherers++;
+	}
+    if (this.spawns < this.maxSpawn && this.game.enemyResources > 10 ){
+		var dice = Math.random()*100;
+		if(dice > 50){
+			var ent = new Scourge(this.game, this.xMid, this.yMid, this);
+		} else{
+			var ent = new Leech(this.game, this.xMid, this.yMid, this);
+		}
+		ent.x = this.x + (this.pWidth * this.scale) / 2;
+		ent.y = this.y + (this.pHeight * this.scale) / 2;
+		this.game.addEntity(ent);
+		this.spawns++;
+		this.game.enemyResources -=10;
+
+    }
+	this.generateGatherer -= 1;
+	this.angle += 0.0075;
+    Entity.prototype.update.call(this);
+}
+
+AlienSpaceStation.prototype.draw = function () {
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+    //Entity.prototype.draw.call(this);
+}
 /* ========================================================================================================== */
 // Boss 1
 /* ========================================================================================================== */
@@ -356,13 +445,14 @@ LaserBlast.prototype.draw = function () {
 /* ========================================================================================================== */
 // Leech - Enemy
 /* ========================================================================================================== */
-function Leech(game, spritesheet, xIn, yIn) {
+function Leech(game, xIn, yIn, spawner) {
 
 	this.pWidth = 32;
 	this.pHeight = 32;
 	this.scale = 1;
-	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight,448, 0.1, 14, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/Leech.png"), this.pWidth, this.pHeight,448, 0.1, 14, true, this.scale);
 	this.angle = 0;
+	this.spawner = spawner;
 	this.name = "Enemy";
 	this.speed = 0.1;
 	this.maxSpeed = 0.1; // For resetting after ship rolls
@@ -480,6 +570,7 @@ Leech.prototype.update = function () {
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
 		this.game.addEntity(explosion);
+		this.spawner.spawns--;
 	}
 
 	Entity.prototype.update.call(this);
@@ -504,13 +595,14 @@ Leech.prototype.draw = function () {
 /* ========================================================================================================== */
 // Scourge - Enemy
 /* ========================================================================================================== */
-function Scourge(game, spritesheet, xIn, yIn) {
+function Scourge(game, spritesheet, xIn, yIn, spawner) {
 
 	this.pWidth = 128;
 	this.pHeight = 128;
 	this.scale = .5;
-	this.animation = new Animation(spritesheet, this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/scourge.png"), this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
 	this.angle = 0;
+	this.spawner = spawner;
 	this.name = "Enemy";
 	this.speed = 0.55;
 	this.x = xIn;
@@ -701,7 +793,7 @@ Spawner.prototype.draw = function () {
 /* ========================================================================================================== */
 // Resource Gatherer Enemy
 /* ========================================================================================================== */
-function BiologicalResourceGatherer(game) {
+function BiologicalResourceGatherer(game, spawner) {
 
 
 	this.pWidth = 54;
@@ -717,6 +809,7 @@ function BiologicalResourceGatherer(game) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Enemy";
+	this.spawner = spawner;
 	this.x = 50;
 	this.y = 50;
 	this.angle = 0;
@@ -766,9 +859,9 @@ BiologicalResourceGatherer.prototype.update = function () {
 	//if it hasn't found its target yet, or its target has become undefined
 	if (!this.target){
 		var closest = 100000000;
-
+		this.angle += 0.0125;
 		//find the closest resource node to gather from
-		for (var i = 0; i<this.game.resources.length; i++){
+		for (var i = 0; i < this.game.resources.length; i++){
 			var ent = this.game.resources[i];
 			var d = distance(this, ent);
 			if(d < closest){
@@ -849,6 +942,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
+		this.spawner.gatherers--;
 	}
 
 	Entity.prototype.update.call(this);

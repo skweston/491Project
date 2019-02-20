@@ -52,15 +52,9 @@ SceneManager.prototype.update = function () {
 		this.changeScenes(new StoryScrollScene(game));
 		this.game.gameStart = false;
 	}
-	if (this.currentScene.bossTimer > 0){
-		this.currentScene.bossTimer--;
-	}
-	if (this.game.running && this.currentScene.bossTimer === 0) {
-		this.currentScene.bossTimer = this.currentScene.bossTimerStart;
-		this.currentScene.addBoss();
-	}
 
-	this.spawnAtRandom();
+
+//	this.spawnAtRandom();
 
 	if (this.game.ship.health < 1) {
 		//var audio = document.createElement('audio');
@@ -309,9 +303,17 @@ function PrototypeLevel(game) {
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 
-	this.playerSpaceStation = new SpaceStation(this.game);
+	//this spawns and places the player base
+	this.playerSpaceStation = new SpaceStation(this.game, 300, 300);
 	this.game.addEntity(this.playerSpaceStation);
 	this.entities.push(this.playerSpaceStation);
+	//this spawns the enemy base
+	this.enemySpaceStation = new AlienSpaceStation(this.game, 2500, 2500);
+	this.game.addEntity(this.enemySpaceStation);
+	this.entities.push(this.enemySpaceStation);
+
+	this.game.playerResources = 150;
+	this.game.enemyResources = 100;
 
 	this.hud = new HUD(this.game); //mandatory
 	this.game.addEntity(this.hud);

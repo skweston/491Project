@@ -1,10 +1,11 @@
-function PurpleChroma(game) {
+function PurpleChroma(game, spawner) {
 
 	this.pWidth = 32;
 	this.pHeight = 32;
 	this.scale = 2;
 	this.animation = new Animation(AM.getAsset("./img/PurpleChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
 	this.angle = 0;
+	this.spawner = spawner
 	this.name = "Ally";
 	this.maxSpeed = 0.65;
 	this.speed = this.maxSpeed;
@@ -19,7 +20,8 @@ function PurpleChroma(game) {
 	this.health = 75;
 	this.damage = 20;
 	this.target = null;
-	this.shootCooldown = 100;
+	this.fullShootCooldown = 20;
+	this.shootCooldown = this.fullShootCooldown;
 	//console.log("starting health: " + this.health);
 	Entity.call(this, game, this.x, this.y);
 }
@@ -62,7 +64,7 @@ PurpleChroma.prototype.update = function () {
 		}
 
 		//if it hasn't found its target yet, or its target has become undefined
-		if (!this.target){
+		if (true){
 			var closest = 100000000;
 
 			//find the closest resource node to gather from
@@ -86,11 +88,17 @@ PurpleChroma.prototype.update = function () {
 		}
 		if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
 			this.createProjectile("Primary", 0, 0);
-			this.shootCooldown = 100;
+			this.shootCooldown = this.fullShootCooldown;
 		}
-		// move the thing
+		if(this.target && 300 > distance(this,this.target)){
+			this.speed = -this.maxSpeed * .5;
+		}else if (this.target && 500 < distance(this, this.target)){
+			this.speed = this.maxSpeed;
+		}
+
 		this.x += Math.cos(this.angle) * 10 * this.speed;
 		this.y += Math.sin(this.angle) * 10 * this.speed;
+
 
 		//update its hitbox
 		this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
@@ -146,6 +154,7 @@ PurpleChroma.prototype.update = function () {
 		if (this.removeFromWorld) {
 			var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 			this.game.addEntity(explosion);
+			this.spawner.spawns--;
 		}
 
 		Entity.prototype.update.call(this);
@@ -171,7 +180,7 @@ PurpleChroma.prototype.draw = function () {
 /* ========================================================================================================== */
 // Spawner - allied space station
 /* ========================================================================================================== */
-function SpaceStation(game) {
+function SpaceStation(game, x, y) {
     //Specific to spawners:
     this.timerReset = 500;
     this.generateGatherer = this.timerReset;
@@ -182,8 +191,8 @@ function SpaceStation(game) {
     this.scale = .5;
 	this.animation = new Animation(AM.getAsset("./img/SpaceStation.png"), this.pWidth, this.pHeight, 1024, 0.25, 2, true, this.scale);
     this.name = "Ally";
-    this.x = 500;
-    this.y = 500;
+    this.x = x;
+    this.y = y;
     this.xMid = this.x + (this.pWidth * this.scale) / 2;
     this.yMid = this.y + (this.pHeight * this.scale) / 2;
     this.radius = 475 * this.scale;
@@ -197,6 +206,8 @@ function SpaceStation(game) {
 
 	//the spawns that the spawner 'owns'
 	this.spawns = 0;
+	this.maxGatherers = 10;
+	this.gatherers = 0;
 }
 SpaceStation.prototype = new Entity();
 SpaceStation.prototype.constructor = SpaceStation;
@@ -221,16 +232,17 @@ SpaceStation.prototype.update = function () {
     //this.angle *= 180 / Math.PI;
 */
 	//timer reaches 0 Enter
-	if(this.generateGatherer <1){
-		var ent = new MechanicalResourceGatherer(this.game);
+	if(this.gatherers < this.maxGatherers && this.generateGatherer <1){
+		var ent = new MechanicalResourceGatherer(this.game, this);
 
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
-		this.generateGatherer = 1000;
+		this.generateGatherer = this.timerReset;
+		this.gatherers++;
 	}
     if (this.spawns < this.maxSpawn && this.game.playerResources > 100 ){
-		var ent = new PurpleChroma(this.game);
+		var ent = new PurpleChroma(this.game, this);
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
@@ -254,7 +266,7 @@ SpaceStation.prototype.draw = function () {
 /* ========================================================================================================== */
 // Resource Gatherer Enemy
 /* ========================================================================================================== */
-function MechanicalResourceGatherer(game) {
+function MechanicalResourceGatherer(game, spawner) {
 
 
 	this.pWidth = 40;
@@ -270,6 +282,7 @@ function MechanicalResourceGatherer(game) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Ally";
+	this.spawner = spawner;
 	this.x = 50;
 	this.y = 50;
 	this.angle = 0;
@@ -318,10 +331,11 @@ MechanicalResourceGatherer.prototype.update = function () {
 
 	//if it hasn't found its target yet, or its target has become undefined
 	if (!this.target){
+		this.angle += 0.0125;
 		var closest = 100000000;
 
 		//find the closest resource node to gather from
-		for (var i = 0; i<this.game.resources.length; i++){
+		for (var i = 0; i < this.game.resources.length; i++){
 			var ent = this.game.resources[i];
 			var d = distance(this, ent);
 			if(d < closest){
@@ -402,6 +416,7 @@ MechanicalResourceGatherer.prototype.update = function () {
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
+		this.spawner.gatherers--;
 	}
 
 	Entity.prototype.update.call(this);

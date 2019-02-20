@@ -431,9 +431,11 @@ AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
 AM.queueDownload("./img/BossExplosion.png");
 AM.queueDownload("./img/Leech.png");
+AM.queueDownload("./img/scourge.png");
+
 
 AM.queueDownload("./img/BiologicalResourceGatherer.png");
-AM.queueDownload("./img/scourge.png");
+AM.queueDownload("./img/AlienSpaceStation.png");
 AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
