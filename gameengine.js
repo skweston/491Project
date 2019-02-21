@@ -51,6 +51,8 @@ function GameEngine() {
 	this.mouseY = 0;
 	this.firePrimary = false;
 	this.fireSecondary = false;
+	this.swapPrimary = false;
+	this.swapSecondary = false;
 	this.bomb = false;
 	this.moveUp = false;
 	this.moveLeft = false;
@@ -232,13 +234,15 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "AltLeft") {
 			that.gameStart = true;
 		}
-		if(e.code === "KeyV") {
+		if (e.code === "KeyV") {
 			//console.log("V detected");
 			that.gameStart = true;
 		}
-		if(e.code === "KeyV") {
-			//console.log("V detected");
-			that.gameStart = true;
+		if (e.code === "Digit1") {
+			that.swapPrimary = true;
+		}
+		if (e.code === "Digit2") {
+			that.swapSecondary = true;
 		}
 	}, false);
 
@@ -519,6 +523,8 @@ GameEngine.prototype.update = function () {
 	this.wasclicked = false;
 	this.roll = false;
 	this.bomb = false;
+	this.swapPrimary = false;
+	this.swapSecondary = false;
 }
 
 GameEngine.prototype.loop = function () {

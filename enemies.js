@@ -312,7 +312,9 @@ BossTurret.prototype.update = function () {
 		if(Collide(this, ent)){
 
 			this.takeDamage(ent.damage);
-			ent.removeFromWorld = true;
+			if (!ent.pierce) {
+				ent.removeFromWorld = true;
+			}
 		}
 	}
     var dx = this.game.ship.xMid - this.xMid-1;
@@ -527,7 +529,9 @@ Leech.prototype.update = function () {
 		var ent = this.game.playerProjectiles[i];
 		if (Collide(this, ent)) {
 			this.takeDamage(ent.damage);
-			ent.removeFromWorld = true;
+			if (!ent.pierce) {
+				ent.removeFromWorld = true;
+			}
 			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
 			splatter.angle = this.angle;
 			this.game.addEntity (splatter);
@@ -710,7 +714,9 @@ Scourge.prototype.update = function () {
 		var ent = this.game.playerProjectiles[i];
 		if (Collide(this, ent)) {
 			this.takeDamage(ent.damage);
-			ent.removeFromWorld = true;
+			if (!ent.pierce) {
+				ent.removeFromWorld = true;
+			}
 			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
 			splatter.angle = this.angle;
 			this.game.addEntity (splatter);
