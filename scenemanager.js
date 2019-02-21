@@ -166,7 +166,20 @@ function PrototypeLevel(game) {
 	//this only allows for one type of random spawn per level at the moment
 	this.random = function (x, y)  {
 		//return new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
-		return new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);//swapped x and y
+		/*return new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);//swapped x and y
+		var openGate = x % 3;
+		switch (openGate) {
+			case 0:
+				return new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
+				break;
+			case 1:
+				return new Leech(this.game, AM.getAsset("./img/Leech.png"), x, y);
+				break;
+			case 2:*/
+				return new Stalker(this.game, AM.getAsset("./img/stalker.png"), x, y);
+		/*		break;
+			default:
+		*/		//astroid? other enemy? Add your enemy <-here 1800-def-ault;
 
 	};
 }

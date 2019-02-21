@@ -250,6 +250,8 @@ Camera.prototype.draw = function (cameraCtx) {
 };
 
 Camera.prototype.update = function () {
+	console.log(`${this.x} x, ${this.y} y,
+		 				${this.ctx.canvas.width} CW, ${this.ctx.canvas.height} CH`);
 	// this.game.reticle.x =
 	// this.game.reticle.y =
 	// this.x = this.game.ship.xMid - this.ctx.canvas.width/2;
@@ -452,7 +454,6 @@ BackgroundLayer.prototype.update = function () {
 var AM = new AssetManager();
 
 AM.queueDownload("./img/PScroll1/space.png");
-AM.queueDownload("./img/Uberspace.png");
 AM.queueDownload("./img/4kBackground1.png");
 AM.queueDownload("./img/4kBackground2.png");
 AM.queueDownload("./img/PScroll1/cloud.png");
@@ -479,9 +480,9 @@ AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
 AM.queueDownload("./img/BossExplosion.png");
 AM.queueDownload("./img/Leech.png");
-
 AM.queueDownload("./img/scourge.png");
 AM.queueDownload("./img/SpawnDoor.png");
+AM.queueDownload("./img/stalker.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
 AM.queueDownload("./img/SPACEFIGHT.png");
@@ -498,8 +499,6 @@ AM.downloadAll(function () {
 	//danny fiddling:
 	gameEngine.ctx = ctx;
 	gameEngine.init(ctx, cameraCtx);
-
-
 	gameEngine.running = false;
 
 	var ship = new TheShip(gameEngine);
