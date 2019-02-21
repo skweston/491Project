@@ -601,9 +601,9 @@ Spawner.prototype.draw = function () {
 
 function Stalker(game, spritesheet, xIn, yIn){
 
-		this.pWidth = 128;
-		this.pHeight = 128;
-		this.scale = .5;
+		this.pWidth = 32;
+		this.pHeight = 32;
+		this.scale = 2;
 		this.animation = new Animation(spritesheet, this.pWidth, this.pHeight,
 										512, 0.1, 5, true, this.scale);
 										/*swap these two for HD sprite*/

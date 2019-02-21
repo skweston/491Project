@@ -176,7 +176,7 @@ function PrototypeLevel(game) {
 				return new Leech(this.game, AM.getAsset("./img/Leech.png"), x, y);
 				break;
 			case 2:*/
-				return new Stalker(this.game, AM.getAsset("./img/stalker.png"), x, y);
+				return new Stalker(this.game, AM.getAsset("./img/stalker32.png"), x, y);
 		/*		break;
 			default:
 		*/		//astroid? other enemy? Add your enemy <-here 1800-def-ault;

@@ -482,7 +482,7 @@ AM.queueDownload("./img/BossExplosion.png");
 AM.queueDownload("./img/Leech.png");
 AM.queueDownload("./img/scourge.png");
 AM.queueDownload("./img/SpawnDoor.png");
-AM.queueDownload("./img/stalker.png");
+AM.queueDownload("./img/stalker32.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
 AM.queueDownload("./img/SPACEFIGHT.png");
