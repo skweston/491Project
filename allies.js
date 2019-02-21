@@ -54,108 +54,81 @@ PurpleChroma.prototype.createProjectile = function(type, offset, adjustAngle) {
 }
 PurpleChroma.prototype.update = function () {
 
-		this.shootCooldown--;
+	this.shootCooldown--;
 
-		//something likethis for an Effect
-		//this.lifetime--;
-		if (this.health < 1){
-			this.removeFromWorld = true;
-			return;
-		}
+	//if it hasn't found its target yet, or its target has become undefined
+	if (true){
+		var closest = 100000000;
 
-		//if it hasn't found its target yet, or its target has become undefined
-		if (true){
-			var closest = 100000000;
-
-			//find the closest resource node to gather from
-			for (var i = 0; i<this.game.enemies.length; i++){
-				var ent = this.game.enemies[i];
-				var d = distance(this, ent);
-				if(d < closest){
-					closest = d;
-					this.target = ent;
-
+		//find the closest resource node to gather from
+		for (var i = 0; i<this.game.enemies.length; i++){
+			var ent = this.game.enemies[i];
+			var d = distance(this, ent);
+			if(d < closest){
+				closest = d;
+				this.target = ent;
 				}
+		}
+	}
+
+	// update angle
+	if(this.target){
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.angle = -Math.atan2(dy,dx);
+	}
+	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
+		this.createProjectile("Primary", 0, 0);
+		this.shootCooldown = this.fullShootCooldown;
+	}
+	if(this.target && 300 > distance(this,this.target)){
+		this.speed = -this.maxSpeed * .5;
+	}else if (this.target && 500 < distance(this, this.target)){
+		this.speed = this.maxSpeed;
+	}
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	//update its hitbox
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	// check collision with player projectiles
+	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
+		var ent = this.game.enemyProjectiles[i];
+		if (Collide(this, ent)) {
+			this.takeDamage(end.damage);
+			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
+			this.game.addEntity (splatter);
+			if (this.health < 1) {
+				break;
 			}
 		}
-
-
-		// update angle
-		if(this.target){
-			var dx = this.target.xMid - this.xMid;
-			var dy = this.yMid - this.target.yMid;
-			this.angle = -Math.atan2(dy,dx);
-		}
-		if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
-			this.createProjectile("Primary", 0, 0);
-			this.shootCooldown = this.fullShootCooldown;
-		}
-		if(this.target && 300 > distance(this,this.target)){
-			this.speed = -this.maxSpeed * .5;
-		}else if (this.target && 500 < distance(this, this.target)){
-			this.speed = this.maxSpeed;
-		}
-
-		this.x += Math.cos(this.angle) * 10 * this.speed;
-		this.y += Math.sin(this.angle) * 10 * this.speed;
-
-
-		//update its hitbox
-		this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-		this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-
-
-		// check collision with player projectiles
-		for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
-			var ent = this.game.enemyProjectiles[i];
-			if (Collide(this, ent)) {
-				this.takeDamage(end.damage);
-				ent.removeFromWorld = true;
-				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-				splatter.angle = this.angle;
-				this.game.addEntity (splatter);
-				if (this.health < 1) {
-					break;
-				}
-			}
-		}
-
-
+	}
 
 
 		// check health
-		if (this.health < 1) {
-			//SCORE++; //how many points is it worth
-
-			for(var i = 0; i < 1; i++){
-				var scrap = new Scrap(this.game);
-				scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-				scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-				scrap.xMid = this.xMid;
-				scrap.yMid = this.yMid;
-
-				this.game.addEntity(scrap);
-			}
-			//does it drop a powerup?
-			// if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
-			// 	var spreader = new Spreader(this.game);
-			// 	spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-			// 	spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			// 	spreader.xMid = this.xMid;
-			// 	spreader.yMid = this.yMid;
-			//
-			// 	this.game.addEntity(spreader);
-			// }
-
-			this.removeFromWorld = true;
+	if (this.health < 1) {
+		//SCORE++; //how many points is it worth
+		for(var i = 0; i < 1; i++){
+			var scrap = new Scrap(this.game);
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
+			this.game.addEntity(scrap);
 		}
+		this.removeFromWorld = true;
 
+	}
 		//does it blow up when it dies?
-		if (this.removeFromWorld) {
-			var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
-			this.game.addEntity(explosion);
-			this.spawner.spawns--;
-		}
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		this.game.addEntity(explosion);
+		this.spawner.spawns--;
+	}
 
 		Entity.prototype.update.call(this);
 
@@ -184,7 +157,7 @@ function SpaceStation(game, x, y) {
     //Specific to spawners:
     this.timerReset = 500;
     this.generateGatherer = this.timerReset;
-    this.maxSpawn = 5; // maybe make this a difficulty variable.
+    this.maxSpawn = 3; // maybe make this a difficulty variable.
 
     this.pWidth = 512;
     this.pHeight = 512;
@@ -206,7 +179,7 @@ function SpaceStation(game, x, y) {
 
 	//the spawns that the spawner 'owns'
 	this.spawns = 0;
-	this.maxGatherers = 10;
+	this.maxGatherers = 5;
 	this.gatherers = 0;
 }
 SpaceStation.prototype = new Entity();
@@ -323,14 +296,10 @@ MechanicalResourceGatherer.prototype.draw = function () {
 MechanicalResourceGatherer.prototype.update = function () {
 
 	//something likethis for an Effect
-	//this.lifetime--;
-	if (this.health < 1){
-		this.removeFromWorld = true;
-		return;
-	}
+
 
 	//if it hasn't found its target yet, or its target has become undefined
-	if (!this.target){
+	if (true){
 		this.angle += 0.0125;
 		var closest = 100000000;
 
@@ -345,27 +314,24 @@ MechanicalResourceGatherer.prototype.update = function () {
 			}
 		}
 	}
-	if (this.target && Collide(this, this.target)){
-		this.target.removeFromWorld = true;
-		this.game.playerResources += this.target.value;
-		this.target = null;
-	}
-
 	// update angle
 	if(this.target){
 		var dx = this.target.xMid - this.xMid;
 		var dy = this.yMid - this.target.yMid;
 		this.angle = -Math.atan2(dy,dx);
 	}
-
 	// move the thing
 	this.x += Math.cos(this.angle) * 10 * this.speed;
 	this.y += Math.sin(this.angle) * 10 * this.speed;
-
 	//update its hitbox
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
+	if (this.target && Collide(this, this.target)){
+		this.target.removeFromWorld = true;
+		this.game.playerResources += this.target.value;
+		this.target = null;
+	}
 
 	// check collision with enemy projectiles
 	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {

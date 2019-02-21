@@ -34,7 +34,7 @@ AlienSpaceStation.prototype = new Entity();
 AlienSpaceStation.prototype.constructor = AlienSpaceStation;
 
 AlienSpaceStation.prototype.update = function () {
-	// this.game.enemyResources++;
+	this.game.enemyResources++;
     if(this.health < 1){
       this.removeFromWorld = true;
 	  return;
@@ -43,17 +43,8 @@ AlienSpaceStation.prototype.update = function () {
 		this.health += 0.5;
 	}
 
-/* Dont need this as the spawner should remain stationary
-    //this.x += this.game.clockTick * this.speed;
-    //if (this.x > 800) this.x = -230;
-    var dx = this.game.mouseX - this.xMid-1;
-    var dy = (this.yMid - this.game.mouseY)-1;
-    // this should be the angle in radians
-    this.angle = -Math.atan2(dy,dx);
-    //if we want it in degrees
-    //this.angle *= 180 / Math.PI;
-*/
-	//timer reaches 0 Enter
+
+
 	if(this.gatherers < this.maxGatherers && this.generateGatherer <1){
 		var ent = new BiologicalResourceGatherer(this.game, this);
 
@@ -466,6 +457,7 @@ function Leech(game, xIn, yIn, spawner) {
 	this.removeFromWorld = false;
 	this.health = 50;
 	this.damage = 5;
+	this.target = null;
 
 	this.maxDamageCooldown = 50;
 	this.damageCooldown = 0;
@@ -477,18 +469,41 @@ Leech.prototype = new Entity();
 Leech.prototype.constructor = Leech;
 
 Leech.prototype.update = function () {
-	// update angle
-	var dx = this.game.ship.xMid - this.xMid;
-	var dy = this.yMid - this.game.ship.yMid;
-	this.angle = -Math.atan2(dy,dx);
 
-	// moves like Scourge
+
+	//if it hasn't found its target yet, or its target has become undefined
+	var closest = 100000000;
+	if (true){
+		this.angle += 0.0125;
+
+
+		//find the player allied ship
+		for (var i = 0; i < this.game.allies.length; i++){
+			var ent = this.game.allies[i];
+			var d = distance(this, ent);
+			if(d < closest){
+				closest = d;
+				this.target = ent;
+
+			}
+		}
+	}
+
+	if(distance(this, this.game.ship) < closest){
+		this.target = this.game.ship;
+	}
+	// update angle
+	if(this.target){
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.angle = -Math.atan2(dy,dx);
+	}
+	// move the thing
 	this.x += Math.cos(this.angle) * 10 * this.speed;
 	this.y += Math.sin(this.angle) * 10 * this.speed;
-
+	//update its hitbox
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-
 	// check collision with player projectiles
 	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
 		var ent = this.game.playerProjectiles[i];
@@ -503,6 +518,8 @@ Leech.prototype.update = function () {
 			}
 		}
 	}
+
+
 
 	// check collision with ship
 	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
@@ -530,6 +547,15 @@ Leech.prototype.update = function () {
 			}
 		}
 	}
+	if(Collide(this, this.target)){
+		this.damageCooldown--;
+		this.speed = this.target.speed;
+		if(this.damageCooldown < 0) {
+			this.damageCooldown = this.maxDamageCooldown;
+			this.target.health -= this.damage;
+		}
+	}
+
 
 	// check health
 	if (this.health < 1) {
@@ -616,6 +642,7 @@ function Scourge(game, xIn, yIn, spawner) {
 	this.removeFromWorld = false;
 	this.health = 20;
 	this.damage = 20;
+	this.target = null;
 	//console.log("starting health: " + this.health);
 	Entity.call(this, game, this.x, this.y);
 }
@@ -624,17 +651,41 @@ Scourge.prototype = new Entity();
 Scourge.prototype.constructor = Scourge;
 
 Scourge.prototype.update = function () {
-	// update angle
-	var dx = this.game.ship.xMid - this.xMid;
-	var dy = this.yMid - this.game.ship.yMid;
-	this.angle = -Math.atan2(dy,dx);
 
-	// move the scourge
-	this.x += Math.cos(this.angle) * 10 * this.speed;
-	this.y += Math.sin(this.angle) * 10 * this.speed;
 
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+		//if it hasn't found its target yet, or its target has become undefined
+		var closest = 100000000;
+		if (true){
+
+
+
+			//find the player allied ship
+			for (var i = 0; i < this.game.allies.length; i++){
+				var ent = this.game.allies[i];
+				var d = distance(this, ent);
+				if(d < closest){
+					closest = d;
+					this.target = ent;
+
+				}
+			}
+		}
+
+		if(distance(this, this.game.ship) < closest){
+			this.target = this.game.ship;
+		}
+		// update angle
+		if(this.target){
+			var dx = this.target.xMid - this.xMid;
+			var dy = this.yMid - this.target.yMid;
+			this.angle = -Math.atan2(dy,dx);
+		}
+		// move the thing
+		this.x += Math.cos(this.angle) * 10 * this.speed;
+		this.y += Math.sin(this.angle) * 10 * this.speed;
+		//update its hitbox
+		this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+		this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	// check collision with player projectiles
 	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
@@ -650,7 +701,11 @@ Scourge.prototype.update = function () {
 			}
 		}
 	}
-
+	if(Collide(this, this.target)){
+		this.target.health -= this.damage;
+		this.removeFromWorld = true;
+		
+	}
 	// check collision with ship
 	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
 		this.game.ship.takeDamage(this.damage);
@@ -858,7 +913,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 	}
 
 	//if it hasn't found its target yet, or its target has become undefined
-	if (!this.target){
+	if (true){
 		var closest = 100000000;
 		this.angle += 0.0125;
 		//find the closest resource node to gather from
