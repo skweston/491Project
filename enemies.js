@@ -16,7 +16,7 @@ function AlienSpaceStation(game, x, y) {
     this.y = y;
     this.xMid = this.x + (this.pWidth * this.scale) / 2;
     this.yMid = this.y + (this.pHeight * this.scale) / 2;
-    this.radius = 260 * this.scale;
+    this.radius = 85 * this.scale;
     this.speed = 0;
     this.angle = 0;
     this.game = game;
@@ -34,10 +34,10 @@ AlienSpaceStation.prototype = new Entity();
 AlienSpaceStation.prototype.constructor = AlienSpaceStation;
 
 AlienSpaceStation.prototype.update = function () {
-	this.game.enemyResources++;
+	// this.game.enemyResources++;
     if(this.health < 1){
       this.removeFromWorld = true;
-	  
+
 	}
 	if(this.health < 5000){
 		this.health += 0.5;
@@ -86,6 +86,14 @@ AlienSpaceStation.prototype.update = function () {
 AlienSpaceStation.prototype.draw = function () {
 	if(onCamera(this)){
 		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
 	}
     //Entity.prototype.draw.call(this);
 }
@@ -570,7 +578,7 @@ Leech.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
-		this.spawner.spawns--;
+
 		for(var i = 0; i< 2; i++){
 			var scrap = new Scrap(this.game);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
@@ -607,7 +615,7 @@ Leech.prototype.update = function () {
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
 		this.game.addEntity(explosion);
-
+		this.spawner.spawns--
 	}
 
 	Entity.prototype.update.call(this);
@@ -725,7 +733,7 @@ Scourge.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
-		this.spawner.spawns--;
+
 		if (Math.random() * 100 < 20) {
 			var spreader = new Spreader(this.game);
 			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
@@ -751,6 +759,7 @@ Scourge.prototype.update = function () {
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
 		this.game.addEntity(explosion);
+		this.spawner.spawns--;
 	}
 
 	Entity.prototype.update.call(this);
@@ -887,7 +896,7 @@ function BiologicalResourceGatherer(game, spawner) {
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;
 	this.yMid = this.y + (this.pHeight * this.scale) / 2;
-	this.radius = 40 * this.scale;
+	this.radius = 18 * this.scale;
 
 //this is for movement
 	this.speed = .35;
@@ -910,6 +919,14 @@ BiologicalResourceGatherer.prototype.draw = function () {
 	if(onCamera(this)){
   		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
   	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
 	Entity.prototype.draw.call(this);
 }
 

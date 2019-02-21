@@ -1,5 +1,5 @@
 // useful global things here
-var SHOW_HITBOX = false;
+var SHOW_HITBOX = true;
 var SCORE = 0;
 
 /*
@@ -418,7 +418,8 @@ AM.queueDownload("./img/BlackWhiteChroma.png");
 AM.queueDownload("./img/MechanicalResourceGatherer.png");
 AM.queueDownload("./img/SpaceStation.png");
 
-
+//Terrain
+AM.queueDownload("./img/Asteroid.png");
 
 //drops and powerups
 AM.queueDownload("./img/RepairDrop.png");

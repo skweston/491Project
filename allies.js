@@ -13,7 +13,7 @@ function PurpleChroma(game, spawner) {
 	this.y = 0;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 30 * this.scale;
+	this.radius = 5.4 * this.scale;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -157,7 +157,7 @@ function SpaceStation(game, x, y) {
     //Specific to spawners:
     this.timerReset = 500;
     this.generateGatherer = this.timerReset;
-    this.maxSpawn = 3; // maybe make this a difficulty variable.
+    this.maxSpawn = 5; // maybe make this a difficulty variable.
 
     this.pWidth = 512;
     this.pHeight = 512;
@@ -232,6 +232,14 @@ SpaceStation.prototype.draw = function () {
 	if(onCamera(this)){
 		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
     //Entity.prototype.draw.call(this);
 }
 
@@ -267,7 +275,7 @@ function MechanicalResourceGatherer(game, spawner) {
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;
 	this.yMid = this.y + (this.pHeight * this.scale) / 2;
-	this.radius = 40 * this.scale;
+	this.radius = 18 * this.scale;
 
 //this is for movement
 	this.speed = .35;
@@ -290,6 +298,14 @@ MechanicalResourceGatherer.prototype.draw = function () {
 	if(onCamera(this)){
   		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
   	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
 	Entity.prototype.draw.call(this);
 }
 

@@ -256,7 +256,7 @@ GameEngine.prototype.addEntity = function (entity) {
 		this.allies.push(entity);
 	}
 	if(entity.name == "Terrain") {
-		this.allies.push(entity);
+		this.terrain.push(entity);
 	}
 
 	if (entity.name === "Level") {

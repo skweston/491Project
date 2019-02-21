@@ -107,7 +107,7 @@ function RepairDrop(game) {
 	this.y = 0;
 	this.xMid = 0;
 	this.yMid = 0;
-	this.radius = this.scale * 42;
+	this.radius = this.scale * 128;
 	this.angle = 0;
 
 	this.lifetime = 500;

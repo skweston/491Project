@@ -304,10 +304,17 @@ function PrototypeLevel(game) {
 	this.entities.push(this.background);
 
 	//this spawns and places the player base
+	this.rock1 = new Asteroid(this.game, 300, 300);
+	this.game.addEntity(this.rock1);
+	this.entities.push(this.rock1);
 	this.playerSpaceStation = new SpaceStation(this.game, 300, 300);
 	this.game.addEntity(this.playerSpaceStation);
 	this.entities.push(this.playerSpaceStation);
 	//this spawns the enemy base
+	this.rock2 = new Asteroid(this.game, 2500, 2500);
+	this.game.addEntity(this.rock2);
+	this.entities.push(this.rock2);
+
 	this.enemySpaceStation = new AlienSpaceStation(this.game, 2500, 2500);
 	this.game.addEntity(this.enemySpaceStation);
 	this.entities.push(this.enemySpaceStation);
