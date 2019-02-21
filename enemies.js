@@ -37,7 +37,7 @@ AlienSpaceStation.prototype.update = function () {
 	this.game.enemyResources++;
     if(this.health < 1){
       this.removeFromWorld = true;
-	  return;
+	  
 	}
 	if(this.health < 5000){
 		this.health += 0.5;
@@ -70,6 +70,16 @@ AlienSpaceStation.prototype.update = function () {
     }
 	this.generateGatherer -= 1;
 	this.angle += 0.0075;
+
+	for (var i = 0; i<this.game.playerProjectiles.length; i++){
+		var ent = this.game.playerProjectiles[i];
+		if(Collide(this, ent)){
+			this.takeDamage(ent.damage);
+			ent.removeFromWorld = true;
+		}
+	}
+
+
     Entity.prototype.update.call(this);
 }
 
@@ -704,7 +714,7 @@ Scourge.prototype.update = function () {
 	if(Collide(this, this.target)){
 		this.target.health -= this.damage;
 		this.removeFromWorld = true;
-		
+
 	}
 	// check collision with ship
 	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
