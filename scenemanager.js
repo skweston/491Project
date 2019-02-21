@@ -12,9 +12,14 @@ SceneManager.prototype.constructor = SceneManager;
 SceneManager.prototype.reset = function () {
 	this.game.running = false;
 	this.game.clicked = false;
+	this.game.playerResources = 0;
+	this.game.enemyResources = 0;
 
 	for (var i = 0; i < this.game.extras.length; i++) {
 		this.game.extras[i].removeFromWorld = true;
+	}
+	for (var i = 0; i < this.game.allies.length; i++) {
+		this.game.allies[i].removeFromWorld = true;
 	}
 	for (var i = 0; i < this.game.enemies.length; i++){
 		this.game.enemies[i].removeFromWorld = true;
@@ -24,6 +29,12 @@ SceneManager.prototype.reset = function () {
 	}
 	for(var i = 0; i< this.game.playerProjectiles.length; i++){
 		this.game.playerProjectiles[i].removeFromWorld = true;
+	}
+	for(var i = 0; i< this.game.resources.length; i++){
+		this.game.resources[i].removeFromWorld = true;
+	}
+	for (var i = 0; i < this.game.effects.length; i++) {
+		this.game.effects[i].removeFromWorld = true;
 	}
 
 	var ship = new TheShip(this.game);
@@ -41,15 +52,9 @@ SceneManager.prototype.update = function () {
 		this.changeScenes(new StoryScrollScene(game));
 		this.game.gameStart = false;
 	}
-	if (this.currentScene.bossTimer > 0){
-		this.currentScene.bossTimer--;
-	}
-	if (this.game.running && this.currentScene.bossTimer === 0) {
-		this.currentScene.bossTimer = this.currentScene.bossTimerStart;
-		this.currentScene.addBoss();
-	}
 
-	this.spawnAtRandom();
+
+//	this.spawnAtRandom();
 
 	if (this.game.ship.health < 1) {
 		//var audio = document.createElement('audio');
@@ -206,7 +211,7 @@ function SplashScene(game) {
 	this.entities.push(this.title);
 
 	this.scroll = null;
-}	
+}
 
 SplashScene.prototype.constructor = SplashScene;
 
@@ -277,7 +282,7 @@ StoryScroll1.prototype.update = function () {
 	if(this.lift === -1400 || this.game.clicked) {
 		this.isDone = true;
 		//To test new level, swap level here.
-		this.game.sceneManager.changeScenes(new PrototypeLevel(this.game)); 
+		this.game.sceneManager.changeScenes(new PrototypeLevel(this.game));
 	}
 	Entity.prototype.update.call(this);
 }
@@ -291,15 +296,55 @@ function PrototypeLevel(game) {
 	this.spawnTimer = this.spawnTimerStart;
 	this.counter = 0;
 
-	this.entities = []; 
+
+
+	this.entities = [];
 	this.background = new Background(this.game, AM.getAsset("./img/4kBackground1.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
+
+	//this spawns and places the player base
+	this.rock1 = new Asteroid(this.game, 300, 300);
+	this.game.addEntity(this.rock1);
+	this.entities.push(this.rock1);
+
+	this.playerSpaceStation = new SpaceStation(this.game, 300, 300, this.rock1);
+	this.game.addEntity(this.playerSpaceStation);
+	this.entities.push(this.playerSpaceStation);
+
+	this.rock1.hasbase = true;
+	this.rock1.base = this.playerSpaceStation;
+
+	this.testBuilder = new PlayerBuilder(this.game, this.playerSpaceStation);
+	this.game.addEntity(this.testBuilder);
+
+
+	//this spawns the enemy base
+	this.rock2 = new Asteroid(this.game, 2500, 2500);
+	this.game.addEntity(this.rock2);
+	this.entities.push(this.rock2);
+
+	this.enemySpaceStation = new AlienSpaceStation(this.game, 2500, 2500, this.rock2);
+	this.game.addEntity(this.enemySpaceStation);
+	this.entities.push(this.enemySpaceStation);
+
+	this.rock2.hasbase = true;
+	this.rock2.base = this.enemySpaceStation;
+
+	//Neutral rock
+	this.rock3 = new Asteroid(this.game, 650, 300);
+	this.game.addEntity(this.rock3);
+	this.entities.push(this.rock3);
+
+	this.game.playerResources = 150;
+	this.game.enemyResources = 100;
 
 	this.hud = new HUD(this.game); //mandatory
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
 	this.game.sceneManager.loadPlayer(); //mandatory
+
+
 }
 
 PrototypeLevel.prototype.randomSpawns = function (x, y) {
@@ -307,7 +352,9 @@ PrototypeLevel.prototype.randomSpawns = function (x, y) {
 	if(Math.random() * 100 < 50){
 		newSpawn = new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
 	}else{
-		newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
+		// console.log("Spawning a resource gatherer");
+		newSpawn = new BiologicalResourceGatherer(this.game);
+		//newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
 	}
 
 	this.entities.push(newSpawn);
