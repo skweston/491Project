@@ -31,11 +31,16 @@ function GameEngine() {
 	this.background = [];
 	this.player = [];
 	this.enemies = [];
+	this.allies = [];
 	this.playerProjectiles = [];
 	this.enemyProjectiles = [];
 	this.extras = [];
 	this.effects = [];
 	this.elements = [];
+	this.resources = [];
+	this.terrain = [];
+	this.playerResources = 0;
+	this.enemyResources = 0;
 
 	// start the game
 	this.mouse = false;
@@ -46,6 +51,8 @@ function GameEngine() {
 	this.mouseY = 0;
 	this.firePrimary = false;
 	this.fireSecondary = false;
+	this.swapPrimary = false;
+	this.swapSecondary = false;
 	this.bomb = false;
 	this.moveUp = false;
 	this.moveLeft = false;
@@ -224,12 +231,18 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "ShiftLeft") {
 			that.boost = false;
 		}
-		/*if (e.code === "AltLeft") {
+		if (e.code === "AltLeft") {
 			that.gameStart = true;
-		}*/
-		if(e.code === "KeyV") {
+		}
+		if (e.code === "KeyV") {
 			//console.log("V detected");
 			that.gameStart = true;
+		}
+		if (e.code === "Digit1") {
+			that.swapPrimary = true;
+		}
+		if (e.code === "Digit2") {
+			that.swapSecondary = true;
 		}
 	}, false);
 
@@ -243,9 +256,18 @@ GameEngine.prototype.addEntity = function (entity) {
 	if(entity.name == "Element") {
 		this.elements.push(entity);
 	}
+	if(entity.name == "Ally") {
+		this.allies.push(entity);
+	}
+	if(entity.name == "Terrain") {
+		this.terrain.push(entity);
+	}
 
 	if (entity.name === "Level") {
 		this.levels.push(entity);
+	}
+	if (entity.name === "Resource") {
+		this.resources.push(entity);
 	}
 	if (entity.name === "Background") {
 		this.background.push(entity);
@@ -285,7 +307,17 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].draw(this.ctx);
 	}
-	
+	for (var i = 0; i < this.terrain.length; i++) {
+		this.terrain[i].draw(this.ctx);
+	}
+
+	for (var i = 0; i < this.resources.length; i++) {
+		this.resources[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.allies.length; i++) {
+		this.allies[i].draw(this.ctx);
+	}
+
 	for(var i = 0; i < this.elements.length; i++) {
 		this.elements[i].draw(this.ctx);
 	}
@@ -358,7 +390,44 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}*/
+	count = this.resources.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.resources[i];
+		if (entity.removeFromWorld) {
+			this.resources.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
 
+	count = this.terrain.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.terrain[i];
+		if (entity.removeFromWorld) {
+			this.terrain.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
+	count = this.allies.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.allies[i];
+		if (entity.removeFromWorld) {
+			this.allies.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
 
 	count = this.elements.length;
 	for (var i = 0; i < count; i++) {
@@ -427,6 +496,7 @@ GameEngine.prototype.update = function () {
 	for (var i = 0; i < count; i++) {
 		var entity = this.enemies[i];
 		if (entity.removeFromWorld) {
+			entity.generateItem();
 			this.enemies.splice(i, 1);
 			count--;
 			i--;
@@ -453,6 +523,8 @@ GameEngine.prototype.update = function () {
 	this.wasclicked = false;
 	this.roll = false;
 	this.bomb = false;
+	this.swapPrimary = false;
+	this.swapSecondary = false;
 }
 
 GameEngine.prototype.loop = function () {
@@ -508,7 +580,7 @@ Entity.prototype.takeDamage = function(damage) {
 
 	// The entity taking damage is relevant?
 	//console.log("This:");
-	if (this.name === 'Player' || this.name === 'Enemy') {
+	if (this.name === 'Player' || this.name === 'Enemy' || this.name === "Ally") {
 
 		// Is it a Player? if so make sure its not invincible
 		//console.log(`if: ${this.name}`);
@@ -519,4 +591,56 @@ Entity.prototype.takeDamage = function(damage) {
 			this.health -= damage;
 		}
 	}
+}
+
+Entity.prototype.generateItem = function() {
+	//can use this.name to check for enemy or boss to change odds or item drop potential
+	//console.log(`${dice} ${this.name}`);
+	var dice = Math.random()*100;
+	switch (this.name) {
+		case 'Enemy':
+			if (dice < 50) {
+							var repair = new RepairDrop(this.game);
+							repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
+							repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
+							repair.xMid = this.xMid;
+							repair.yMid = this.yMid;
+							this.game.addEntity(repair);
+
+			} else {
+							var spreader = new Spreader(this.game);
+							spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+							spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+							spreader.xMid = this.xMid;
+							spreader.yMid = this.yMid;
+
+							this.game.addEntity(spreader);
+			}
+			break;
+		case 'Boss':
+			if (dice < 100) { //the boss always drops something
+				if(dice < 85){
+					var repair = new RepairDrop(this.game);
+					repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
+					repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
+					repair.xMid = this.xMid;
+					repair.yMid = this.yMid;
+					this.game.addEntity(repair);
+
+				} else {
+					var spreader = new Spreader(this.game);
+					spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+					spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+					spreader.xMid = this.xMid;
+					spreader.yMid = this.yMid;
+
+					this.game.addEntity(spreader);
+				}
+			}
+			break;
+		default:
+			break;
+
+	}
+
 }

@@ -407,12 +407,31 @@ AM.queueDownload("./img/shipBoost.png");
 AM.queueDownload("./img/shipRoll.png");
 AM.queueDownload("./img/shipBoostRoll.png");
 AM.queueDownload("./img/shipReticle.png");
+AM.queueDownload("./img/shipPrimary0.png");
 AM.queueDownload("./img/shipPrimary1.png");
-AM.queueDownload("./img/shipSecondary1.png");
+AM.queueDownload("./img/shipPrimary2.png");
+AM.queueDownload("./img/shipPrimary3Idle.png");
+AM.queueDownload("./img/shipPrimary3Burst.png");
+AM.queueDownload("./img/shipSecondary0.png");
+AM.queueDownload("./img/shipSecondary1Idle.png");
+AM.queueDownload("./img/shipSecondary1Homing.png");
+
+//Allies
+AM.queueDownload("./img/GreenChroma.png");
+AM.queueDownload("./img/PurpleChroma.png");
+AM.queueDownload("./img/RedChroma.png");
+AM.queueDownload("./img/BlackWhiteChroma.png");
+AM.queueDownload("./img/MechanicalResourceGatherer.png");
+AM.queueDownload("./img/SpaceStation.png");
+AM.queueDownload("./img/PlayerBuilder.png");
+
+//Terrain
+AM.queueDownload("./img/Asteroid.png");
 
 //drops and powerups
 AM.queueDownload("./img/RepairDrop.png");
 AM.queueDownload("./img/spreader.png");
+AM.queueDownload("./img/scrap.png");
 
 // enemies
 AM.queueDownload("./img/Boss1.png");
@@ -420,8 +439,11 @@ AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
 AM.queueDownload("./img/BossExplosion.png");
 AM.queueDownload("./img/Leech.png");
-
 AM.queueDownload("./img/scourge.png");
+
+
+AM.queueDownload("./img/BiologicalResourceGatherer.png");
+AM.queueDownload("./img/AlienSpaceStation.png");
 AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
@@ -447,15 +469,15 @@ AM.downloadAll(function () {
 	var reticle = new Reticle(gameEngine);
 	//var background = new Background(gameEngine, AM.getAsset("./img/4kBackground1.png"));
 	//var pg = new PlayGame(gameEngine);
-	
+
 	//pg.loadGame();
-	
+
 
 
 	gameEngine.addEntity(ship);
 	gameEngine.addEntity(reticle);
 	//gameEngine.addEntity(background);
-	
+
 
 	gameEngine.ship = ship;
 	gameEngine.cameraTrick = cameraTrick;
@@ -466,6 +488,6 @@ AM.downloadAll(function () {
 	//console.log(gameEngine);
 	//var pg = new PlayGame(gameEngine);
 	//gameEngine.addEntity(pg);
-	
+
 	console.log("All Done!");
 });
