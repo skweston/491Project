@@ -13,6 +13,7 @@ function TheShip(game) {
 	this.rollAnimation = new Animation(AM.getAsset("./img/shipRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
 	this.boostRollAnimation = new Animation(AM.getAsset("./img/shipBoostRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, 0.25);
+	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipIdle.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, 0.3);
 
 	this.invincible = false;
 	this.name = "Player";
@@ -34,14 +35,23 @@ function TheShip(game) {
 	// weapons
 	this.primaryType = 0;
 	this.primaryTimer = 0;
-	this.secondaryType = 1;
+	this.secondaryType = 0;
 	this.secondaryTimer = 0;
+	this.orbiterAngle = 0;
+	this.orbiter1 = {x: 0, y: 0};
+	this.orbiter2 = {x: 0, y: 0};
 	this.bombType = 0;
 	this.bombTimer = 0;
 
-	// miscellaneous
+	// power ups
+	this.boostLevel = 0;
+	this.boostTimer = 0;
+	this.powerLevel = 0;
+	this.powerTimer = 0;
 	this.spreaderLevel = 0;
 	this.spreaderTimer = 0;
+
+	// miscellaneous
 	this.boostGainRate = 1;
 	this.boostConsumeRate = 2;
 	this.bombAmmo = 0;
@@ -59,10 +69,10 @@ TheShip.prototype.update = function () {
 	if(this.health < 1){
 		this.removeFromWorld = true;
 	}
+
 	// boosting
 	this.speed = 0.5;
 	this.boosting = false;
-
 	if (this.game.boost && !this.rolling && this.boost > 1) {
 		this.cancelBoost = false;
 		this.boosting = true;
@@ -110,7 +120,6 @@ TheShip.prototype.update = function () {
 			xMove += 10 * this.speed;
 		}
 	}
-
 	if (xMove === 0) {
 		this.y += yMove;
 		if(this.game.camera.isScrolling){
@@ -181,50 +190,114 @@ TheShip.prototype.update = function () {
 		this.spreaderLevel = 0;
 	}
 
+	// primary weapons
+	this.orbiterAngle += 0.1;
+	if (this.orbiterAngle >= 360) {
+		this.orbiterAngle = 0;
+	}
+	this.orbiter1.x = this.xMid + 100 * Math.cos(this.orbiterAngle / Math.PI);
+	this.orbiter1.y = this.yMid + 100 * Math.sin(this.orbiterAngle / Math.PI);
+	this.orbiter2.x = this.xMid - 100 * Math.cos(this.orbiterAngle / Math.PI);
+	this.orbiter2.y = this.yMid - 100 * Math.sin(this.orbiterAngle / Math.PI);
+
 	if (this.game.firePrimary && this.primaryTimer === 0) {
 		if (this.primaryType === 0) { // laser
 			this.primaryTimer = 10;
 
 			for (var i = 0; i < 2; i++) {
-				var offset = (4 * Math.pow(-1, i));
+				var offset = (0.5 * Math.pow(-1, i));
 				this.createProjectile("P0", offset, 0);
 			}
 			if (this.spreaderLevel > 0) {
 				for (var i = 0; i < 2; i++) {
 					for (var j = 0; j < 2; j++) {
-						var offset = (4 * Math.pow(-1, j));
+						var offset = (0.5 * Math.pow(-1, j));
 						this.createProjectile("P0", offset, ((Math.PI / 12) * Math.pow(-1, i)));
 					}
 					if (this.spreaderLevel > 1) {
 						for (var j = 0; j < 2; j++) {
-							var offset = (4 * Math.pow(-1, j));
+							var offset = (0.5 * Math.pow(-1, j));
 							this.createProjectile("P0", offset, ((Math.PI / 6) * Math.pow(-1, i)));
 						}
 					}
 				}
 			}
+			if (this.secondaryType === 3) { // orbiters
+				this.createOrbiterProjectile("P0", 0, 0);
+			}
 		}
 		if (this.primaryType === 1) { // wave
 			this.primaryTimer = 20;
-			this.createProjectile("P1", 0, 0);
+
+			if (this.spreaderLevel === 0) {
+				this.createProjectile("P1", 0, 0);
+			}
+			else if (this.spreaderLevel === 1) {
+				for (var i = 0; i < 2; i++) {
+					this.createProjectile("P1", 0, ((Math.PI / 30) * Math.pow(-1, i)));
+				}
+			}
+			else {
+				this.createProjectile("P1", 0, 0);
+				for (var i = 0; i < 2; i++) {
+					this.createProjectile("P1", 0, ((Math.PI / 20) * Math.pow(-1, i)));
+				}
+			}
+			if (this.secondaryType === 3) { // orbiters
+				this.createOrbiterProjectile("P1", 0, 0);
+			}
 		}
 		if (this.primaryType === 2) { // bullets
 			this.primaryTimer = 5;
+
 			this.createProjectile("P2", 0, 0);
+			if (this.spreaderLevel > 0) {
+				for (var i = 0; i < 2; i++) {
+					this.createProjectile("P2", 0, ((Math.PI / 24) * Math.pow(-1, i)));
+					if (this.spreaderLevel > 1) {
+						this.createProjectile("P2", 0, ((Math.PI / 12) * Math.pow(-1, i)));
+					}
+				}
+			}
+			if (this.secondaryType === 3) { // orbiters
+				this.createOrbiterProjectile("P2", 0, 0);
+			}
 		}
 		if (this.primaryType === 3) { // burst
 			this.primaryTimer = 50;
-			this.createProjectile("P3", 0, 0);
+
+			if (this.spreaderLevel === 0) {
+				this.createProjectile("P3", 0, 0);
+			}
+			else if (this.spreaderLevel === 1) {
+				for (var i = 0; i < 2; i++) {
+					this.createProjectile("P3", 0, ((Math.PI / 16) * Math.pow(-1, i)));
+				}
+			}
+			else {
+				this.createProjectile("P3", 0, 0);
+				for (var i = 0; i < 2; i++) {
+					this.createProjectile("P3", 0, ((Math.PI / 8) * Math.pow(-1, i)));
+				}
+			}
+			if (this.secondaryType === 3) { // orbiters
+				this.createOrbiterProjectile("P3", 0, 0);
+			}
 		}
 	}
+
+	// secondary weapons
 	if (this.game.fireSecondary && this.secondaryTimer === 0) {
 		if (this.secondaryType === 0) { // rockets
 			this.secondaryTimer = 50;
 
 			this.createProjectile("S0", 0, 0);
-			if (this.spreaderLevel > 1) {
+			if (this.spreaderLevel > 0) {
 				for (var i = 0; i < 2; i++) {
-					this.createProjectile("S0", 0, ((Math.PI / 8) * Math.pow(-1, i)));
+					this.createProjectile("S0", 0, ((Math.PI / 20) * Math.pow(-1, i)));
+					if (this.spreaderLevel > 1) {
+						this.createProjectile("S0", 0, ((Math.PI / 10) * Math.pow(-1, i)));
+					}
 				}
 			}
 		}
@@ -247,9 +320,6 @@ TheShip.prototype.update = function () {
 			}
 		}
 		if (this.secondaryType === 2) { // charge shot
-			
-		}
-		if (this.secondaryType === 3) { // orbiters
 			
 		}
 	}
@@ -275,7 +345,7 @@ TheShip.prototype.update = function () {
 	}
 	if (this.game.swapSecondary) {
 		this.secondaryType++;
-		if (this.secondaryType > 1) {
+		if (this.secondaryType > 3) {
 			this.secondaryType = 0;
 		}
 	}
@@ -288,16 +358,16 @@ TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
 							   {xMid: this.game.mouseX, yMid: this.game.mouseY});
 	var angle = this.angle + adjustAngle;
 	if (type === "P0") {
-		var projectile = new ShipPrimary0(this.game);
+		var projectile = new ShipPrimary0(this.game, 1);
 	}
 	if (type === "P1") {
-		var projectile = new ShipPrimary1(this.game);
+		var projectile = new ShipPrimary1(this.game, 1);
 	}
 	if (type === "P2") {
-		var projectile = new ShipPrimary2(this.game);
+		var projectile = new ShipPrimary2(this.game, 1);
 	}
 	if (type === "P3") {
-		var projectile = new ShipPrimary3(this.game);
+		var projectile = new ShipPrimary3(this.game, 1);
 	}
 	if (type === "S0") {
 		var projectile = new ShipSecondary0(this.game);
@@ -307,8 +377,8 @@ TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
 	}
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
-	var dir = direction(target, this);
-
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
 	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
 				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
 	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
@@ -318,6 +388,52 @@ TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
 	projectile.angle = angle;
 
 	this.game.addEntity(projectile);
+}
+
+TheShip.prototype.createOrbiterProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.game.mouseX, yMid: this.game.mouseY});
+	var angle = this.angle + adjustAngle;
+	if (type === "P0") {
+		var projectile1 = new ShipPrimary0(this.game, 0.6);
+		var projectile2 = new ShipPrimary0(this.game, 0.6);
+	}
+	if (type === "P1") {
+		var projectile1 = new ShipPrimary1(this.game, 0.6);
+		var projectile2 = new ShipPrimary1(this.game, 0.6);
+	}
+	if (type === "P2") {
+		var projectile1 = new ShipPrimary2(this.game, 0.6);
+		var projectile2 = new ShipPrimary2(this.game, 0.6);
+	}
+	if (type === "P3") {
+		var projectile1 = new ShipPrimary3(this.game, 0.6);
+		var projectile2 = new ShipPrimary3(this.game, 0.6);
+	}
+	var target1 = {x: Math.cos(angle) * dist + this.orbiter1.x,
+				   y: Math.sin(angle) * dist + this.orbiter1.y};
+	var target2 = {x: Math.cos(angle) * dist + this.orbiter2.x,
+				   y: Math.sin(angle) * dist + this.orbiter2.y};
+	var dir = direction(target1, this.orbiter1);
+
+	projectile1.damage = (projectile1.damage + (projectile1.damage * this.powerLevel / 2)) * 0.6;
+	projectile2.damage = (projectile2.damage + (projectile2.damage * this.powerLevel / 2)) * 0.6;
+
+	projectile1.x = this.orbiter1.x - (projectile1.pWidth * projectile1.scale / 2);
+	projectile1.y = this.orbiter1.y - (projectile1.pHeight * projectile1.scale / 2);
+	projectile2.x = this.orbiter2.x - (projectile2.pWidth * projectile2.scale / 2);
+	projectile2.y = this.orbiter2.y - (projectile2.pHeight * projectile2.scale / 2);
+
+	projectile1.velocity.x = dir.x * projectile1.maxSpeed;
+	projectile1.velocity.y = dir.y * projectile1.maxSpeed;
+	projectile2.velocity.x = dir.x * projectile1.maxSpeed;
+	projectile2.velocity.y = dir.y * projectile2.maxSpeed;
+
+	projectile1.angle = angle;
+	projectile2.angle = angle;
+	
+	this.game.addEntity(projectile1);
+	this.game.addEntity(projectile2);
 }
 
 TheShip.prototype.draw = function () {
@@ -339,6 +455,17 @@ TheShip.prototype.draw = function () {
 		}
 	}
 
+	if (this.secondaryType === 3) {
+		this.orbiterAnimation.drawFrame(this.game.clockTick, this.ctx,
+										this.orbiter1.x - (this.pWidth * 0.3 / 2),
+										this.orbiter1.y - (this.pHeight * 0.3 / 2),
+										this.angle);
+		this.orbiterAnimation.drawFrame(this.game.clockTick, this.ctx,
+										this.orbiter2.x - (this.pWidth * 0.3 / 2),
+										this.orbiter2.y - (this.pHeight * 0.3 / 2),
+										this.angle);
+	}
+
 	if (SHOW_HITBOX) {
 		this.ctx.beginPath();
 		this.ctx.strokeStyle = "Red";
@@ -355,10 +482,10 @@ TheShip.prototype.draw = function () {
 // Ship Primary Weapons
 /* ========================================================================================================== */
 
-function ShipPrimary0(game) {	// laser
+function ShipPrimary0(game, adjustScale) {	// laser
 	this.pWidth = 128;
 	this.pHeight = 128;
-	this.scale = 0.25;
+	this.scale = 0.25 * adjustScale;
 	this.animation = new Animation(AM.getAsset("./img/shipPrimary0.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
 
 	this.name = "PlayerProjectile";
@@ -370,7 +497,7 @@ function ShipPrimary0(game) {	// laser
 	this.pierce = false;
 	this.angle = 0;
 	this.lifetime = 300;
-	this.damage = 4;
+	this.damage = 5;
 	this.maxSpeed = 1500;
 	this.velocity = {x: 0, y: 0};
 
@@ -413,10 +540,10 @@ ShipPrimary0.prototype.draw = function () {
 	Entity.prototype.draw.call(this);
 }
 
-function ShipPrimary1(game) {	// wave
+function ShipPrimary1(game, adjustScale) {	// wave
 	this.pWidth = 128;
 	this.pHeight = 128;
-	this.scale = 0.35;
+	this.scale = 0.65 * adjustScale;
 	this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.25, 3, true, this.scale);
 	
 	this.name = "PlayerProjectile";
@@ -471,10 +598,10 @@ ShipPrimary1.prototype.draw = function () {
 	Entity.prototype.draw.call(this);
 }
 
-function ShipPrimary2(game) {	// bullet
+function ShipPrimary2(game, adjustScale) {	// bullet
 	this.pWidth = 128;
 	this.pHeight = 128;
-	this.scale = 0.25;
+	this.scale = 0.25 * adjustScale;
 	this.animation = new Animation(AM.getAsset("./img/shipPrimary2.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
 
 	this.name = "PlayerProjectile";
@@ -529,10 +656,10 @@ ShipPrimary2.prototype.draw = function () {
 	Entity.prototype.draw.call(this);
 }
 
-function ShipPrimary3(game) {	// burst shot
+function ShipPrimary3(game, adjustScale) {	// burst shot
 	this.pWidth = 128;
 	this.pHeight = 128;
-	this.scale = 1;
+	this.scale = 1 * adjustScale;
 	this.animation = new Animation(AM.getAsset("./img/shipPrimary3Idle.png"), this.pWidth, this.pHeight, 768, 0.05, 6, true, this.scale);
 
 	this.name = "PlayerProjectile";
@@ -566,7 +693,8 @@ ShipPrimary3.prototype.update = function () {
 	if (this.lifetime < 0) {
 		this.removeFromWorld = true;
 
-		var projectile = new ShipPrimary3Blast(this.game);
+		var projectile = new ShipPrimary3Blast(this.game, this.scale);
+		projectile.damage = projectile.damage * this.damage;
 		projectile.angle = this.angle;
 		projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
 					   ((projectile.pWidth * projectile.scale / 2) * Math.cos(this.angle)) + this.radius / 2 * Math.cos(this.angle);
@@ -596,10 +724,10 @@ ShipPrimary3.prototype.draw = function () {
 	Entity.prototype.draw.call(this);
 }
 
-function ShipPrimary3Blast(game) {	// burst blast
+function ShipPrimary3Blast(game, adjustScale) {	// burst blast
 	this.pWidth = 128;
 	this.pHeight = 128;
-	this.scale = 1;
+	this.scale = 1 * adjustScale;
 	this.animation = new Animation(AM.getAsset("./img/shipPrimary3Burst.png"), this.pWidth, this.pHeight, 640, 0.05, 5, true, this.scale);
 
 	this.name = "PlayerProjectile";
@@ -611,7 +739,7 @@ function ShipPrimary3Blast(game) {	// burst blast
 	this.pierce = true;
 	this.angle = 0;
 	this.lifetime = 16;
-	this.damage = 1.5;
+	this.damage = .15;
 	this.maxSpeed = 0;
 	this.velocity = {x: 0, y: 0};
 
@@ -858,7 +986,7 @@ function Spreader(game) {
 	this.y = 0;
 	this.xMid = 0;
 	this.yMid = 0;
-	this.radius = 42 * this.scale;
+	this.radius = 30 * this.scale;
 	this.angle = 0;
 
 	this.lifetime = 500;
@@ -917,7 +1045,7 @@ function RepairDrop(game) {
 	this.y = 0;
 	this.xMid = 0;
 	this.yMid = 0;
-	this.radius = 42 * this.scale;
+	this.radius = 80 * this.scale;
 	this.angle = 0;
 
 	this.lifetime = 500;
