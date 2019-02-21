@@ -423,6 +423,7 @@ AM.queueDownload("./img/RedChroma.png");
 AM.queueDownload("./img/BlackWhiteChroma.png");
 AM.queueDownload("./img/MechanicalResourceGatherer.png");
 AM.queueDownload("./img/SpaceStation.png");
+AM.queueDownload("./img/PlayerBuilder.png");
 
 //Terrain
 AM.queueDownload("./img/Asteroid.png");

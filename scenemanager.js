@@ -314,6 +314,11 @@ function PrototypeLevel(game) {
 
 	this.rock1.hasbase = true;
 	this.rock1.base = this.playerSpaceStation;
+
+	this.testBuilder = new PlayerBuilder(this.game, this.playerSpaceStation);
+	this.game.addEntity(this.testBuilder);
+
+
 	//this spawns the enemy base
 	this.rock2 = new Asteroid(this.game, 2500, 2500);
 	this.game.addEntity(this.rock2);
@@ -325,6 +330,11 @@ function PrototypeLevel(game) {
 
 	this.rock2.hasbase = true;
 	this.rock2.base = this.enemySpaceStation;
+
+	//Neutral rock
+	this.rock3 = new Asteroid(this.game, 650, 300);
+	this.game.addEntity(this.rock3);
+	this.entities.push(this.rock3);
 
 	this.game.playerResources = 150;
 	this.game.enemyResources = 100;
