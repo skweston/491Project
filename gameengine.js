@@ -529,17 +529,52 @@ Entity.prototype.takeDamage = function(damage) {
 
 Entity.prototype.generateItem = function() {
 	//can use this.name to check for enemy or boss to change odds or item drop potential
-	var genItem = Math.random() * 100;
-	//console.log(`${genItem} ${this.name}`);
-	if (genItem < 20) {
-		var spreader = new Spreader(this.game);
-		spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-		spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-		spreader.xMid = this.xMid;
-		spreader.yMid = this.yMid;
+	//console.log(`${dice} ${this.name}`);
+	var dice = Math.random()*100;
+	switch (this.name) {
+		case 'Enemy':
+			if (dice < 50) {
+							var repair = new RepairDrop(this.game);
+							repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
+							repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
+							repair.xMid = this.xMid;
+							repair.yMid = this.yMid;
+							this.game.addEntity(repair);
 
-		this.game.addEntity(spreader);
-	} else if (genItem >= 80 && genItem < 100) {
-		//new powerup here
+			} else {
+							var spreader = new Spreader(this.game);
+							spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+							spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+							spreader.xMid = this.xMid;
+							spreader.yMid = this.yMid;
+
+							this.game.addEntity(spreader);
+			}
+			break;
+		case 'Boss':
+			if (dice < 100) { //the boss always drops something
+				if(dice < 85){
+					var repair = new RepairDrop(this.game);
+					repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
+					repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
+					repair.xMid = this.xMid;
+					repair.yMid = this.yMid;
+					this.game.addEntity(repair);
+
+				} else {
+					var spreader = new Spreader(this.game);
+					spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+					spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+					spreader.xMid = this.xMid;
+					spreader.yMid = this.yMid;
+
+					this.game.addEntity(spreader);
+				}
+			}
+			break;
+		default:
+			break;
+
 	}
+
 }
