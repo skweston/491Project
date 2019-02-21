@@ -82,7 +82,7 @@ function BloodSplatter(game, shipXMid, shipYMid) {
   this.name = "Effect";
   this.xMid = shipXMid;
   this.yMid = shipYMid;
-  this.lifetime = 100;
+  this.lifetime = 25;
   this.angle = 0;
   //console.log("middle explosion: " + this.xMid + ", " + this.yMid);
   this.x = this.xMid - ((this.pWidth * this.scale) / 2);

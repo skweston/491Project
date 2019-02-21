@@ -5,8 +5,9 @@ function PurpleChroma(game, spawner) {
 	this.scale = 2;
 	this.animation = new Animation(AM.getAsset("./img/PurpleChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
 	this.angle = 0;
-	this.spawner = spawner
+	this.spawner = spawner;
 	this.name = "Ally";
+	this.weaponType = "P2";
 	this.maxSpeed = 0.5;
 	this.speed = this.maxSpeed;
 	this.x = 0;
@@ -22,6 +23,7 @@ function PurpleChroma(game, spawner) {
 	this.target = null;
 	this.fullShootCooldown = 20;
 	this.shootCooldown = this.fullShootCooldown;
+	this.powerLevel = 0;
 	//console.log("starting health: " + this.health);
 	Entity.call(this, game, this.x, this.y);
 }
@@ -32,20 +34,32 @@ PurpleChroma.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
 							   {xMid: this.target.xMid, yMid: this.target.yMid});
 	var angle = this.angle + adjustAngle;
-	if (type === "Primary") {
-		var projectile = new ShipPrimary(this.game);
+	if (type === "P0") {
+		var projectile = new ShipPrimary0(this.game, 1);
 	}
-	if (type === "Secondary") {
-		var projectile = new ShipSecondary(this.game);
+	if (type === "P1") {
+		var projectile = new ShipPrimary1(this.game, 1);
+	}
+	if (type === "P2") {
+		var projectile = new ShipPrimary2(this.game, 1);
+	}
+	if (type === "P3") {
+		var projectile = new ShipPrimary3(this.game, 1);
+	}
+	if (type === "S0") {
+		var projectile = new ShipSecondary0(this.game);
+	}
+	if (type === "S1") {
+		var projectile = new ShipSecondary1(this.game);
 	}
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
-	var dir = direction(target, this);
-
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
 	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset));
-	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2)  +
-				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset));
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
+	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset)) + this.radius / 2 *  Math.sin(angle);
 	projectile.velocity.x = dir.x * projectile.maxSpeed;
 	projectile.velocity.y = dir.y * projectile.maxSpeed;
 	projectile.angle = angle;
@@ -78,7 +92,7 @@ PurpleChroma.prototype.update = function () {
 		this.angle = -Math.atan2(dy,dx);
 	}
 	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
-		this.createProjectile("Primary", 0, 0);
+		this.createProjectile(this.weaponType, 0, 0);
 		this.shootCooldown = this.fullShootCooldown;
 	}
 	if(this.target && 300 > distance(this,this.target)){
@@ -153,7 +167,7 @@ PurpleChroma.prototype.draw = function () {
 /* ========================================================================================================== */
 // Spawner - allied space station
 /* ========================================================================================================== */
-function SpaceStation(game, x, y) {
+function SpaceStation(game, x, y, rock) {
     //Specific to spawners:
     this.timerReset = 500;
     this.generateGatherer = this.timerReset;
@@ -166,6 +180,7 @@ function SpaceStation(game, x, y) {
     this.name = "Ally";
     this.x = x;
     this.y = y;
+	this.asteroid = rock;
     this.xMid = this.x + (this.pWidth * this.scale) / 2;
     this.yMid = this.y + (this.pHeight * this.scale) / 2;
     this.radius = 475 * this.scale;
@@ -189,6 +204,8 @@ SpaceStation.prototype.update = function () {
 
     if(this.health < 1){
       this.removeFromWorld = true;
+	  this.asteroid.hasbase = false;
+	  this.asteroid.base = null;
 	}
 	if(this.health < 5000){
 		this.health += 0.5;

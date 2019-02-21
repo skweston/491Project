@@ -16,7 +16,11 @@ function Asteroid(game, x, y) {
 	this.name = "Terrain";
 	this.x = x;
 	this.y = y;
+	this.scrapPerTick = 2;
+	this.maxScrapCooldown = 120;
+	this.scrapCooldown = this.maxScrapCooldown;
 	this.hasbase = false;
+	this.base = null;
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 	this.angle = 0;
 
@@ -37,6 +41,20 @@ Asteroid.prototype.draw = function () {
 Asteroid.prototype.update = function () {
 
 	this.angle += 0.000125;
+	if (this.hasbase){
+		this.scrapCooldown--;
+		if (this.scrapCooldown < 1){
+			for(var i = 0; i < this.scrapPerTick; i++){
+				var scrap = new Scrap(this.game);
+				scrap.x = this.base.xMid - (scrap.pWidth*scrap.scale /2);
+				scrap.y = this.base.yMid - (scrap.pHeight*scrap.scale /2);
+				scrap.xMid = this.xMid;
+				scrap.yMid = this.yMid;
+				this.game.addEntity(scrap);
+				this.scrapCooldown = this.maxScrapCooldown;
+			}
+		}
+	}
 
 
 

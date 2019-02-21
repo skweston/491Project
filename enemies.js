@@ -1,7 +1,7 @@
 /* ========================================================================================================== */
 // Spawner - alien space station
 /* ========================================================================================================== */
-function AlienSpaceStation(game, x, y) {
+function AlienSpaceStation(game, x, y, rock) {
     //Specific to spawners:
     this.timerReset = 100;
     this.generateGatherer = this.timerReset;
@@ -14,6 +14,7 @@ function AlienSpaceStation(game, x, y) {
     this.name = "Enemy";
     this.x = x;
     this.y = y;
+	this.asteroid = rock;
     this.xMid = this.x + (this.pWidth * this.scale) / 2;
     this.yMid = this.y + (this.pHeight * this.scale) / 2;
     this.radius = 85 * this.scale;
@@ -37,9 +38,10 @@ AlienSpaceStation.prototype.update = function () {
 	// this.game.enemyResources++;
     if(this.health < 1){
       this.removeFromWorld = true;
-
+	  this.asteroid.hasbase = false;
+	  this.asteroid.base = null;
 	}
-	if(this.health < 5000){
+	if(!this.removeFromWorld && this.health < 5000){
 		this.health += 0.5;
 	}
 
@@ -75,7 +77,9 @@ AlienSpaceStation.prototype.update = function () {
 		var ent = this.game.playerProjectiles[i];
 		if(Collide(this, ent)){
 			this.takeDamage(ent.damage);
-			ent.removeFromWorld = true;
+			if (!ent.pierce) {
+				ent.removeFromWorld = true;
+			}
 		}
 	}
 
@@ -531,16 +535,16 @@ Leech.prototype.update = function () {
 			this.takeDamage(ent.damage);
 			if (!ent.pierce) {
 				ent.removeFromWorld = true;
+				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+				splatter.angle = this.angle;
+				this.game.addEntity (splatter);
 			}
-			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-			splatter.angle = this.angle;
-			this.game.addEntity (splatter);
+
 			if (this.health < 1) {
 				break;
 			}
 		}
 	}
-
 
 
 	// check collision with ship
@@ -678,10 +682,7 @@ Scourge.prototype.update = function () {
 		//if it hasn't found its target yet, or its target has become undefined
 		var closest = 100000000;
 		if (true){
-
-
-
-			//find the player allied ship
+		//find the player allied ship
 			for (var i = 0; i < this.game.allies.length; i++){
 				var ent = this.game.allies[i];
 				var d = distance(this, ent);
@@ -716,10 +717,10 @@ Scourge.prototype.update = function () {
 			this.takeDamage(ent.damage);
 			if (!ent.pierce) {
 				ent.removeFromWorld = true;
+				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+				splatter.angle = this.angle;
+				this.game.addEntity (splatter);
 			}
-			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-			splatter.angle = this.angle;
-			this.game.addEntity (splatter);
 			if (this.health < 1) {
 				break;
 			}
@@ -986,11 +987,13 @@ BiologicalResourceGatherer.prototype.update = function () {
 	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
 		var ent = this.game.playerProjectiles[i];
 		if (Collide(this, ent)) {
-			this.health -= ent.damage;
-			ent.removeFromWorld = true;
-			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-			splatter.angle = this.angle;
-			this.game.addEntity (splatter);
+			this.takeDamage(ent.damage);
+			if (!ent.pierce) {
+				ent.removeFromWorld = true;
+				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+				splatter.angle = this.angle;
+				this.game.addEntity (splatter);
+			}
 			if (this.health < 1) {
 				break;
 			}

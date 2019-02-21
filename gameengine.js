@@ -580,7 +580,7 @@ Entity.prototype.takeDamage = function(damage) {
 
 	// The entity taking damage is relevant?
 	//console.log("This:");
-	if (this.name === 'Player' || this.name === 'Enemy') {
+	if (this.name === 'Player' || this.name === 'Enemy' || this.name === "Ally") {
 
 		// Is it a Player? if so make sure its not invincible
 		//console.log(`if: ${this.name}`);
