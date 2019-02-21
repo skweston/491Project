@@ -174,7 +174,8 @@ function Scrap(game) {
 	this.angle = Math.random() * Math.PI * 2;
 	this.value = 10;
 	this.speed = 1;
-
+	this.isTargettedAlly = false;
+	this.isTargettedEnemy = false;
 	this.lifetime = 500;
 
 	this.game = game;

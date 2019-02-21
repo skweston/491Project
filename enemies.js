@@ -948,16 +948,20 @@ BiologicalResourceGatherer.prototype.update = function () {
 
 	//if it hasn't found its target yet, or its target has become undefined
 	if (true){
-		var closest = 100000000;
 		this.angle += 0.0125;
+		var closest = 100000000;
+
 		//find the closest resource node to gather from
 		for (var i = 0; i < this.game.resources.length; i++){
 			var ent = this.game.resources[i];
 			var d = distance(this, ent);
-			if(d < closest){
+			if(!ent.isTargettedEnemy && d < closest){
 				closest = d;
+				if(this.target){
+					this.target.isTargettedEnemy = false;
+				}
 				this.target = ent;
-
+				this.target.isTargettedEnemy = true;
 			}
 		}
 	}
@@ -1006,7 +1010,9 @@ BiologicalResourceGatherer.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++; //how many points is it worth
-
+		if(this.target){
+			this.target.isTargettedEnemy = false;
+		}
 		for(var i = 0; i < 1; i++){
 			var scrap = new Scrap(this.game);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);

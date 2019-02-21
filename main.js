@@ -1,5 +1,5 @@
 // useful global things here
-var SHOW_HITBOX = true;
+var SHOW_HITBOX = false;
 var SCORE = 0;
 
 /*

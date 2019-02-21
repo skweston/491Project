@@ -340,10 +340,14 @@ MechanicalResourceGatherer.prototype.update = function () {
 		for (var i = 0; i < this.game.resources.length; i++){
 			var ent = this.game.resources[i];
 			var d = distance(this, ent);
-			if(d < closest){
-				closest = d;
-				this.target = ent;
 
+			if(!ent.isTargettedAlly && d < closest){
+				closest = d;
+				if(this.target){
+					this.target.isTargettedAlly = false;
+				}
+				this.target = ent;
+				this.target.isTargettedAlly = true;
 			}
 		}
 	}
@@ -387,7 +391,9 @@ MechanicalResourceGatherer.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		//SCORE++; //how many points is it worth
-
+		if(this.target){
+			this.target.isTargettedAlly = false;
+		}
 		for(var i = 0; i< 3; i++){
 			var scrap = new Scrap(this.game);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
