@@ -55,43 +55,61 @@ function onCamera(ent){
 /* ========================================================================================================== */
 /*
 function sampleEntity(game, extraInputVarial, extraInputVarialTwo) {
+
+
 	this.pWidth = Interger width Of Single Frame of Animation;
 	this.pHeight = Interger height Of Single Frame of Animation;
 	this.scale = the scaling factor for this entity;
+
   	Stuff gets passed into an animation object in this order:
   	spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
+
 	this.animation = new Animation(AM.getAsset("./img/NameOfAsset.png"),
 								 this.pWidth, this.pHeight,
 								 width of spriteSheet,  Duration Each Frame Lasts, # of Frames,
 								 Boolean for looping, this.scale);
+
+
+
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Effect" XOR "Level" XOR "Background" XOR "Player" XOR "Enemy" XOR
 				"PlayerProjectile" XOR "EnemyProjectile" XOR "Extra" XOR "Effect";
+
 	this.x = 0;
 	this.y = 0;
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 ///////////Above this is MANDATORY for all entities////////////////////////
 //If it's killable
 	this.health = some magic number;
+
 //this is for collision
 	this.xMid = extraInputVarial;
 	this.yMid = extraInputVarialTwo;
 	this.radius = some magic number * this.scale;
+
 //this is for movement
 	this.speed = some magic number;
+
 //this is for if it needs to decay off the lists, like an explostion
 this.lifetime = 100; //when this reaches 0, it is removed from world
+
 //Add other variables to objects for whatever added functionality you need
 	this.sampleValue = sample Magic Number;
+
+
+
 }
+
 sampleEntity.prototype.draw = function () {
 	if(onCamera(this)){
   		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
   	}
 	Entity.prototype.draw.call(this);
 }
+
 sampleEntity.prototype.update = function () {
+
 	//something likethis for an Effect
 	this.lifetime--;
 	if (this.lifetime < 1){
@@ -101,12 +119,16 @@ sampleEntity.prototype.update = function () {
 	var dx = this.game.ship.xMid - this.xMid;
 	var dy = this.yMid - this.game.ship.yMid;
 	this.angle = -Math.atan2(dy,dx);
+
 	// move the thing
 	this.x += Math.cos(this.angle) * 10 * this.speed;
 	this.y += Math.sin(this.angle) * 10 * this.speed;
+
 	//update its hitbox
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+
 	// check collision with player projectiles
 	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
 		var ent = this.game.playerProjectiles[i];
@@ -121,14 +143,17 @@ sampleEntity.prototype.update = function () {
 			}
 		}
 	}
+
 	// check collision with ship if it matters
 	if (!this.game.ship.rolling && Collide(this, this.game.ship)) {
 		this.game.ship.health -= this.damage;
 		this.removeFromWorld = true;
 	}
+
 	// check health
 	if (this.health < 1) {
 		SCORE++; //how many points is it worth
+
 		//does it drop a powerup?
 		if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
 			var spreader = new Spreader(this.game);
@@ -136,19 +161,33 @@ sampleEntity.prototype.update = function () {
 			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
 			spreader.xMid = this.xMid;
 			spreader.yMid = this.yMid;
+
 			this.game.addEntity(spreader);
 		}
+
 		this.removeFromWorld = true;
 	}
+
 	//does it blow up when it dies?
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
 	}
+
 	Entity.prototype.update.call(this);
+
+
 }
+
+
+
+
+
+
 */
 /*a list of powerups, things like multishot and such
+
+
 /* ========================================================================================================== */
 // Animation
 /* ========================================================================================================== */
@@ -250,8 +289,8 @@ Camera.prototype.draw = function (cameraCtx) {
 };
 
 Camera.prototype.update = function () {
-	console.log(`${this.x} x, ${this.y} y,
-		 				${this.ctx.canvas.width} CW, ${this.ctx.canvas.height} CH`);
+	//console.log(`${this.x} x, ${this.y} y,
+	//	 				${this.ctx.canvas.width} CW, ${this.ctx.canvas.height} CH`);
 	// this.game.reticle.x =
 	// this.game.reticle.y =
 	// this.x = this.game.ship.xMid - this.ctx.canvas.width/2;
@@ -294,7 +333,7 @@ Camera.prototype.update = function () {
 		this.y = this.game.ctx.canvas.height - this.ctx.canvas.height;
 	}
 
-	//console.log(`${this.x} = x ${this.y} = y`);
+
 
 };
 
@@ -303,8 +342,7 @@ Camera.prototype.update = function () {
 /* ========================================================================================================== */
 function Background(game, spritesheet) {
 
-	this.name = "Background";
-
+	this.name = 'Background';
 	this.spritesheet = spritesheet;
 	this.game = game;
 	this.ctx = game.ctx;
@@ -322,7 +360,8 @@ function Background(game, spritesheet) {
 };
 
 Background.prototype.draw = function () {
-
+	// console.log(`${this.ctx.canvas.width} = CW ${this.spritesheet.naturalWidth} = SNW
+	// 		${this.ctx.canvas.height} = CH ${this.spritesheet.naturalHeight} = SNH`);
 	//drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 	this.ctx.drawImage(this.spritesheet,
 					this.sx, this.sy,
@@ -341,6 +380,7 @@ Background.prototype.update = function () {
 /* ========================================================================================================== */
 function MainBackground(game, spritesheet) {
 	Background.call(this, game, spritesheet);
+
 	this.ctx.canvas.width = this.spritesheet.naturalWidth;
 	this.ctx.canvas.height = this.spritesheet.naturalHeight;
 
@@ -446,13 +486,13 @@ BackgroundLayer.prototype.update = function () {
 	//console.log(`${(differenceY / this.yScrollRate)} =(${differenceY} / ${this.yScrollRate})`);
 
 };
-
 /* ========================================================================================================== */
 // Asset Manager aka Main
 /* ========================================================================================================== */
 
 var AM = new AssetManager();
 
+AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/PScroll1/space.png");
 AM.queueDownload("./img/4kBackground1.png");
 AM.queueDownload("./img/4kBackground2.png");
@@ -461,6 +501,7 @@ AM.queueDownload("./img/PScroll1/comet.png");
 AM.queueDownload("./img/PScroll1/planet1.png");
 AM.queueDownload("./img/PScroll1/planet2.png");
 AM.queueDownload("./img/BloodSplatter.png");
+
 // ship stuff
 AM.queueDownload("./img/shipIdle.png");
 AM.queueDownload("./img/shipBoost.png");
@@ -470,9 +511,18 @@ AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary1.png");
 AM.queueDownload("./img/shipSecondary1.png");
 
+//Allies
+AM.queueDownload("./img/GreenChroma.png");
+AM.queueDownload("./img/PurpleChroma.png");
+AM.queueDownload("./img/RedChroma.png");
+AM.queueDownload("./img/BlackWhiteChroma.png");
+AM.queueDownload("./img/MechanicalResourceGatherer.png");
+AM.queueDownload("./img/SpaceStation.png");
+
 //drops and powerups
 AM.queueDownload("./img/RepairDrop.png");
 AM.queueDownload("./img/spreader.png");
+AM.queueDownload("./img/scrap.png");
 
 // enemies
 AM.queueDownload("./img/Boss1.png");
@@ -481,8 +531,11 @@ AM.queueDownload("./img/LaserBlast.png");
 AM.queueDownload("./img/BossExplosion.png");
 AM.queueDownload("./img/Leech.png");
 AM.queueDownload("./img/scourge.png");
-AM.queueDownload("./img/SpawnDoor.png");
 AM.queueDownload("./img/stalker32.png");
+
+AM.queueDownload("./img/BiologicalResourceGatherer.png");
+AM.queueDownload("./img/AlienSpaceStation.png");
+AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
 AM.queueDownload("./img/SPACEFIGHT.png");
@@ -496,46 +549,21 @@ AM.downloadAll(function () {
 	var ctx = canvas.getContext("2d");
 
 	var gameEngine = new GameEngine();
-	//danny fiddling:
 	gameEngine.ctx = ctx;
 	gameEngine.init(ctx, cameraCtx);
 	gameEngine.running = false;
 
 	var ship = new TheShip(gameEngine);
 	var reticle = new Reticle(gameEngine);
-	var background = new MainBackground(gameEngine, AM.getAsset("./img/4kBackground1.png"));
-	var pg = new PlayGame(gameEngine);
+	var sm = new SceneManager(gameEngine);
 
 	gameEngine.addEntity(ship);
 	gameEngine.addEntity(reticle);
-	gameEngine.addEntity(background);
-	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/cloud.png")));
-	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/comet.png")));
-	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/planet1.png")));
-	gameEngine.addEntity(new BackgroundLayer(gameEngine, AM.getAsset("./img/PScroll1/planet2.png")));
-	gameEngine.addEntity(pg);
-	//var background = new Background(gameEngine, AM.getAsset("./img/4kBackground1.png"));
-	//var pg = new PlayGame(gameEngine);
-
-	//pg.loadGame();
-
-
-
-	gameEngine.addEntity(ship);
-	gameEngine.addEntity(reticle);
-	//gameEngine.addEntity(background);
-
 
 	gameEngine.ship = ship;
 	gameEngine.cameraTrick = cameraTrick;
 	gameEngine.camera = new Camera(gameEngine);
-	gameEngine.sceneManager = pg;
-	//gameEngine.sceneManager = new SceneManager(gameEngine);
+	gameEngine.sceneManager = sm;
 	gameEngine.start();
-
-	//console.log(gameEngine);
-	//var pg = new PlayGame(gameEngine);
-	//gameEngine.addEntity(pg);
-
 	console.log("All Done!");
 });

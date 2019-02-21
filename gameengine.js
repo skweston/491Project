@@ -29,13 +29,19 @@ function GameEngine() {
 	// this.entities = [];
 	this.levels = [];
 	this.background = [];
+	this.layers = [];
 	this.player = [];
 	this.enemies = [];
+	this.allies = [];
 	this.playerProjectiles = [];
 	this.enemyProjectiles = [];
 	this.extras = [];
 	this.effects = [];
 	this.elements = [];
+	this.resources = [];
+	this.terrain = [];
+	this.playerResources = 0;
+	this.enemyResources = 0;
 
 	// start the game
 	this.mouse = false;
@@ -247,12 +253,24 @@ GameEngine.prototype.addEntity = function (entity) {
 	if(entity.name == "Element") {
 		this.elements.push(entity);
 	}
+	if(entity.name == "Ally") {
+		this.allies.push(entity);
+	}
+	if(entity.name == "Terrain") {
+		this.allies.push(entity);
+	}
 
 	if (entity.name === "Level") {
 		this.levels.push(entity);
 	}
+	if (entity.name === "Resource") {
+		this.resources.push(entity);
+	}
 	if (entity.name === "Background") {
 		this.background.push(entity);
+	}
+	if (entity.name === "Layer") {
+		this.layers.push(entity);
 	}
 	if (entity.name === "Player") {
 		this.player.push(entity);
@@ -285,11 +303,25 @@ GameEngine.prototype.draw = function () {
 
 	for (var i = 0; i < this.background.length; i++) {
 		this.background[i].draw(this.ctx);
+		console.log(`drawing ${this.background[i].name}`);
 	}
+	/*for (var i = 0; i < this.layers.length; i++) {
+		this.layers[i].draw(this.ctx);
+		console.log(`drawing ${this.layers[i].name}`);
+	}*/
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].draw(this.ctx);
 	}
+	for (var i = 0; i < this.terrain.length; i++) {
+		this.terrain[i].draw(this.ctx);
+	}
 
+	for (var i = 0; i < this.resources.length; i++) {
+		this.resources[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.allies.length; i++) {
+		this.allies[i].draw(this.ctx);
+	}
 
 	for(var i = 0; i < this.elements.length; i++) {
 		this.elements[i].draw(this.ctx);
@@ -363,7 +395,44 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}*/
+	count = this.resources.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.resources[i];
+		if (entity.removeFromWorld) {
+			this.resources.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
 
+	count = this.terrain.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.terrain[i];
+		if (entity.removeFromWorld) {
+			this.terrain.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
+	count = this.allies.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.allies[i];
+		if (entity.removeFromWorld) {
+			this.allies.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
 
 	count = this.elements.length;
 	for (var i = 0; i < count; i++) {
