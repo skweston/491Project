@@ -299,7 +299,7 @@ function MechanicalResourceGatherer(game, spawner) {
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 ///////////Above this is MANDATORY for all entities////////////////////////
 //If it's killable
-	this.health = 55;
+	this.health = 25;
 
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;
@@ -467,7 +467,7 @@ function PlayerBuilder(game, spawner) {
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 ///////////Above this is MANDATORY for all entities////////////////////////
 //If it's killable
-	this.health = 500;
+	this.health = 100;
 
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;
