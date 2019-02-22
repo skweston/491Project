@@ -107,7 +107,7 @@ PurpleChroma.prototype.update = function () {
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
-	// check collision with player projectiles
+	// check collision with enemy projectiles
 	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
 		var ent = this.game.enemyProjectiles[i];
 		if (Collide(this, ent)) {
@@ -169,8 +169,8 @@ PurpleChroma.prototype.draw = function () {
 /* ========================================================================================================== */
 function SpaceStation(game, x, y, rock) {
     //Specific to spawners:
-    this.timerReset = 500;
-    this.generateGatherer = this.timerReset;
+    this.gathererTimerReset = 100;
+    this.generateGatherer = this.gathererTimerReset;
     this.maxSpawn = 3; // maybe make this a difficulty variable.
 
     this.pWidth = 512;
@@ -183,16 +183,19 @@ function SpaceStation(game, x, y, rock) {
 	this.asteroid = rock;
     this.xMid = this.x + (this.pWidth * this.scale) / 2;
     this.yMid = this.y + (this.pHeight * this.scale) / 2;
-    this.radius = 362 * this.scale;
+    this.radius = 300 * this.scale;
     this.speed = 0;
     this.angle = 0;
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
-    this.health = 1000;
+	this.maxHealth = 1000;
+    this.health = this.maxHealth;
 
 
 	//the spawns that the spawner 'owns'
+	this.chromaTimerReset = 500;
+	this.chromaTimer = this.chromaTimerReset;
 	this.spawns = 0;
 	this.maxGatherers = 5;
 	this.gatherers = 0;
@@ -209,7 +212,7 @@ SpaceStation.prototype.update = function () {
 	  this.asteroid.hasbase = false;
 	  this.asteroid.base = null;
 	}
-	if(this.health < 5000){
+	if(this.health < this.maxHealth){
 		this.health += 0.05;
 	}
 
@@ -230,17 +233,17 @@ SpaceStation.prototype.update = function () {
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
-		this.generateGatherer = this.timerReset;
+		this.generateGatherer = this.gathererTimerReset;
 		this.gatherers++;
 	}
-    if (this.spawns < this.maxSpawn && this.game.playerResources > 100 ){
+    if (this.chromaTimer < 1 && this.spawns < this.maxSpawn && this.game.playerResources > 100 ){
 		var ent = new PurpleChroma(this.game, this);
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
 		this.spawns++;
 		this.game.playerResources -=100;
-
+		this.chromaTimer = this.chromaTimerReset;
     }
 	var asteroidfree = false;
 	for (var i = 0; i < this.game.terrain.length; i++){
@@ -250,7 +253,7 @@ SpaceStation.prototype.update = function () {
 	}
 	if (asteroidfree && this.builders < this.maxBuilders && this.game.playerResources > 500){
 		var ent = new PlayerBuilder(this.game, this);
-		console.log("I spawned a Builder");
+
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
@@ -258,8 +261,25 @@ SpaceStation.prototype.update = function () {
 		this.game.playerResources -=500;
 
 	}
+	// check collision with enemy projectiles
+	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
+		var ent = this.game.enemyProjectiles[i];
+		if (Collide(this, ent)) {
+			this.takeDamage(ent.damage);
+			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
+			this.game.addEntity (splatter);
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+
 
 	this.generateGatherer -= 1;
+	this.chromaTimer--;
 	this.angle += 0.01;
     Entity.prototype.update.call(this);
 }
@@ -272,7 +292,7 @@ SpaceStation.prototype.draw = function () {
 		this.ctx.beginPath();
 		this.ctx.strokeStyle = "Red";
 		this.ctx.lineWidth = 1;
-		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.arc(this.xMid, this.yMid, this.radiusa, 0, Math.PI * 2, false);
 		this.ctx.stroke();
 		this.ctx.closePath();
 	}
@@ -323,7 +343,8 @@ function MechanicalResourceGatherer(game, spawner) {
 	//this.sampleValue = sample Magic Number;
 
 	this.target = null;
-	this.targetDistance = 100000000;
+	this.maxTargetDistance = 100000000;
+	this.targetDistance = this.maxTargetDistance;
 
 
 }
@@ -352,10 +373,11 @@ MechanicalResourceGatherer.prototype.update = function () {
 
 
 	//if it hasn't found its target yet, or its target has become undefined
-	if (true){
+	if (!this.target){
 		this.angle += 0.0125;
-		var closest = 100000000;
+		var closest = this.maxTargetDistance;
 
+		//find the closest resource node to gather from
 		//find the closest resource node to gather from
 		for (var i = 0; i < this.game.resources.length; i++){
 			var ent = this.game.resources[i];

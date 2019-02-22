@@ -33,8 +33,14 @@ SceneManager.prototype.reset = function () {
 	for(var i = 0; i< this.game.resources.length; i++){
 		this.game.resources[i].removeFromWorld = true;
 	}
+	for (var i = 0; i < this.game.terrain.length; i++){
+		this.game.terrain[i].removeFromWorld = true;
+	}
 	for (var i = 0; i < this.game.effects.length; i++) {
 		this.game.effects[i].removeFromWorld = true;
+	}
+	for (var i = 0; i < this.game.extras.length; i++){
+		this.game.extras[i].removeFromWorld = true;
 	}
 
 	var ship = new TheShip(this.game);
@@ -332,6 +338,7 @@ function PrototypeLevel(game) {
 	this.rock1.hasbase = true;
 	this.rock1.base = this.playerSpaceStation;
 
+
 	//this spawns the enemy base
 	this.rock2 = new Asteroid(this.game, 3000, 3000);
 	this.game.addEntity(this.rock2);
@@ -350,12 +357,27 @@ function PrototypeLevel(game) {
 	this.entities.push(this.rock3);
 
 	//Neutral rock
-	this.rock4 = new Asteroid(this.game, 1600, 1600);
+	this.rock4 = new Asteroid(this.game, 300, 1600);
 	this.game.addEntity(this.rock4);
 	this.entities.push(this.rock4);
 
-	this.game.playerResources = 1100;
-	this.game.enemyResources = 1000;
+	//Neutral rock
+	this.rock5 = new Asteroid(this.game, 2700, 2300);
+	this.game.addEntity(this.rock5);
+	this.entities.push(this.rock5);
+
+	//Neutral rock
+	this.rock6 = new Asteroid(this.game, 2200, 3000);
+	this.game.addEntity(this.rock6);
+	this.entities.push(this.rock6);
+
+	//Neutral rock
+	this.rock7 = new Asteroid(this.game, 2400, 600);
+	this.game.addEntity(this.rock7);
+	this.entities.push(this.rock7);
+
+	this.game.playerResources = 700;
+	this.game.enemyResources = 700;
 
 	this.hud = new HUD(this.game); //mandatory
 	this.game.addEntity(this.hud);

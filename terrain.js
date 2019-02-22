@@ -23,7 +23,7 @@ function Asteroid(game, x, y) {
 	this.base = null;
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 	this.angle = 0;
-	
+
 
 
 

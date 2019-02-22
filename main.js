@@ -1,7 +1,7 @@
 // useful global things here
 var SHOW_HITBOX = false;
 var SCORE = 0;
-var DEBUG = true;
+var DEBUG = false;
 /*
 function distance(a, b) {
 	var dx = a.x - b.x;
