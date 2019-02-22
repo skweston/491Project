@@ -323,6 +323,7 @@ function MechanicalResourceGatherer(game, spawner) {
 	//this.sampleValue = sample Magic Number;
 
 	this.target = null;
+	this.targetDistance = 100000000;
 
 
 }
