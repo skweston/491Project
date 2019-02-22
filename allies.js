@@ -242,8 +242,15 @@ SpaceStation.prototype.update = function () {
 		this.game.playerResources -=100;
 
     }
-	if (this.builders < this.maxBuilders && this.game.playerResources > 500){
+	var asteroidfree = false;
+	for (var i = 0; i < this.game.terrain.length; i++){
+		if(!this.game.terrain[i].hasbase){
+			asteroidfree = true;
+		}
+	}
+	if (asteroidfree && this.builders < this.maxBuilders && this.game.playerResources > 500){
 		var ent = new PlayerBuilder(this.game, this);
+		console.log("I spawned a Builder");
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);

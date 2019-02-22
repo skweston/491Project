@@ -307,7 +307,6 @@ GameEngine.prototype.draw = function () {
 
 	for (var i = 0; i < this.background.length; i++) {
 		this.background[i].draw(this.ctx);
-		console.log(`drawing ${this.background[i].name}`);
 	}
 	/*for (var i = 0; i < this.layers.length; i++) {
 		this.layers[i].draw(this.ctx);
@@ -327,9 +326,7 @@ GameEngine.prototype.draw = function () {
 		this.allies[i].draw(this.ctx);
 	}
 
-	for(var i = 0; i < this.elements.length; i++) {
-		this.elements[i].draw(this.ctx);
-	}
+
 
 	for (var i = 0; i < this.playerProjectiles.length; i++) {
 		this.playerProjectiles[i].draw(this.ctx);
@@ -345,6 +342,9 @@ GameEngine.prototype.draw = function () {
 	}
 	for (var i = 0; i < this.effects.length; i++) {
 		this.effects[i].draw(this.ctx);
+	}
+	for(var i = 0; i < this.elements.length; i++) {
+		this.elements[i].draw(this.ctx);
 	}
 	for (var i = 0; i < this.player.length; i++) {
 		this.player[i].draw(this.ctx);

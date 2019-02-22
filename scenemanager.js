@@ -144,6 +144,11 @@ HUD.prototype.draw = function() {
 	this.game.ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
 	this.game.ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
 
+	//Player resource counter
+	this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
+
+
+
 	Entity.prototype.draw.call(this);
 }
 
@@ -340,11 +345,16 @@ function PrototypeLevel(game) {
 	this.rock2.base = this.enemySpaceStation;
 
 	//Neutral rock
-	this.rock3 = new Asteroid(this.game, 600, 300);
+	this.rock3 = new Asteroid(this.game, 1600, 300);
 	this.game.addEntity(this.rock3);
 	this.entities.push(this.rock3);
 
-	this.game.playerResources = 110;
+	//Neutral rock
+	this.rock4 = new Asteroid(this.game, 1600, 1600);
+	this.game.addEntity(this.rock4);
+	this.entities.push(this.rock4);
+
+	this.game.playerResources = 1100;
 	this.game.enemyResources = 1000;
 
 	this.hud = new HUD(this.game); //mandatory

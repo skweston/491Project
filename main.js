@@ -553,6 +553,7 @@ AM.queueDownload("./img/stalker32.png");
 
 AM.queueDownload("./img/BiologicalResourceGatherer.png");
 AM.queueDownload("./img/AlienSpaceStation.png");
+AM.queueDownload("./img/AlienBuilder.png");
 AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
