@@ -13,6 +13,7 @@ function TheShip(game) {
 	this.rollAnimation = new Animation(AM.getAsset("./img/shipRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
 	this.boostRollAnimation = new Animation(AM.getAsset("./img/shipBoostRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, 0.25);
+	this.chargeAnimation = new Animation(AM.getAsset("./img/shipSecondary2Charging.png"), this.pWidth, this.pHeight, 768, 0.05, 6, true, 1);
 	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipIdle.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, 0.3);
 
 	this.invincible = false;
@@ -37,6 +38,8 @@ function TheShip(game) {
 	this.primaryTimer = 0;
 	this.secondaryType = 0;
 	this.secondaryTimer = 0;
+	this.charging = true;
+	this.charge = 0.5;
 	this.orbiterAngle = 0;
 	this.orbiter1 = {x: 0, y: 0};
 	this.orbiter2 = {x: 0, y: 0};
@@ -319,9 +322,72 @@ TheShip.prototype.update = function () {
 				}
 			}
 		}
-		if (this.secondaryType === 2) { // charge shot
-			
+		if (this.secondaryType === 2 && this.charge < 3) { // charge shot
+			this.charging = true;
+			this.charge += 0.01;
 		}
+	}
+	if (!this.game.fireSecondary && this.secondaryType === 2 && this.charge > 0.5) {
+		if (this.charge > 1) {
+			if (this.primaryType === 0) {	// laser
+				for (var i = 0; i < 10; i++) {
+					this.createChargeShot("P0", Math.random() * 10, 0, 0);
+				}
+				if (this.spreaderLevel > 0) {
+					for (var i = 0; i < 10; i++) {
+						this.createChargeShot("P0", Math.random() * 10, 0, 0);
+					}
+				}
+				if (this.spreaderLevel > 1) {
+					for (var i = 0; i < 10; i++) {
+						this.createChargeShot("P0", Math.random() * 10, 0, 0);
+					}
+				}
+			}
+			if (this.primaryType === 1) {	// wave
+				this.createChargeShot("P1", 0, 0, 0);
+				if (this.spreaderLevel > 0) {
+					this.createChargeShot("P1", 0, 0, 1);
+				}
+				if (this.spreaderLevel > 1) {
+					this.createChargeShot("P1", 0, 0, 2);
+				}
+			}
+			if (this.primaryType === 2) {	// bullet
+				if (this.charge > 2) {
+					this.charge = 2;
+				}
+				for (var i = 0; i < 15; i++) {
+					this.createChargeShot("P2", 0, (Math.random() - 0.5) / 2, 0);
+				}
+				if (this.spreaderLevel > 0) {
+					for (var i = 0; i < 15; i++) {
+						this.createChargeShot("P2", 0, (Math.random() - 0.5) / 2, 0);
+					}
+				}
+				if (this.spreaderLevel > 1) {
+					for (var i = 0; i < 15; i++) {
+						this.createChargeShot("P2", 0, (Math.random() - 0.5) / 2, 0);
+					}
+				}
+			}
+			if (this.primaryType === 3) {	// burst
+				this.createChargeShot("P3", 0, 0, 0);
+				if (this.spreaderLevel > 0) {
+					this.createChargeShot("P3", 0, 0, 1);
+				}
+				if (this.spreaderLevel > 1) {
+					this.createChargeShot("P3", 0, 0, 2);
+				}
+			}
+		}
+
+		this.charging = false;
+		this.charge = 0.5;
+	}
+	if (!(this.secondaryType === 2)) {
+		this.charging = false;
+		this.charge = 0.5;
 	}
 	if (this.game.fireBomb && this.bombTimer === 0 && this.bombAmmo > 0) {
 		if (this.bombType === 0) { // neutron bomb
@@ -390,6 +456,48 @@ TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
 	this.game.addEntity(projectile);
 }
 
+TheShip.prototype.createChargeShot = function(type, offset, adjustAngle, spreadNum) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.game.mouseX, yMid: this.game.mouseY});
+	var angle = this.angle + adjustAngle;
+	if (type === "P0") {
+		var projectile = new ShipPrimary0(this.game, 1 * this.charge);
+		projectile.maxSpeed *= (0.7 + Math.random());
+	}
+	if (type === "P1") {
+		var projectile = new ShipPrimary1(this.game, 1 * this.charge);
+	}
+	if (type === "P2") {
+		var projectile = new ShipPrimary2(this.game, 1 * this.charge);
+		projectile.maxSpeed *= Math.random();
+		console.log(projectile.maxSpeed);
+	}
+	if (type === "P3") {
+		var projectile = new ShipPrimary3(this.game, 1 * this.charge);
+		if (spreadNum === 1) {
+			projectile.maxSpeed *= 0.5;
+			projectile.lifetime *= 0.5;
+		}
+		if (spreadNum === 2) {
+			projectile.maxSpeed *= 0.15;
+			projectile.lifetime *= 0.15;
+		}
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+	projectile.damage = (projectile.damage + (projectile.damage * this.powerLevel / 2)) * this.charge * this.charge;
+	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
+	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset)) + this.radius / 2 *  Math.sin(angle);
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
+}
+
 TheShip.prototype.createOrbiterProjectile = function(type, offset, adjustAngle) {
 	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
 							   {xMid: this.game.mouseX, yMid: this.game.mouseY});
@@ -438,6 +546,9 @@ TheShip.prototype.createOrbiterProjectile = function(type, offset, adjustAngle) 
 
 TheShip.prototype.draw = function () {
 	if (!this.game.running) return;
+	if (this.charging) {
+		this.chargeAnimation.drawFrame(this.game.clockTick, this.ctx, this.x - (this.pWidth * 0.5 / 2), this.y - (this.pHeight * 0.5 / 2), this.angle);
+	}
 	if (this.rolling) {
 		if (this.boosting) {
 			this.boostRollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
