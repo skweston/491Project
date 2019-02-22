@@ -54,7 +54,7 @@ SceneManager.prototype.update = function () {
 
 	if(this.game.menu === true) {
 		this.reset();
-		this.changeScenes(new SplashScene(this.game));
+		//this.changeScenes(new SplashScene(this.game));
 		this.game.menu = false;
 	}
 
