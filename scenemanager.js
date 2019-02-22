@@ -310,7 +310,7 @@ HowTo.prototype.draw = function() {
 	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 0, (this.offset * this.line++), 650);
 	this.game.ctx.fillText("Cycle Primary Weapons: 1", 0, (this.offset * this.line++), 650);
 	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Return to Menu at Anytime: P", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (this.offset * this.line++), 650);
 
 	//Weapons
 	this.game.ctx.textAlign = "right";
