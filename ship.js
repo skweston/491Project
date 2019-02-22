@@ -13,8 +13,11 @@ function TheShip(game) {
 	this.rollAnimation = new Animation(AM.getAsset("./img/shipRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
 	this.boostRollAnimation = new Animation(AM.getAsset("./img/shipBoostRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, 0.25);
-
-	this.invincible = false;
+	if(DEBUG) {
+		this.invincible = true;
+	} else {
+		this.invincible = false;
+	}
 	this.name = "Player";
 	this.health = 100;
 	this.boostMax = 1000;
