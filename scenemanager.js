@@ -49,12 +49,24 @@ SceneManager.prototype.reset = function () {
 
 SceneManager.prototype.update = function () {
 	if (!this.game.running && this.game.gameStart) {
-		this.changeScenes(new StoryScrollScene(game));
 		this.game.gameStart = false;
 	}
 
+	if(this.game.menu === true) {
+		this.reset();
+		this.changeScenes(new SplashScene(this.game));
+		this.game.menu = false;
+	}
 
-//	this.spawnAtRandom();
+	if(this.game.tutorial === true) {
+		this.game.tutorial = false;
+		this.changeScenes(new TutorialScene(this.game));
+	}
+
+	if(this.game.level === true) {
+		this.game.level = false;
+		this.changeScenes(new StoryScrollScene(this.game));
+	}
 
 	if (this.game.ship.health < 1) {
 		//var audio = document.createElement('audio');
@@ -188,7 +200,8 @@ TitleEffect.prototype.draw = function () {
 	this.game.ctx.fillText("Super Plutonian Ace Command Earth Fighting Inter-Galactic Hero Team", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400, 500);
 
 	//This needs to flicker
-	this.game.ctx.fillText("Press V to Play", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
+	this.game.ctx.fillText("Press V to Play Level 1", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
+	this.game.ctx.fillText("Press W to Play Tutorial", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 650, 500);
 
 	Entity.prototype.draw.call(this);
 }
@@ -215,6 +228,118 @@ function SplashScene(game) {
 
 SplashScene.prototype.constructor = SplashScene;
 
+function TutorialScene(game) {
+	this.game = game;
+	this.ctx = this.game.ctx;
+	this.entities = [];
+
+	this.background = new MainBackground(this.game, AM.getAsset("./img/4kBackground1.png"));
+	this.game.addEntity(this.background);
+	this.entities.push(this.background);
+
+	this.tutorial = new HowTo(this.game);
+	this.game.addEntity(this.tutorial);
+	this.entities.push(this.tutorial);
+
+
+	//Enemies
+
+	//PowerUps
+
+	//Extras
+
+
+
+
+	this.hud = new HUD(this.game);
+	this.game.addEntity(this.hud);
+	this.entities.push(this.hud);
+	this.game.sceneManager.loadPlayer();
+
+
+
+	//this.game.sceneManager.loadPlayer(); //mandatory
+
+}
+
+function HowTo(game) {
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Element";
+	this.x = 0;
+	this.y = 0;
+	this.removeFromWorld = false;
+	this.isDone = false;
+
+	Entity.call(this, this.game, this.x, this.y);
+}
+
+HowTo.prototype.update = function() {
+	/*if(false) {
+		this.isDone = true;
+		//this.removeFromWorld = true; - Will be in changeScenes
+	}*/
+
+	Entity.prototype.update.call(this);
+}
+
+HowTo.prototype.draw = function() {
+	var ctx = this.game.ctx;
+	ctx.font = "26pt Helvetica";
+	this.game.ctx.fillStyle = "Grey";
+	this.offset = 35;
+	this.line = 1;
+
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Welcome to SPACEFIGHT!", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("Your goal is to take revenge on Earth for demoting the seat of the Empire to \"dwarf\" planet.", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("As you travel to Earth, your caravan will build bases, harvest materials and fight the scum of the Sol System.", 600, (this.offset * this.line++), 800);
+
+
+	//Basic Controls
+	this.offset = 30;
+	this.line += 3;
+	this.game.ctx.textAlign = "left";
+	this.game.ctx.fillStyle = "Blue";
+	ctx.font = "20pt Impact";
+	this.game.ctx.fillText("To Move: W A S D", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("To Dodge: SPACEBAR", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("To Boost Speed: SHIFT", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("To aim: Place cursor on target", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Cycle Primary Weapons: 1", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Return to Menu at Anytime: P", 0, (this.offset * this.line++), 650);
+
+	//Weapons
+	this.game.ctx.textAlign = "right";
+	this.game.ctx.fillText("Primary Weapons", 1200, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Laser", 1200, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Wave", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Bullet", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Burst", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Secondary Weapons", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Missle", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Homing Missle", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Orbiters", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Charge Shot", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("In Game Power Ups", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Spreader", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Repair", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("Enemies", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("", 0, (this.offset * this.line++), 650);
+	this.game.ctx.fillText("", 0, (this.offset * this.line++), 650);
+
+
+	this.game.ctx.textAlign = "right";
+	ctx.font = "24pt Impact";
+	//Stays in bottom right corner of screen
+	this.game.ctx.fillText("Main Menu: P", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
+
+	Entity.prototype.draw.call(this);
+}
 
 function StoryScrollScene(game) {
 	this.game = game;
@@ -232,11 +357,6 @@ function StoryScroll1(game) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Element";
-
-	this.entities = [];
-	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
-	this.game.addEntity(this.background);
-	this.entities.push(this.background);
 
 	this.x = 0;
 	this.y = 0;
@@ -295,8 +415,6 @@ function PrototypeLevel(game) {
 	this.spawnTimerStart = 100;
 	this.spawnTimer = this.spawnTimerStart;
 	this.counter = 0;
-
-
 
 	this.entities = [];
 	this.background = new MainBackground(this.game, AM.getAsset("./img/4kBackground1.png"));

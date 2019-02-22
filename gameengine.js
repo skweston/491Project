@@ -46,6 +46,7 @@ function GameEngine() {
 	// start the game
 	this.mouse = false;
 	this.clicked = false;
+	this.paused = false;
 
 	// player input
 	this.mouseX = 0;
@@ -205,6 +206,21 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "Enter") {
 			that.clicked = true;
 		}
+		if(e.code === "KeyP") {
+			if(that.paused === true) {
+				that.paused = false;
+			} else {
+				that.paused = true;
+			}
+		}
+		if(e.code === "KeyW") {
+			//console.log("V detected");
+			that.tutorial = true;
+		}
+		if(e.code === "Escape") {
+			//console.log("menu");
+			that.menu = true;
+		}
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("keypress", function (e) {
@@ -237,7 +253,7 @@ GameEngine.prototype.startInput = function () {
 		}
 		if (e.code === "KeyV") {
 			//console.log("V detected");
-			that.gameStart = true;
+			that.level = true;
 		}
 		if (e.code === "Digit1") {
 			that.swapPrimary = true;
@@ -307,7 +323,7 @@ GameEngine.prototype.draw = function () {
 
 	for (var i = 0; i < this.background.length; i++) {
 		this.background[i].draw(this.ctx);
-		console.log(`drawing ${this.background[i].name}`);
+		//console.log(`drawing ${this.background[i].name}`);
 	}
 	/*for (var i = 0; i < this.layers.length; i++) {
 		this.layers[i].draw(this.ctx);
@@ -356,6 +372,7 @@ GameEngine.prototype.draw = function () {
 }
 
 GameEngine.prototype.update = function () {
+if(this.paused === false) {
 	// var entitiesCount = this.entities.length;
 
 	// for (var i = 0; i < entitiesCount; i++) {
@@ -534,6 +551,7 @@ GameEngine.prototype.update = function () {
 	this.bomb = false;
 	this.swapPrimary = false;
 	this.swapSecondary = false;
+	} //end of if
 }
 
 GameEngine.prototype.loop = function () {
