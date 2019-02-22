@@ -397,7 +397,7 @@ Background.prototype.update = function () {
 var AM = new AssetManager();
 
 AM.queueDownload("./img/space1-1.png");
-AM.queueDownload("./img/Uberspace.png");
+// AM.queueDownload("./img/Uberspace.png");
 AM.queueDownload("./img/4kBackground1.png");
 AM.queueDownload("./img/4kBackground2.png");
 AM.queueDownload("./img/BloodSplatter.png");
