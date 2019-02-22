@@ -345,7 +345,7 @@ function PrototypeLevel(game) {
 	this.entities.push(this.rock3);
 
 	this.game.playerResources = 110;
-	this.game.enemyResources = 100;
+	this.game.enemyResources = 1000;
 
 	this.hud = new HUD(this.game); //mandatory
 	this.game.addEntity(this.hud);

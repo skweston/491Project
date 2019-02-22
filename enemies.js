@@ -70,6 +70,12 @@ AlienSpaceStation.prototype.update = function () {
 		this.game.enemyResources -=10;
 
     }
+	if(this.game.enemyResources > 500){
+		var ent = new Boss1(this.game);
+		ent.x = this.x;
+		this.game.addEntity(ent);
+		this.game.enemyResources -=500;
+	}
 	this.generateGatherer -= 1;
 	this.angle += 0.0075;
 
@@ -252,11 +258,12 @@ function BossTurret(game, boss, xOffset, yOffset){
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
-    this.health = 5;
+    this.health = 150;
 	this.shootCooldown = 30;
 	this.missleCooldown = 1500;
 	this.shotCount = 0;
 	this.boss = boss;
+	this.target = null;
 
 
 }
@@ -321,8 +328,29 @@ BossTurret.prototype.update = function () {
 			}
 		}
 	}
-    var dx = this.game.ship.xMid - this.xMid-1;
-    var dy = (this.yMid - this.game.ship.yMid)-1;
+	var closest = 100000000;
+	if (true){
+
+
+
+		//find the player allied ship
+		for (var i = 0; i < this.game.allies.length; i++){
+			var ent = this.game.allies[i];
+			var d = distance(this, ent);
+			if(d < closest){
+				closest = d;
+				this.target = ent;
+
+			}
+		}
+	}
+
+	if(distance(this, this.game.ship) < closest){
+		this.target = this.game.ship;
+	}
+
+    var dx = this.target.xMid - this.xMid-1;
+    var dy = (this.yMid - this.target.yMid)-1;
     // this should be the angle in radians
     this.angle = -Math.atan2(dy,dx);
 
@@ -344,7 +372,7 @@ BossTurret.prototype.update = function () {
 }
 BossTurret.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
-							   {xMid: this.game.ship.xMid, yMid: this.game.ship.YMid});
+							   {xMid: this.target.xMid, yMid: this.target.YMid});
 	var angle = this.angle + adjustAngle;
 	if (type === "LaserBlast") {
 		var projectile = new LaserBlast(this.game, this.angle);
@@ -354,7 +382,7 @@ BossTurret.prototype.createProjectile = function(type, offset, adjustAngle) {
 	}
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
-	var dir = direction(this.game.ship, this);
+	var dir = direction(this.target, this);
 
 	projectile.x = this.xMid;
 	projectile.y = this.yMid;

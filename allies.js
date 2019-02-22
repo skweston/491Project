@@ -111,7 +111,7 @@ PurpleChroma.prototype.update = function () {
 	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
 		var ent = this.game.enemyProjectiles[i];
 		if (Collide(this, ent)) {
-			this.takeDamage(end.damage);
+			this.takeDamage(ent.damage);
 			ent.removeFromWorld = true;
 			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
 			splatter.angle = this.angle;
@@ -503,9 +503,11 @@ PlayerBuilder.prototype.draw = function () {
 
 PlayerBuilder.prototype.update = function () {
 
-	//something likethis for an Effect
 
 
+	if (this.target && this.target.hasbase){
+		this.target = null;
+	}
 	//if it hasn't found its target yet, or its target has become undefined
 	if (!this.target){
 		this.angle += 0.0125;
@@ -536,7 +538,7 @@ PlayerBuilder.prototype.update = function () {
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
-	if (this.target && Collide(this, this.target)){
+	if (this.target && Collide(this, this.target) && !this.target.hasbase){
 		this.target.hasbase = true;
 		var base = new SpaceStation(this.game, this.target.x, this.target.y, this.target);
 		this.target.base = base;
