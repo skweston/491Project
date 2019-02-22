@@ -345,12 +345,30 @@ TheShip.prototype.update = function () {
 				}
 			}
 			if (this.primaryType === 1) {	// wave
-				this.createChargeShot("P1", 0, 0, 0);
-				if (this.spreaderLevel > 0) {
-					this.createChargeShot("P1", 0, 0, 1);
+				if (this.charge > 1.5) {
+					this.charge = 1.5;
 				}
-				if (this.spreaderLevel > 1) {
+				if (this.spreaderLevel === 0) {
+					this.createChargeShot("P1", 0, 0, 0);
+					this.createChargeShot("P1", 0, 0, 1);
 					this.createChargeShot("P1", 0, 0, 2);
+				}
+				else if (this.spreaderLevel === 1) {
+					for (var i = 0; i < 2; i++) {
+						this.createChargeShot("P1", 0, ((Math.PI / 30) * Math.pow(-1, i)), 0);
+						this.createChargeShot("P1", 0, ((Math.PI / 30) * Math.pow(-1, i)), 1);
+						this.createChargeShot("P1", 0, ((Math.PI / 30) * Math.pow(-1, i)), 2);
+					}
+				}
+				else {
+					this.createChargeShot("P1", 0, 0, 0);
+					this.createChargeShot("P1", 0, 0, 1);
+					this.createChargeShot("P1", 0, 0, 2);
+					for (var i = 0; i < 2; i++) {
+						this.createChargeShot("P1", 0, ((Math.PI / 20) * Math.pow(-1, i)), 0);
+						this.createChargeShot("P1", 0, ((Math.PI / 20) * Math.pow(-1, i)), 1);
+						this.createChargeShot("P1", 0, ((Math.PI / 20) * Math.pow(-1, i)), 2);
+					}
 				}
 			}
 			if (this.primaryType === 2) {	// bullet
@@ -381,7 +399,6 @@ TheShip.prototype.update = function () {
 				}
 			}
 		}
-
 		this.charging = false;
 		this.charge = 0.5;
 	}
@@ -465,12 +482,22 @@ TheShip.prototype.createChargeShot = function(type, offset, adjustAngle, spreadN
 		projectile.maxSpeed *= (0.7 + Math.random());
 	}
 	if (type === "P1") {
-		var projectile = new ShipPrimary1(this.game, 1 * this.charge);
+		if (spreadNum === 1) {
+			var projectile = new ShipPrimary1(this.game, 1 * this.charge * 0.75);
+			projectile.damage *= 0.75 * 0.5;
+		}
+		else if (spreadNum === 2) {
+			var projectile = new ShipPrimary1(this.game, 1 * this.charge * 0.75 * 0.75);
+			projectile.damage *=  0.75 * 0.75 * 0.5;
+		}
+		else {
+			var projectile = new ShipPrimary1(this.game, 1 * this.charge);
+			projectile.damage *= 0.5;
+		}
 	}
 	if (type === "P2") {
 		var projectile = new ShipPrimary2(this.game, 1 * this.charge);
 		projectile.maxSpeed *= Math.random();
-		console.log(projectile.maxSpeed);
 	}
 	if (type === "P3") {
 		var projectile = new ShipPrimary3(this.game, 1 * this.charge);
@@ -597,7 +624,7 @@ function ShipPrimary0(game, adjustScale) {	// laser
 	this.pWidth = 128;
 	this.pHeight = 128;
 	this.scale = 0.25 * adjustScale;
-	this.animation = new Animation(AM.getAsset("./img/shipPrimary0.png"), this.pWidth, this.pHeight, 384, 0.15, 3, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/shipPrimary0.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
 
 	this.name = "PlayerProjectile";
 	this.x = 0;
@@ -655,7 +682,7 @@ function ShipPrimary1(game, adjustScale) {	// wave
 	this.pWidth = 128;
 	this.pHeight = 128;
 	this.scale = 0.65 * adjustScale;
-	this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.25, 3, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/shipPrimary1.png"), this.pWidth, this.pHeight, 384, 0.1, 3, true, this.scale);
 	
 	this.name = "PlayerProjectile";
 	this.x = 0;
