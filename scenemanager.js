@@ -37,34 +37,38 @@ SceneManager.prototype.reset = function () {
 		this.game.effects[i].removeFromWorld = true;
 	}
 
-	var ship = new TheShip(this.game);
+	/*var ship = new TheShip(this.game);
 	var reticle = new Reticle(this.game);
 	this.game.addEntity(ship);
 	this.game.addEntity(reticle);
-	this.game.ship = ship;
+	this.game.ship = ship;*/
 
 	//back to title screen on death
-	this.changeScenes(new SplashScene(this.game));
+	//this.changeScenes(new SplashScene(this.game));
 }
 
 SceneManager.prototype.update = function () {
+	//console.log("current scene: " + this.currentScene.name);
+	//console.log(this.game.tutrl);
 	if (!this.game.running && this.game.gameStart) {
 		this.game.gameStart = false;
 	}
 
 	if(this.game.menu === true) {
-		this.reset();
-		//this.changeScenes(new SplashScene(this.game));
 		this.game.menu = false;
+		this.reset();
+		this.changeScenes(new SplashScene(this.game));
 	}
 
-	if(this.game.tutorial === true) {
-		this.game.tutorial = false;
+	if(this.game.tutrl === true) {
+		this.game.tutrl = false;
+		this.reset();
 		this.changeScenes(new TutorialScene(this.game));
 	}
 
 	if(this.game.level === true) {
 		this.game.level = false;
+		this.reset();
 		this.changeScenes(new StoryScrollScene(this.game));
 	}
 
@@ -72,12 +76,18 @@ SceneManager.prototype.update = function () {
 		//var audio = document.createElement('audio');
 		//audio.src = "./img/Die.wav";
 		//audio.play();
-		this.reset();
+		//this.reset();
+		this.game.menu = true;
 	}
 }
 
 SceneManager.prototype.loadPlayer = function () {
 	this.game.running = true;
+	var ship = new TheShip(this.game);
+	var reticle = new Reticle(this.game);
+	this.game.addEntity(ship);
+	this.game.addEntity(reticle);
+	this.game.ship = ship;
 	this.game.ship.health = 100;
 	SCORE = 0;
 }
@@ -201,7 +211,7 @@ TitleEffect.prototype.draw = function () {
 
 	//This needs to flicker
 	this.game.ctx.fillText("Press V to Play Level 1", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
-	this.game.ctx.fillText("Press W to Play Tutorial", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 650, 500);
+	this.game.ctx.fillText("Press O to Play Tutorial", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 650, 500);
 
 	Entity.prototype.draw.call(this);
 }
@@ -212,6 +222,7 @@ TitleEffect.prototype.update = function () {
 }
 
 function SplashScene(game) {
+	this.name = "Splash";
 	this.game = game;
 	this.entities = [];
 
@@ -229,6 +240,7 @@ function SplashScene(game) {
 SplashScene.prototype.constructor = SplashScene;
 
 function TutorialScene(game) {
+	this.name = "Tutorial";
 	this.game = game;
 	this.ctx = this.game.ctx;
 	this.entities = [];
@@ -241,25 +253,10 @@ function TutorialScene(game) {
 	this.game.addEntity(this.tutorial);
 	this.entities.push(this.tutorial);
 
-
-	//Enemies
-
-	//PowerUps
-
-	//Extras
-
-
-
-
 	this.hud = new HUD(this.game);
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
 	this.game.sceneManager.loadPlayer();
-
-
-
-	//this.game.sceneManager.loadPlayer(); //mandatory
-
 }
 
 function HowTo(game) {
@@ -342,6 +339,7 @@ HowTo.prototype.draw = function() {
 }
 
 function StoryScrollScene(game) {
+	this.name = "Scroll";
 	this.game = game;
 	this.entities = [];
 	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
@@ -408,6 +406,7 @@ StoryScroll1.prototype.update = function () {
 }
 
 function PrototypeLevel(game) {
+	this.name = "prototype";
 	this.game = game;
 	this.bossTimerStart = 1000;
 	this.bossTimer = 0;

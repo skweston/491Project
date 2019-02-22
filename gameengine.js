@@ -47,6 +47,9 @@ function GameEngine() {
 	this.mouse = false;
 	this.clicked = false;
 	this.paused = false;
+	this.tutrl = false;
+	this.level = false;
+	this.menu = false;
 
 	// player input
 	this.mouseX = 0;
@@ -213,9 +216,9 @@ GameEngine.prototype.startInput = function () {
 				that.paused = true;
 			}
 		}
-		if(e.code === "KeyW") {
-			//console.log("V detected");
-			that.tutorial = true;
+		if(e.code === "KeyO") {
+			//console.log("O detected");
+			that.tutrl = true;
 		}
 		if(e.code === "Escape") {
 			//console.log("menu");
