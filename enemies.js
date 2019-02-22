@@ -587,7 +587,7 @@ Leech.prototype.update = function () {
 	if (this.health < 1) {
 		SCORE++;
 
-		for(var i = 0; i< 2; i++){
+		for(var i = 0; i< 1; i++){
 			var scrap = new Scrap(this.game);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
@@ -597,8 +597,8 @@ Leech.prototype.update = function () {
 			this.game.addEntity(scrap);
 		}
 		var dice = Math.random()*100;
-		if (dice < 35) {
-			if(dice < 25){
+		if (dice < 10) {
+			if(dice < 6){
 				var repair = new RepairDrop(this.game);
 				repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
 				repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
@@ -623,7 +623,7 @@ Leech.prototype.update = function () {
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
 		this.game.addEntity(explosion);
-		this.spawner.spawns--
+		this.spawner.spawns--;
 	}
 
 	Entity.prototype.update.call(this);
@@ -740,8 +740,8 @@ Scourge.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
-		this.spawner.spawns--;
-		if (Math.random() * 100 < 20) {
+
+		if (Math.random() * 100 < 7) {
 			var spreader = new Spreader(this.game);
 			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
 			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
@@ -750,7 +750,7 @@ Scourge.prototype.update = function () {
 
 			this.game.addEntity(spreader);
 		}
-		for(var i = 0; i< 3; i++){
+		for(var i = 0; i< 1; i++){
 			var scrap = new Scrap(this.game);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
@@ -939,7 +939,7 @@ Stalker.prototype.update = function () {
 
 	if(this.health < 1) {
 		SCORE += 3;
-        this.spawner.spaws--;
+
         this.removeFromWorld = true;
     }
 	for (var i = 0; i<this.game.playerProjectiles.length; i++){
@@ -960,7 +960,11 @@ Stalker.prototype.update = function () {
 			this.createProjectile("LaserBlast", 0, -Math.PI/2);
 	}
 
-
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+		this.game.addEntity(explosion);
+		this.spawner.spawns--;
+	}
 
 	Entity.prototype.update.call(this);
 }

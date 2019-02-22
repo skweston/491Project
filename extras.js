@@ -202,10 +202,10 @@ Scrap.prototype.update = function () {
 
 
 
-	// this.lifetime -= 1;
-	// if (this.lifetime < 0) {
-	// 	this.removeFromWorld = true;
-	// }
+	this.lifetime -= 1;
+	if (this.lifetime < 0) {
+		this.removeFromWorld = true;
+	}
 
 	Entity.prototype.update.call(this);
 }

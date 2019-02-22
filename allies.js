@@ -21,7 +21,7 @@ function PurpleChroma(game, spawner) {
 	this.health = 75;
 	this.damage = 20;
 	this.target = null;
-	this.fullShootCooldown = 20;
+	this.fullShootCooldown = 35;
 	this.shootCooldown = this.fullShootCooldown;
 	this.powerLevel = 0;
 	//console.log("starting health: " + this.health);
@@ -171,7 +171,7 @@ function SpaceStation(game, x, y, rock) {
     //Specific to spawners:
     this.timerReset = 500;
     this.generateGatherer = this.timerReset;
-    this.maxSpawn = 5; // maybe make this a difficulty variable.
+    this.maxSpawn = 3; // maybe make this a difficulty variable.
 
     this.pWidth = 512;
     this.pHeight = 512;
@@ -183,19 +183,21 @@ function SpaceStation(game, x, y, rock) {
 	this.asteroid = rock;
     this.xMid = this.x + (this.pWidth * this.scale) / 2;
     this.yMid = this.y + (this.pHeight * this.scale) / 2;
-    this.radius = 475 * this.scale;
+    this.radius = 362 * this.scale;
     this.speed = 0;
     this.angle = 0;
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
-    this.health = 5000;
+    this.health = 1000;
 
 
 	//the spawns that the spawner 'owns'
 	this.spawns = 0;
 	this.maxGatherers = 5;
 	this.gatherers = 0;
+	this.maxBuilders = 1;
+	this.builders = 0;
 }
 SpaceStation.prototype = new Entity();
 SpaceStation.prototype.constructor = SpaceStation;
@@ -240,6 +242,15 @@ SpaceStation.prototype.update = function () {
 		this.game.playerResources -=100;
 
     }
+	if (this.builders < this.maxBuilders && this.game.playerResources > 500){
+		var ent = new PlayerBuilder(this.game, this);
+		ent.x = this.x + (this.pWidth * this.scale) / 2;
+		ent.y = this.y + (this.pHeight * this.scale) / 2;
+		this.game.addEntity(ent);
+		this.builders++;
+		this.game.playerResources -=500;
+
+	}
 
 	this.generateGatherer -= 1;
 	this.angle += 0.01;
@@ -573,7 +584,7 @@ PlayerBuilder.prototype.update = function () {
 	if (this.removeFromWorld) {
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
-		// this.spawner.gatherers--;
+		this.spawner.builders--;
 	}
 
 	Entity.prototype.update.call(this);

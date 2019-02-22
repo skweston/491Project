@@ -505,7 +505,7 @@ GameEngine.prototype.update = function () {
 	for (var i = 0; i < count; i++) {
 		var entity = this.enemies[i];
 		if (entity.removeFromWorld) {
-			entity.generateItem();
+			// entity.generateItem();
 			this.enemies.splice(i, 1);
 			count--;
 			i--;
