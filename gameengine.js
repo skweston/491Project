@@ -29,6 +29,7 @@ function GameEngine() {
 	// this.entities = [];
 	this.levels = [];
 	this.background = [];
+	this.layers = [];
 	this.player = [];
 	this.enemies = [];
 	this.allies = [];
@@ -272,6 +273,9 @@ GameEngine.prototype.addEntity = function (entity) {
 	if (entity.name === "Background") {
 		this.background.push(entity);
 	}
+	if (entity.name === "Layer") {
+		this.layers.push(entity);
+	}
 	if (entity.name === "Player") {
 		this.player.push(entity);
 	}
@@ -303,7 +307,12 @@ GameEngine.prototype.draw = function () {
 
 	for (var i = 0; i < this.background.length; i++) {
 		this.background[i].draw(this.ctx);
+		console.log(`drawing ${this.background[i].name}`);
 	}
+	/*for (var i = 0; i < this.layers.length; i++) {
+		this.layers[i].draw(this.ctx);
+		console.log(`drawing ${this.layers[i].name}`);
+	}*/
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].draw(this.ctx);
 	}

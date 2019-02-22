@@ -740,7 +740,7 @@ Scourge.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
-
+		this.spawner.spawns--;
 		if (Math.random() * 100 < 20) {
 			var spreader = new Spreader(this.game);
 			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
@@ -871,6 +871,136 @@ Spawner.prototype.draw = function () {
     //Entity.prototype.draw.call(this);
 }
 
+/* ========================================================================================================== */
+// Stalker
+/* ========================================================================================================== */
+
+function Stalker(game, xIn, yIn, spawner){
+
+		this.pWidth = 32;
+		this.pHeight = 32;
+		this.scale = 2;
+		this.animation = new Animation(AM.getAsset("./img/stalker32.png"), this.pWidth, this.pHeight,
+										512, 0.1, 5, true, this.scale);
+										/*swap these two for HD sprite*/
+										//976, 0.1, 5, true, this.scale);
+		this.angle = 0;
+		this.name = "Enemy";
+		this.speed = 0.5;
+		this.x = xIn;
+		this.y = yIn;
+        this.spawner = spawner;
+		this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+		this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+		this.radius = 41 * this.scale;
+		this.game = game;
+		this.ctx = game.ctx;
+		this.removeFromWorld = false;
+		this.health = 100;
+		this.damage = 3;
+		this.shootCooldown = 300;
+		//console.log("starting health: " + this.health);
+		Entity.call(this, game, this.x, this.y);
+
+
+}
+
+Stalker.prototype = new Entity();
+Stalker.prototype.constructor = Stalker;
+
+Stalker.prototype.update = function () {
+
+	// update angle
+	var dx = this.game.ship.xMid - this.xMid;
+	var dy = this.yMid - this.game.ship.yMid;
+	this.angle = -Math.atan2(dy,dx);
+
+	//uses main.js distance function to maintain a radius 300 around ship.
+	//potential other uses depending on chroma set up.
+	var currentDistance = distance(this, this.game.ship);
+
+	// Change will be -/+ depending on radius from ship.
+	var changeX = Math.cos(this.angle) * 10 * this.speed;
+	var changeY = Math.sin(this.angle) * 10 * this.speed;
+
+	if(currentDistance > 300) {
+		this.x += changeX;
+		this.y += changeY;
+	} else {
+		this.x -= changeX;
+		this.y -= changeY;
+	}
+
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	//gun stuff below
+	this.shootCooldown--;
+
+	if(this.health < 1) {
+		SCORE += 3;
+        this.spawner.spaws--;
+        this.removeFromWorld = true;
+    }
+	for (var i = 0; i<this.game.playerProjectiles.length; i++){
+
+		var ent = this.game.playerProjectiles[i];
+		if(Collide(this, ent)){
+
+			this.takeDamage(ent.damage);
+			ent.removeFromWorld = true;
+		}
+	}
+
+    // this should be the angle in radians
+    this.angle = -Math.atan2(dy,dx);
+
+	if (this.shootCooldown < 1){
+			this.shootCooldown = 75;
+			this.createProjectile("LaserBlast", 0, -Math.PI/2);
+	}
+
+
+
+	Entity.prototype.update.call(this);
+}
+
+Stalker.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.game.ship.xMid, yMid: this.game.ship.YMid});
+	var angle = this.angle + adjustAngle;
+	if (type === "LaserBlast") {
+		var projectile = new LaserBlast(this.game, this.angle);
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(this.game.ship, this);
+
+	projectile.x = this.xMid;
+	projectile.y = this.yMid;
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
+}
+
+Stalker.prototype.draw = function () {
+	//this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+	Entity.prototype.draw.call(this);
+}
 
 /* ========================================================================================================== */
 // Resource Gatherer Enemy

@@ -15,7 +15,11 @@ function TheShip(game) {
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, 0.25);
 	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipIdle.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, 0.3);
 
-	this.invincible = false;
+	if(DEBUG) {
+		this.invincible = true;
+	} else {
+		this.invincible = false;
+	}
 	this.name = "Player";
 	this.health = 100;
 	this.boostMax = 1000;
