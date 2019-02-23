@@ -15,6 +15,9 @@ SceneManager.prototype.reset = function () {
 	this.game.playerResources = 0;
 	this.game.enemyResources = 0;
 
+	for (var i = 0; i < this.game.player.length; i++) {
+		this.game.player[i].removeFromWorld = true;
+	}
 	for (var i = 0; i < this.game.extras.length; i++) {
 		this.game.extras[i].removeFromWorld = true;
 	}
@@ -24,13 +27,13 @@ SceneManager.prototype.reset = function () {
 	for (var i = 0; i < this.game.enemies.length; i++){
 		this.game.enemies[i].removeFromWorld = true;
 	}
-	for(var i = 0; i< this.game.enemyProjectiles.length; i++){
+	for(var i = 0; i < this.game.enemyProjectiles.length; i++){
 		this.game.enemyProjectiles[i].removeFromWorld = true;
 	}
-	for(var i = 0; i< this.game.playerProjectiles.length; i++){
+	for(var i = 0; i < this.game.playerProjectiles.length; i++){
 		this.game.playerProjectiles[i].removeFromWorld = true;
 	}
-	for(var i = 0; i< this.game.resources.length; i++){
+	for(var i = 0; i < this.game.resources.length; i++){
 		this.game.resources[i].removeFromWorld = true;
 	}
 	for (var i = 0; i < this.game.terrain.length; i++){
@@ -39,39 +42,47 @@ SceneManager.prototype.reset = function () {
 	for (var i = 0; i < this.game.effects.length; i++) {
 		this.game.effects[i].removeFromWorld = true;
 	}
-	for (var i = 0; i < this.game.extras.length; i++){
-		this.game.extras[i].removeFromWorld = true;
-	}
-
-	var ship = new TheShip(this.game);
-	var reticle = new Reticle(this.game);
-	this.game.addEntity(ship);
-	this.game.addEntity(reticle);
-	this.game.ship = ship;
-
-	//back to title screen on death
-	this.changeScenes(new SplashScene(this.game));
 }
 
 SceneManager.prototype.update = function () {
 	if (!this.game.running && this.game.gameStart) {
-		this.changeScenes(new StoryScrollScene(game));
 		this.game.gameStart = false;
 	}
 
+	if(this.game.menu === true) {
+		this.game.menu = false;
+		this.reset();
+		this.changeScenes(new SplashScene(this.game));
+	}
 
-//	this.spawnAtRandom();
+	if(this.game.tutrl === true) {
+		this.game.tutrl = false;
+		this.reset();
+		this.changeScenes(new TutorialScene(this.game));
+	}
+
+	if(this.game.level === true) {
+		this.game.level = false;
+		this.reset();
+		this.changeScenes(new StoryScrollScene(this.game));
+	}
 
 	if (this.game.ship.health < 1) {
 		//var audio = document.createElement('audio');
 		//audio.src = "./img/Die.wav";
 		//audio.play();
-		this.reset();
+		//this.reset();
+		this.game.menu = true;
 	}
 }
 
 SceneManager.prototype.loadPlayer = function () {
 	this.game.running = true;
+	var ship = new TheShip(this.game);
+	var reticle = new Reticle(this.game);
+	this.game.addEntity(ship);
+	this.game.addEntity(reticle);
+	this.game.ship = ship;
 	this.game.ship.health = 100;
 	SCORE = 0;
 }
@@ -153,7 +164,11 @@ HUD.prototype.draw = function() {
 	//Player resource counter
 	this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
 
-
+	//Idea has not yet been discussed but should be tested for quick implementation
+	this.game.ctx.textAlign = "right";
+	this.game.ctx.font = "24pt Impact";
+	//Stays in bottom right corner of screen
+	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
 
 	Entity.prototype.draw.call(this);
 }
@@ -199,7 +214,8 @@ TitleEffect.prototype.draw = function () {
 	this.game.ctx.fillText("Super Plutonian Ace Command Earth Fighting Inter-Galactic Hero Team", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400, 500);
 
 	//This needs to flicker
-	this.game.ctx.fillText("Press V to Play", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
+	this.game.ctx.fillText("Press V to Play Level 1", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
+	this.game.ctx.fillText("Press O to Play Tutorial", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 650, 500);
 
 	Entity.prototype.draw.call(this);
 }
@@ -210,6 +226,7 @@ TitleEffect.prototype.update = function () {
 }
 
 function SplashScene(game) {
+	this.name = "Splash";
 	this.game = game;
 	this.entities = [];
 
@@ -226,8 +243,115 @@ function SplashScene(game) {
 
 SplashScene.prototype.constructor = SplashScene;
 
+function TutorialScene(game) {
+	this.name = "Tutorial";
+	this.game = game;
+	this.ctx = this.game.ctx;
+	this.entities = [];
+
+	this.background = new MainBackground(this.game, AM.getAsset("./img/4kBackground1.png"));
+	this.game.addEntity(this.background);
+	this.entities.push(this.background);
+
+	this.tutorial = new HowTo(this.game);
+	this.game.addEntity(this.tutorial);
+	this.entities.push(this.tutorial);
+
+	this.hud = new HUD(this.game);
+	this.game.addEntity(this.hud);
+	this.entities.push(this.hud);
+	this.game.sceneManager.loadPlayer();
+}
+
+function HowTo(game) {
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Element";
+	this.x = 0;
+	this.y = 0;
+	this.removeFromWorld = false;
+	this.isDone = false;
+
+	Entity.call(this, this.game, this.x, this.y);
+}
+
+HowTo.prototype.update = function() {
+	/*if(false) {
+		this.isDone = true;
+		//this.removeFromWorld = true; - Will be in changeScenes
+	}*/
+
+	Entity.prototype.update.call(this);
+}
+
+HowTo.prototype.draw = function() {
+	var ctx = this.game.ctx;
+	ctx.font = "26pt Impact";
+	this.game.ctx.fillStyle = "Grey";
+	this.offset = 35;
+	this.line = 2;
+
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Welcome to SPACEFIGHT!", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("Your goal is to take revenge on Earth for demoting", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("the seat of the Empire to \"dwarf\" planet.", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("As you travel to Earth, your caravan will build bases,", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("harvest materials and fight the scum of the Sol System.", 600, (this.offset * this.line), 800);
+
+	this.point = this.line;
+
+
+	//Basic Controls
+	this.offset = 30;
+	this.line += 3;
+	this.game.ctx.textAlign = "left";
+	this.game.ctx.fillStyle = "Blue";
+	ctx.font = "22pt Impact";
+	this.game.ctx.fillText("To Move: W A S D", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Dodge: SPACEBAR", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Boost Speed: SHIFT", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To aim: Place cursor on target", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("Cycle Primary Weapons: 1", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (this.offset * this.line++), 400); 
+
+	//Weapons
+	/*
+	this.game.ctx.textAlign = "right";
+	this.game.ctx.fillText("Primary Weapons", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Laser", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Wave", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Bullet", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Burst", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550); //blank line
+	this.game.ctx.fillText("Secondary Weapons", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Missle", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Homing Missle", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Orbiters", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Charge Shot", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550); //blank line
+	this.game.ctx.fillText("In Game Power Ups", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Spreader", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Repair", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550); //blank wline
+	this.game.ctx.fillText("Enemies", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
+	*/
+
+	this.game.ctx.textAlign = "right";
+	ctx.font = "24pt Impact";
+	//Stays in bottom right corner of screen
+	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
+
+	Entity.prototype.draw.call(this);
+}
 
 function StoryScrollScene(game) {
+	this.name = "Scroll";
 	this.game = game;
 	this.entities = [];
 	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
@@ -243,11 +367,6 @@ function StoryScroll1(game) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Element";
-
-	this.entities = [];
-	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
-	this.game.addEntity(this.background);
-	this.entities.push(this.background);
 
 	this.x = 0;
 	this.y = 0;
@@ -299,6 +418,7 @@ StoryScroll1.prototype.update = function () {
 }
 
 function PrototypeLevel(game) {
+	this.name = "prototype";
 	this.game = game;
 	this.bossTimerStart = 1000;
 	this.bossTimer = 0;
@@ -306,8 +426,6 @@ function PrototypeLevel(game) {
 	this.spawnTimerStart = 100;
 	this.spawnTimer = this.spawnTimerStart;
 	this.counter = 0;
-
-
 
 	this.entities = [];
 	this.background = new MainBackground(this.game, AM.getAsset("./img/4kBackground1.png"));

@@ -47,6 +47,10 @@ function GameEngine() {
 	// start the game
 	this.mouse = false;
 	this.clicked = false;
+	this.paused = false;
+	this.tutrl = false;
+	this.level = false;
+	this.menu = false;
 
 	// player input
 	this.mouseX = 0;
@@ -206,6 +210,21 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "Enter") {
 			that.clicked = true;
 		}
+		if(e.code === "KeyP") {
+			if(that.paused === true) {
+				that.paused = false;
+			} else {
+				that.paused = true;
+			}
+		}
+		if(e.code === "KeyO") {
+			//console.log("O detected");
+			that.tutrl = true;
+		}
+		if(e.code === "Escape") {
+			//console.log("menu");
+			that.menu = true;
+		}
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("keypress", function (e) {
@@ -238,7 +257,7 @@ GameEngine.prototype.startInput = function () {
 		}
 		if (e.code === "KeyV") {
 			//console.log("V detected");
-			that.gameStart = true;
+			that.level = true;
 		}
 		if (e.code === "Digit1") {
 			that.swapPrimary = true;
@@ -367,6 +386,7 @@ GameEngine.prototype.draw = function () {
 }
 
 GameEngine.prototype.update = function () {
+if(this.paused === false) {
 	// var entitiesCount = this.entities.length;
 
 	// for (var i = 0; i < entitiesCount; i++) {
@@ -558,6 +578,7 @@ GameEngine.prototype.update = function () {
 	this.bomb = false;
 	this.swapPrimary = false;
 	this.swapSecondary = false;
+	} //end of if
 }
 
 GameEngine.prototype.loop = function () {
