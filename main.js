@@ -289,6 +289,7 @@ Camera.prototype.draw = function (cameraCtx) {
 };
 
 Camera.prototype.update = function () {
+	console.log(this.isScrolling);
 	//console.log(`${this.x} x, ${this.y} y,
 	//	 				${this.ctx.canvas.width} CW, ${this.ctx.canvas.height} CH`);
 	// this.game.reticle.x =
@@ -299,8 +300,6 @@ Camera.prototype.update = function () {
 
 
 	//deadzone bounding box logic
-
-
 	if(this.game.ship.xMid > this.x + this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio)){
 		this.x = this.game.ship.xMid - (this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio));
 		this.isScrolling = true;
@@ -317,7 +316,6 @@ Camera.prototype.update = function () {
 		this.y = this.game.ship.yMid - (this.ctx.canvas.height/this.deadzoneRatio);
 		this.isScrolling = true;
 	}
-
 
 	//bounds the edge of the background so we don't draw in the void
 	if(this.x < 0){
@@ -509,17 +507,20 @@ AM.queueDownload("./img/BloodSplatter.png");
 
 // ship stuff
 AM.queueDownload("./img/shipIdleSpeed0.png");
-AM.queueDownload("./img/shipIdleSpeed1.png");
-AM.queueDownload("./img/shipIdleSpeed2.png");
 AM.queueDownload("./img/shipBoostSpeed0.png");
-AM.queueDownload("./img/shipBoostSpeed1.png");
-AM.queueDownload("./img/shipBoostSpeed2.png");
 AM.queueDownload("./img/shipRollSpeed0.png");
-AM.queueDownload("./img/shipRollSpeed1.png");
-AM.queueDownload("./img/shipRollSpeed2.png");
 AM.queueDownload("./img/shipBoostRollSpeed0.png");
+
+AM.queueDownload("./img/shipIdleSpeed1.png");
+AM.queueDownload("./img/shipBoostSpeed1.png");
+AM.queueDownload("./img/shipRollSpeed1.png");
 AM.queueDownload("./img/shipBoostRollSpeed1.png");
+
+AM.queueDownload("./img/shipIdleSpeed2.png");
+AM.queueDownload("./img/shipBoostSpeed2.png");
+AM.queueDownload("./img/shipRollSpeed2.png");
 AM.queueDownload("./img/shipBoostRollSpeed2.png");
+
 AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary0.png");
 AM.queueDownload("./img/shipPrimary1.png");
@@ -529,8 +530,12 @@ AM.queueDownload("./img/shipPrimary3Burst.png");
 AM.queueDownload("./img/shipSecondary0.png");
 AM.queueDownload("./img/shipSecondary1Idle.png");
 AM.queueDownload("./img/shipSecondary1Homing.png");
-AM.queueDownload("./img/shipSecondary2Charging.png");
+AM.queueDownload("./img/shipCharge1.png");
+AM.queueDownload("./img/shipCharge2.png");
+AM.queueDownload("./img/shipCharge3.png");
 AM.queueDownload("./img/shipSecondary3.png");
+AM.queueDownload("./img/shipDamage1.png");
+AM.queueDownload("./img/shipDamage2.png");
 
 //Allies
 AM.queueDownload("./img/GreenChroma.png");
