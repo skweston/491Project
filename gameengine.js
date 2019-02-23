@@ -675,12 +675,5 @@ Entity.prototype.generateItem = function(bonusChance) {
 			repair.yMid = this.yMid;
 			this.game.addEntity(repair);
 		}
-
-		var spreader = new Spreader(this.game);
-		spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-		spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-		spreader.xMid = this.xMid;
-		spreader.yMid = this.yMid;
-		this.game.addEntity(spreader);
 	}
 }

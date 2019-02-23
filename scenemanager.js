@@ -95,52 +95,7 @@ SceneManager.prototype.changeScenes = function (newScene) {
 	this.currentScene = newScene;
 }
 
-SceneManager.prototype.spawnAtRandom = function () {
-	if (this.currentScene.spawnTimer > 0) {
-		this.currentScene.spawnTimer--;
-	}
-	if (this.game.running && this.currentScene.spawnTimer === 0) {
-		this.currentScene.spawnTimer = this.currentScene.spawnTimerStart;
 
-		for (var i = 0; i < this.currentScene.spawnNum; i++) {
-			var border = 0;
-			var x = Math.random() * this.game.ctx.canvas.width;
-			var y = 0;
-
-			border = Math.floor((Math.random() * 2));
-
-			if (border === 0) {
-				x = (Math.random() * 1000) - 100;
-				y = (Math.random() * 100);
-
-				if (y < 50) { // top
-					y = -50 - y;
-				}
-				else { // bottom
-					y = this.game.ctx.canvas.height + y;
-				}
-			}
-			else {
-				y = (Math.random() * 1000) - 100;
-				x = (Math.random() * 100);
-
-				if (x < 50) { // left
-					x = -50 - x;
-				}
-				else { // right
-					x = this.game.ctx.canvas.width + x;
-				}
-			}
-
-			this.currentScene.randomSpawns(x, y);
-			this.currentScene.counter++;
-		}
-
-		if (this.currentScene.counter % 10 === 0) {
-			this.currentScene.spawnNum++;
-		}
-	}
-}
 
 //Every playable level needs a hud.
 function HUD(game) {
@@ -315,7 +270,7 @@ HowTo.prototype.draw = function() {
 	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 0, (this.offset * this.line++), 400);
 	this.game.ctx.fillText("Cycle Primary Weapons: 1", 0, (this.offset * this.line++), 400);
 	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (this.offset * this.line++), 400); 
+	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (this.offset * this.line++), 400);
 
 	//Weapons
 	/*
@@ -412,13 +367,19 @@ StoryScroll1.prototype.update = function () {
 	if(this.lift === -1400 || this.game.clicked) {
 		this.isDone = true;
 		//To test new level, swap level here.
-		this.game.sceneManager.changeScenes(new PrototypeLevel(this.game));
+		this.removeFromWorld = true;
+		var level = new PrototypeLevel(this.game);
+		this.game.sceneManager.changeScenes(level);
+		this.game.addEntity(level);
 	}
 	Entity.prototype.update.call(this);
 }
 
+
+
+
 function PrototypeLevel(game) {
-	this.name = "prototype";
+	this.name = "Element";
 	this.game = game;
 	this.bossTimerStart = 1000;
 	this.bossTimer = 0;
@@ -510,27 +471,22 @@ function PrototypeLevel(game) {
 
 
 }
+PrototypeLevel.prototype.update = function(){
+	this.removeFromWorld = true;
 
-PrototypeLevel.prototype.randomSpawns = function (x, y) {
-	var newSpawn;
-	if(Math.random() * 100 < 50){
-		newSpawn = new Scourge(this.game, AM.getAsset("./img/scourge.png"), x, y);
-	}else{
-		// console.log("Spawning a resource gatherer");
-		newSpawn = new BiologicalResourceGatherer(this.game);
-		//newSpawn = new Leech(this.game, AM.getAsset("./img/Leech.png"), y, x);
+	for(var i = 0; i < this.game.terrain.length; i++){
+		if(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy"){
+			this.removeFromWorld = false;
+		}
+	}
+	if (this.removeFromWorld){
+
+		this.game.sceneManager.reset();
+		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
 	}
 
-	this.entities.push(newSpawn);
-	this.game.addEntity(newSpawn);
 }
-
-PrototypeLevel.prototype.addBoss = function () {
-	this.boss = new Boss1(game);
-	this.game.addEntity(this.boss);
-	this.entities.push(this.boss);
-}
-
+PrototypeLevel.prototype.draw = function () {}
 PrototypeLevel.prototype.constructor = PrototypeLevel;
 
 function LevelOne() {
@@ -546,6 +502,74 @@ function LevelOne() {
 
 }
 
-//LevelOne.prototype.randomSpawns = function (x, y) {
 
-//LevelOne.prototype.addBoss = function () {
+
+function VictoryScrollScene(game) {
+	this.name = "VictoryScroll";
+	this.game = game;
+	this.entities = [];
+	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
+	this.game.addEntity(this.background);
+	this.entities.push(this.background);
+	this.scroll = new VictoryStoryScroll1(this.game, this.leve);
+	this.entities.push(this.scroll);
+	this.game.addEntity(this.scroll);
+}
+
+function VictoryStoryScroll1(game) {
+	//is an entity but doesn't contain an animation
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Element";
+
+	this.x = 0;
+	this.y = 0;
+	this.width = 650; //max pixel width printed per line
+	this.lift = 0; //vertical lift factor
+	this.narrow = -1; //width scaler to send text into screen later
+	this.start = 800; //text starts off the bottom of the screen
+	this.offset = 50; //line height
+	this.removeFromWorld = false;
+	this.isDone = false;
+
+	Entity.call(this, this.game, this.x, this.y);
+}
+
+VictoryStoryScroll1.prototype.draw = function () {
+	var ctx = this.game.ctx;
+	ctx.font = "24pt Impact";
+	this.game.ctx.fillStyle = "Yellow";
+	this.line = 0;
+
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Press Enter to Skip", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 50 + this.offset + this.lift, 650);
+	this.game.ctx.fillText("Victory", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.line++;
+	this.game.ctx.fillText("Victory in the Kuiper Belt over the space lice was not without losses.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("Many Plutonians died not only in the fighting but in the mines", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("as a great deal of resources were required for the war effort.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.line++;
+	this.game.ctx.fillText("Plutonian's are used to the losses that come with a prolonged war,", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Since 2006 they have become hardened. Ready to accept tremendous losses", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("their people are united under a singular and abiding message “Earth will pay.”", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.line++;
+	this.game.ctx.fillText("Thanks for playing our game, and congrats on beating the first level", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Come back soon to experience new and glorious content,", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("For now though, care for another go?", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+
+	Entity.prototype.draw.call(this);
+}
+
+VictoryStoryScroll1.prototype.update = function () {
+	this.lift += -1; //negative makes it go up
+	//this.narrow *= 2; //adjust to allow for in-to-screen scroll
+	if(this.lift === -1400 || this.game.clicked) {
+		this.isDone = true;
+		//To test new level, swap level here.
+		this.removeFromWorld = true;
+		var level = new SplashScene(this.game);
+		this.game.sceneManager.changeScenes(level);
+		this.game.addEntity(level);
+	}
+	Entity.prototype.update.call(this);
+}
