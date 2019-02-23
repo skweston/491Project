@@ -184,6 +184,7 @@ GameEngine.prototype.startInput = function () {
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("keydown", function (e) {
+		//console.log("input: " + e.code);
 		e.preventDefault();
 		if (e.code === "KeyW") {
 			that.moveUp = true;
