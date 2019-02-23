@@ -19,7 +19,9 @@ function AlienSpaceStation(game, x, y, rock) {
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
-    this.health = 1000;
+	this.maxHealth = 1000;
+	this.health = this.maxHealth;
+
 
 	//Specific to spawners:
 	this.gathererTimerReset = 200;
@@ -50,7 +52,7 @@ AlienSpaceStation.prototype.update = function () {
 	  this.asteroid.hasbase = false;
 	  this.asteroid.base = null;
 	}
-	if(!this.removeFromWorld && this.health < 5000){
+	if(!this.removeFromWorld && this.health < this.maxHealth){
 		this.health += 0.5;
 	}
 
@@ -398,7 +400,7 @@ AlienBuilder.prototype.update = function () {
 		this.target = null;
 	}
 	//if it hasn't found its target yet, or its target has become undefined
-	if (!this.target){
+	if (true){
 		this.angle += 0.0125;
 		var closest = 100000000;
 

@@ -351,6 +351,12 @@ function PrototypeLevel(game) {
 	this.rock2.hasbase = true;
 	this.rock2.base = this.enemySpaceStation;
 
+	var abuilder = new AlienBuilder(this.game, this.enemySpaceStation);
+	this.enemySpaceStation.builders = 1;
+	abuilder.x = 3500;
+	abuilder.y = 3500;
+	game.addEntity(abuilder);
+
 	//Neutral rock
 	this.rock3 = new Asteroid(this.game, 1600, 300);
 	this.game.addEntity(this.rock3);

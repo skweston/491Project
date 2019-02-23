@@ -23,7 +23,7 @@ function Asteroid(game, x, y) {
 	this.base = null;
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 	this.angle = 0;
-
+	this.scrapValue = 10;
 
 
 
@@ -48,7 +48,7 @@ Asteroid.prototype.update = function () {
 		this.scrapCooldown--;
 		if (this.scrapCooldown < 1){
 			for(var i = 0; i < this.scrapPerTick; i++){
-				var scrap = new Scrap(this.game);
+				var scrap = new Scrap(this.game, this.scrapValue);
 				scrap.x = this.base.xMid - (scrap.pWidth*scrap.scale /2);
 				scrap.y = this.base.yMid - (scrap.pHeight*scrap.scale /2);
 				scrap.xMid = this.xMid;
