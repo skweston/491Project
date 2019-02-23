@@ -368,9 +368,8 @@ BiologicalResourceGatherer.prototype.update = function () {
 		if(this.target){
 			this.target.isTargettedEnemy = false;
 		}
-		// this.generateItem(0);
-  	  	this.generateScrap(3, 3);
 
+  	  	this.generateScrap(3, 3);
 
 		this.removeFromWorld = true;
 	}
@@ -587,14 +586,11 @@ Boss1.prototype.update = function () {
 			SCORE += 5;
 
 		}
-		if (this.deathTimer < 1){
-
+		if (this.deathTimer < 1) {
 			this.removeFromWorld = true;
+
 			this.generateItem(0);
 			this.generateScrap(10, 11);
-
-
-
 		}
 		this.dying = true;
 	}
@@ -688,6 +684,7 @@ BossTurret.prototype.update = function () {
 		this.boss.turretsRemaining--;
 		var explosion = new BossExplosion(this.game, this.x - this.pWidth, this.y, 0, this.boss);
 		this.game.addEntity(explosion);
+
 		this.generateItem(0);
 	  	this.generateScrap(2, 7);
 
@@ -1043,6 +1040,7 @@ Scourge.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
+
 		this.generateItem(0);
 		this.generateScrap(1, 7);
 
@@ -1262,6 +1260,7 @@ Stalker.prototype.update = function () {
 		SCORE += 3;
 		this.generateItem(0);
 		this.generateScrap(3, 7.5);
+
 		this.removeFromWorld = true;
     }
 
