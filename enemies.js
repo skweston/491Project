@@ -144,6 +144,11 @@ AlienSpaceStation.prototype.update = function () {
 
 
     }
+	if (this.game.enemyResources > 750){
+		var ent = new Boss1(this.game);
+		this.game.addEntity(ent);
+		this.game.enemyResources -= 700;
+	}
 	var asteroidfree = false;
 	for (var i = 0; i < this.game.terrain.length; i++){
 		if(!this.game.terrain[i].hasbase){
@@ -191,17 +196,14 @@ AlienSpaceStation.prototype.update = function () {
 }
 AlienSpaceStation.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
-							   {xMid: this.target.xMid, yMid: this.target.YMid});
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
 	var angle = this.shootAngle + adjustAngle;
 	if (type === "LaserBlast") {
 		var projectile = new LaserBlast(this.game, angle);
 	}
-	if (type === "BossMissle") {
-		var projectile = new BossMissle(this.game, angle);
-	}
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
-	var dir = direction(this.target, this);
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
 
 	projectile.x = this.xMid;
 	projectile.y = this.yMid;
@@ -1283,7 +1285,7 @@ Stalker.prototype.update = function () {
 
 Stalker.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
-							   {xMid: this.target.xMid, yMid: this.target.YMid});
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
 	var angle = this.angle + adjustAngle;
 	if (type === "LaserBlast") {
 		var projectile = new LaserBlast(this.game, this.angle);

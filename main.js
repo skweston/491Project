@@ -491,15 +491,20 @@ BackgroundLayer.prototype.update = function () {
 /* ========================================================================================================== */
 
 var AM = new AssetManager();
-
+//Background
 AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/PScroll1/space.png");
-AM.queueDownload("./img/4kBackground1.png");
-AM.queueDownload("./img/4kBackground2.png");
 AM.queueDownload("./img/PScroll1/cloud.png");
 AM.queueDownload("./img/PScroll1/comet.png");
 AM.queueDownload("./img/PScroll1/planet1.png");
 AM.queueDownload("./img/PScroll1/planet2.png");
+AM.queueDownload("./img/PScroll1/Background_1.png");
+AM.queueDownload("./img/PScroll1/BackgroundLight.png");
+AM.queueDownload("./img/PScroll1/BackgroundMedium.png");
+AM.queueDownload("./img/PScroll1/BackgroundVariant.png");
+AM.queueDownload("./img/PScroll1/Starfield1-1.png");
+AM.queueDownload("./img/PScroll1/Background3k.png");
+
 AM.queueDownload("./img/BloodSplatter.png");
 
 // ship stuff
