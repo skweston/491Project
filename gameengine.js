@@ -184,6 +184,7 @@ GameEngine.prototype.startInput = function () {
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("keydown", function (e) {
+		//console.log("input: " + e.code);
 		e.preventDefault();
 		if (e.code === "KeyW") {
 			that.moveUp = true;
@@ -563,6 +564,18 @@ if(this.paused === false) {
 		var entity = this.reticle[i];
 		if (entity.removeFromWorld) {
 			this.reticle.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+	count = this.levels.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.levels[i];
+		if (entity.removeFromWorld) {
+			this.levels.splice(i, 1);
 			count--;
 			i--;
 		}
