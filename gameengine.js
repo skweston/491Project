@@ -659,23 +659,27 @@ Entity.prototype.generateScrap = function (count, value){
 }
 
 Entity.prototype.generateItem = function(bonusChance) {
-	var dice = Math.random() * 100 + bonusChance;
-	if (dice < 15) {
-		if(dice > 12) {
-			var repair = new HealthRefill(this.game);
-			repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
-			repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
-			repair.xMid = this.xMid;
-			repair.yMid = this.yMid;
-			this.game.addEntity(repair);
+	var dice = Math.random() * 100 - bonusChance;
+
+	if (dice < 20) {
+		dice = Math.random() * 100;
+
+		if (dice < 20) {
+			var powerUp = new HealthRefill(this.game);
+		}
+		else if (dice < 45) {
+			var powerUp = new SpeedUp(this.game);
+		}
+		else if (dice < 70) {
+			var powerUp = new Multishot(this.game);
 		}
 		else {
-			var repair = new Multishot(this.game);
-			repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
-			repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
-			repair.xMid = this.xMid;
-			repair.yMid = this.yMid;
-			this.game.addEntity(repair);
+			var powerUp = new DamageUp(this.game);
 		}
+
+		powerUp.x = this.xMid - (powerUp.pWidth * powerUp.scale / 2);
+		powerUp.y = this.yMid - (powerUp.pHeight * powerUp.scale / 2);
+
+		this.game.addEntity(powerUp);
 	}
 }

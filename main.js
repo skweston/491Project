@@ -503,10 +503,18 @@ AM.queueDownload("./img/PScroll1/planet2.png");
 AM.queueDownload("./img/BloodSplatter.png");
 
 // ship stuff
-AM.queueDownload("./img/shipIdle.png");
-AM.queueDownload("./img/shipBoost.png");
-AM.queueDownload("./img/shipRoll.png");
-AM.queueDownload("./img/shipBoostRoll.png");
+AM.queueDownload("./img/shipIdleSpeed0.png");
+AM.queueDownload("./img/shipIdleSpeed1.png");
+AM.queueDownload("./img/shipIdleSpeed2.png");
+AM.queueDownload("./img/shipBoostSpeed0.png");
+AM.queueDownload("./img/shipBoostSpeed1.png");
+AM.queueDownload("./img/shipBoostSpeed2.png");
+AM.queueDownload("./img/shipRollSpeed0.png");
+AM.queueDownload("./img/shipRollSpeed1.png");
+AM.queueDownload("./img/shipRollSpeed2.png");
+AM.queueDownload("./img/shipBoostRollSpeed0.png");
+AM.queueDownload("./img/shipBoostRollSpeed1.png");
+AM.queueDownload("./img/shipBoostRollSpeed2.png");
 AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary0.png");
 AM.queueDownload("./img/shipPrimary1.png");

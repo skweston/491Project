@@ -8,10 +8,22 @@ function TheShip(game) {
 	this.pWidth = 128;
 	this.pHeight = 128;
 	this.scale = 0.5;
-	this.idleAnimation = new Animation(AM.getAsset("./img/shipIdle.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
-	this.boostAnimation = new Animation(AM.getAsset("./img/shipBoost.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
-	this.rollAnimation = new Animation(AM.getAsset("./img/shipRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
-	this.boostRollAnimation = new Animation(AM.getAsset("./img/shipBoostRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+
+	this.idleSpeed0Animation = new Animation(AM.getAsset("./img/shipIdleSpeed0.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
+	this.boostSpeed0Animation = new Animation(AM.getAsset("./img/shipBoostSpeed0.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
+	this.rollSpeed0Animation = new Animation(AM.getAsset("./img/shipRollSpeed0.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+	this.boostRollSpeed0Animation = new Animation(AM.getAsset("./img/shipBoostRollSpeed0.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+
+	this.idleSpeed1Animation = new Animation(AM.getAsset("./img/shipIdleSpeed1.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
+	this.boostSpeed1Animation = new Animation(AM.getAsset("./img/shipBoostSpeed1.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
+	this.rollSpeed1Animation = new Animation(AM.getAsset("./img/shipRollSpeed1.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+	this.boostRollSpeed1Animation = new Animation(AM.getAsset("./img/shipBoostRollSpeed1.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+
+	this.idleSpeed2Animation = new Animation(AM.getAsset("./img/shipIdleSpeed2.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
+	this.boostSpeed2Animation = new Animation(AM.getAsset("./img/shipBoostSpeed2.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
+	this.rollSpeed2Animation = new Animation(AM.getAsset("./img/shipRollSpeed2.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+	this.boostRollSpeed2Animation = new Animation(AM.getAsset("./img/shipBoostRollSpeed2.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
+
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, 0.25);
 	this.chargeAnimation = new Animation(AM.getAsset("./img/shipSecondary2Charging.png"), this.pWidth, this.pHeight, 768, 0.05, 6, true, 1);
 	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipSecondary3.png"), this.pWidth, this.pHeight, 768, 0.15, 6, true, 0.3);
@@ -29,8 +41,9 @@ function TheShip(game) {
 	this.boost = this.boostMax;
 	this.speed = 0.5;
 	this.boosting = false;
-	this.cancelBoost = false;
 	this.rolling = false;
+	this.rollDuration = 0.03 * 22;
+	this.rollTime = 0;
 	this.rollCooldown = 0;
 	this.x = this.game.cameraCtx.canvas.width/2 - (this.pWidth * this.scale / 2);
 	this.y = this.game.cameraCtx.canvas.height/2 - (this.pHeight * this.scale / 2);
@@ -83,13 +96,13 @@ TheShip.prototype.update = function () {
 	// boosting
 	this.speed = 0.5;
 	this.boosting = false;
-	if (this.game.boost && !this.rolling && this.boost > 1) {
+	if (this.game.boost && this.boost > 1) {
 		this.cancelBoost = false;
 		this.boosting = true;
 		this.speed = 1;
 		this.boost -= this.boostConsumeRate;
 	}
-	if (!this.game.boost && !this.rolling) {
+	if (!this.game.boost) {
 		this.boosting = false;
 		this.speed = 0.5;
 		if (this.boost < this.boostMax){
@@ -97,14 +110,34 @@ TheShip.prototype.update = function () {
 		}
 	}
 
-	// boost input buffer during rolls
-	if (this.game.boost && this.rolling) {
-		this.boosting = true;
-		this.speed = 1;
-		this.cancelBoost = false;
+	// rolling
+	if (this.game.roll && this.rollCooldown === 0) {
+		this.rollCooldown = 100;
+		this.rolling = true;
 	}
-	if (!this.game.boost && this.rolling) {
-		this.cancelBoost = true;
+	if (this.rollCooldown > 0) {
+		this.rollCooldown -= 1;
+	}
+	if (this.rolling) {
+		this.rollTime += this.game.clockTick;
+
+		this.rollSpeed0Animation.elapsedTime = this.rollTime;
+		this.rollSpeed1Animation.elapsedTime = this.rollTime;
+		this.rollSpeed2Animation.elapsedTime = this.rollTime;
+		this.boostRollSpeed0Animation.elapsedTime = this.rollTime;
+		this.boostRollSpeed1Animation.elapsedTime = this.rollTime;
+		this.boostRollSpeed2Animation.elapsedTime = this.rollTime;
+
+		if (this.rollTime > this.rollDuration) {
+			this.rollTime = 0;
+			this.rolling = false;
+			this.rollSpeed0Animation.elapsedTime = 0;
+			this.rollSpeed1Animation.elapsedTime = 0;
+			this.rollSpeed2Animation.elapsedTime = 0;
+			this.boostRollSpeed0Animation.elapsedTime = 0;
+			this.boostRollSpeed1Animation.elapsedTime = 0;
+			this.boostRollSpeed2Animation.elapsedTime = 0;
+		}
 	}
 
 	// movement
@@ -159,29 +192,6 @@ TheShip.prototype.update = function () {
 	var dx = this.game.mouseX - this.xMid;
 	var dy = this.yMid - this.game.mouseY;
 	this.angle = -Math.atan2(dy,dx);
-
-	// rolling
-	if (this.game.roll && this.rollCooldown === 0) {
-		this.rollCooldown = 100;
-		this.rolling = true;
-	}
-	if (this.rollCooldown > 0) {
-		this.rollCooldown -= 1;
-	}
-	if (this.rolling) {
-		if (this.rollAnimation.isDone()) {
-			this.rollAnimation.elapsedTime = 0;
-			this.rolling = false;
-		}
-		else if (this.boostRollAnimation.isDone()) {
-			this.boostRollAnimation.elapsedTime = 0;
-			this.rolling = false;
-			if (this.cancelBoost) {
-				this.cancelBoost = false;
-				this.boosting = false;
-			}
-		}
-	}
 
 	// power ups
 	if (this.speedTimer > 0) {
@@ -626,18 +636,50 @@ TheShip.prototype.draw = function () {
 	}
 	if (this.rolling) {
 		if (this.boosting) {
-			this.boostRollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			if (this.speedLevel === 0) {
+				this.boostRollSpeed0Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
+			else if (this.speedLevel === 1) {
+				this.boostRollSpeed1Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
+			else {
+				this.boostRollSpeed2Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
 		}
 		else {
-			this.rollAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			if (this.speedLevel === 0) {
+				this.rollSpeed0Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
+			else if (this.speedLevel === 1) {
+				this.rollSpeed1Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
+			else {
+				this.rollSpeed2Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
 		}
 	}
 	else {
 		if (this.boosting) {
-			this.boostAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			if (this.speedLevel === 0) {
+				this.boostSpeed0Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
+			else if (this.speedLevel === 1) {
+				this.boostSpeed1Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
+			else {
+				this.boostSpeed2Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
 		}
 		else {
-			this.idleAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			if (this.speedLevel === 0) {
+				this.idleSpeed0Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
+			else if (this.speedLevel === 1) {
+				this.idleSpeed1Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
+			else {
+				this.idleSpeed2Animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+			}
 		}
 	}
 
