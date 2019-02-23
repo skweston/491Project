@@ -9,6 +9,8 @@ function Reticle(game) {
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, this.scale);
 
 	this.name = "Reticle";
+	this.x = 0;
+	this.y = 0;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -18,28 +20,29 @@ Reticle.prototype = new Entity();
 Reticle.prototype.constructor = Reticle;
 
 Reticle.prototype.update = function () {
+	this.x = this.game.mouseX - (this.pWidth * this.scale / 2);
+	this.y = this.game.mouseY - (this.pHeight * this.scale / 2);
+
 	Entity.prototype.update.call(this);
 }
 
 Reticle.prototype.draw = function () {
-	this.reticleAnimation.drawFrame(this.game.clockTick, this.ctx,
-								   (this.game.mouseX - (this.pWidth * this.scale / 2) - 1),
-								   (this.game.mouseY - (this.pHeight * this.scale / 2) - 1), 0);
+	this.reticleAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, 0);
 
 	Entity.prototype.draw.call(this);
 }
 
 /* ========================================================================================================== */
-// drops
+// Drops
 /* ========================================================================================================== */
 
-//SPREADER
+/* Multishot ================================================================================================ */
 
-function Spreader(game) {
+function Multishot(game) {
 	this.pWidth = 128;
 	this.pHeight = 128;
 	this.scale = 0.75;
-	this.animation = new Animation(AM.getAsset("./img/spreader.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/multishot.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
 
 	this.name = "Extra";
 	this.x = 0;
@@ -56,16 +59,18 @@ function Spreader(game) {
 	this.removeFromWorld = false;
 }
 
-Spreader.prototype = new Entity();
-Spreader.prototype.constructor = Spreader;
+Multishot.prototype = new Entity();
+Multishot.prototype.constructor = Multishot;
 
-Spreader.prototype.update = function () {
+Multishot.prototype.update = function () {
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.ship)) {
-		this.game.ship.spreader = 1000;
-		this.game.ship.spreaderLevel++;
+		this.game.ship.multishotTimer = 1000;
+		if (this.game.ship.multishotLevel < 2) {
+			this.game.ship.multishotLevel++;
+		}
 		this.removeFromWorld = true;
 	}
 
@@ -77,7 +82,7 @@ Spreader.prototype.update = function () {
 	Entity.prototype.update.call(this);
 }
 
-Spreader.prototype.draw = function () {
+Multishot.prototype.draw = function () {
 	if(onCamera(this)){
 		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 	}
@@ -93,14 +98,137 @@ Spreader.prototype.draw = function () {
 	Entity.prototype.draw.call(this);
 }
 
+/* Speed Up ================================================================================================= */
 
-//REPAIR
+function SpeedUp(game) {
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.75;
+	this.animation = new Animation(AM.getAsset("./img/speedUp.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
 
-function RepairDrop(game) {
-	this.pWidth = 256;
-	this.pHeight = 256;
-	this.scale = .25;
-	this.animation = new Animation(AM.getAsset("./img/RepairDrop.png"), this.pWidth, this.pHeight, 1536, 0.15, 6, true, this.scale);
+	this.name = "Extra";
+	this.x = 0;
+	this.y = 0;
+	this.xMid = 0;
+	this.yMid = 0;
+	this.radius = this.scale * 42;
+	this.angle = 0;
+
+	this.lifetime = 500;
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+}
+
+SpeedUp.prototype = new Entity();
+SpeedUp.prototype.constructor = SpeedUp;
+
+SpeedUp.prototype.update = function () {
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	if (Collide(this, this.game.ship)) {
+		this.game.ship.speedTimer = 1000;
+		if (this.game.ship.speedLevel < 2) {
+			this.game.ship.speedLevel++;
+		}
+		this.removeFromWorld = true;
+	}
+
+	this.lifetime -= 1;
+	if (this.lifetime < 0) {
+		this.removeFromWorld = true;
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+SpeedUp.prototype.draw = function () {
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+	Entity.prototype.draw.call(this);
+}
+
+/* Damage Up ================================================================================================ */
+
+function DamageUp(game) {
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.75;
+	this.animation = new Animation(AM.getAsset("./img/damageUp.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
+
+	this.name = "Extra";
+	this.x = 0;
+	this.y = 0;
+	this.xMid = 0;
+	this.yMid = 0;
+	this.radius = this.scale * 42;
+	this.angle = 0;
+
+	this.lifetime = 500;
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+}
+
+DamageUp.prototype = new Entity();
+DamageUp.prototype.constructor = DamageUp;
+
+DamageUp.prototype.update = function () {
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	if (Collide(this, this.game.ship)) {
+		this.game.ship.damageTimer = 1000;
+		if (this.game.ship.damageLevel < 2) {
+			this.game.ship.damageLevel++;
+		}
+		this.removeFromWorld = true;
+	}
+
+	this.lifetime -= 1;
+	if (this.lifetime < 0) {
+		this.removeFromWorld = true;
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+DamageUp.prototype.draw = function () {
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+	Entity.prototype.draw.call(this);
+}
+
+/* Health Refill ============================================================================================ */
+
+function HealthRefill(game) {
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.75;
+	this.animation = new Animation(AM.getAsset("./img/healthRefill.png"), this.pWidth, this.pHeight, 512, 0.25, 4, true, this.scale);
 
 	this.name = "Extra";
 	this.x = 0;
@@ -117,10 +245,10 @@ function RepairDrop(game) {
 	this.removeFromWorld = false;
 }
 
-RepairDrop.prototype = new Entity();
-RepairDrop.prototype.constructor = RepairDrop;
+HealthRefill.prototype = new Entity();
+HealthRefill.prototype.constructor = HealthRefill;
 
-RepairDrop.prototype.update = function () {
+HealthRefill.prototype.update = function () {
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
@@ -141,7 +269,7 @@ RepairDrop.prototype.update = function () {
 	Entity.prototype.update.call(this);
 }
 
-RepairDrop.prototype.draw = function () {
+HealthRefill.prototype.draw = function () {
 	if(onCamera(this)){
 		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 	}
@@ -157,7 +285,10 @@ RepairDrop.prototype.draw = function () {
 	Entity.prototype.draw.call(this);
 }
 
-//SCRAP
+/* Boost Refill ============================================================================================= */
+
+
+/* Scrap ==================================================================================================== */
 
 function Scrap(game, value) {
 	this.pWidth = 96;

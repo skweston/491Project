@@ -144,6 +144,11 @@ AlienSpaceStation.prototype.update = function () {
 
 
     }
+	if (this.game.enemyResources > 750){
+		var ent = new Boss1(this.game);
+		this.game.addEntity(ent);
+		this.game.enemyResources -= 700;
+	}
 	var asteroidfree = false;
 	for (var i = 0; i < this.game.terrain.length; i++){
 		if(!this.game.terrain[i].hasbase){
@@ -191,17 +196,14 @@ AlienSpaceStation.prototype.update = function () {
 }
 AlienSpaceStation.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
-							   {xMid: this.target.xMid, yMid: this.target.YMid});
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
 	var angle = this.shootAngle + adjustAngle;
 	if (type === "LaserBlast") {
 		var projectile = new LaserBlast(this.game, angle);
 	}
-	if (type === "BossMissle") {
-		var projectile = new BossMissle(this.game, angle);
-	}
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
-	var dir = direction(this.target, this);
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
 
 	projectile.x = this.xMid;
 	projectile.y = this.yMid;
@@ -368,9 +370,8 @@ BiologicalResourceGatherer.prototype.update = function () {
 		if(this.target){
 			this.target.isTargettedEnemy = false;
 		}
-		// this.generateItem(0);
-  	  	this.generateScrap(3, 3);
 
+  	  	this.generateScrap(3, 3);
 
 		this.removeFromWorld = true;
 	}
@@ -587,14 +588,11 @@ Boss1.prototype.update = function () {
 			SCORE += 5;
 
 		}
-		if (this.deathTimer < 1){
-
+		if (this.deathTimer < 1) {
 			this.removeFromWorld = true;
+
 			this.generateItem(0);
 			this.generateScrap(10, 11);
-
-
-
 		}
 		this.dying = true;
 	}
@@ -688,6 +686,7 @@ BossTurret.prototype.update = function () {
 		this.boss.turretsRemaining--;
 		var explosion = new BossExplosion(this.game, this.x - this.pWidth, this.y, 0, this.boss);
 		this.game.addEntity(explosion);
+
 		this.generateItem(0);
 	  	this.generateScrap(2, 7);
 
@@ -1043,6 +1042,7 @@ Scourge.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
+
 		this.generateItem(0);
 		this.generateScrap(1, 7);
 
@@ -1262,6 +1262,7 @@ Stalker.prototype.update = function () {
 		SCORE += 3;
 		this.generateItem(0);
 		this.generateScrap(3, 7.5);
+
 		this.removeFromWorld = true;
     }
 
@@ -1284,7 +1285,7 @@ Stalker.prototype.update = function () {
 
 Stalker.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
-							   {xMid: this.target.xMid, yMid: this.target.YMid});
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
 	var angle = this.angle + adjustAngle;
 	if (type === "LaserBlast") {
 		var projectile = new LaserBlast(this.game, this.angle);

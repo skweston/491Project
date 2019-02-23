@@ -156,13 +156,13 @@ sampleEntity.prototype.update = function () {
 
 		//does it drop a powerup?
 		if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
-			var spreader = new Spreader(this.game);
-			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			spreader.xMid = this.xMid;
-			spreader.yMid = this.yMid;
+			var multishot = new multishot(this.game);
+			multishot.x = this.xMid - (multishot.pWidth * multishot.scale / 2);
+			multishot.y = this.yMid - (multishot.pHeight * multishot.scale / 2);
+			multishot.xMid = this.xMid;
+			multishot.yMid = this.yMid;
 
-			this.game.addEntity(spreader);
+			this.game.addEntity(multishot);
 		}
 
 		this.removeFromWorld = true;
@@ -289,6 +289,7 @@ Camera.prototype.draw = function (cameraCtx) {
 };
 
 Camera.prototype.update = function () {
+	console.log(this.isScrolling);
 	//console.log(`${this.x} x, ${this.y} y,
 	//	 				${this.ctx.canvas.width} CW, ${this.ctx.canvas.height} CH`);
 	// this.game.reticle.x =
@@ -299,8 +300,6 @@ Camera.prototype.update = function () {
 
 
 	//deadzone bounding box logic
-
-
 	if(this.game.ship.xMid > this.x + this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio)){
 		this.x = this.game.ship.xMid - (this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio));
 		this.isScrolling = true;
@@ -317,7 +316,6 @@ Camera.prototype.update = function () {
 		this.y = this.game.ship.yMid - (this.ctx.canvas.height/this.deadzoneRatio);
 		this.isScrolling = true;
 	}
-
 
 	//bounds the edge of the background so we don't draw in the void
 	if(this.x < 0){
@@ -491,22 +489,38 @@ BackgroundLayer.prototype.update = function () {
 /* ========================================================================================================== */
 
 var AM = new AssetManager();
-
+//Background
 AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/PScroll1/space.png");
-AM.queueDownload("./img/4kBackground1.png");
-AM.queueDownload("./img/4kBackground2.png");
 AM.queueDownload("./img/PScroll1/cloud.png");
 AM.queueDownload("./img/PScroll1/comet.png");
 AM.queueDownload("./img/PScroll1/planet1.png");
 AM.queueDownload("./img/PScroll1/planet2.png");
+AM.queueDownload("./img/PScroll1/Background_1.png");
+AM.queueDownload("./img/PScroll1/BackgroundLight.png");
+AM.queueDownload("./img/PScroll1/BackgroundMedium.png");
+AM.queueDownload("./img/PScroll1/BackgroundVariant.png");
+AM.queueDownload("./img/PScroll1/Starfield1-1.png");
+AM.queueDownload("./img/PScroll1/Background3k.png");
+
 AM.queueDownload("./img/BloodSplatter.png");
 
 // ship stuff
-AM.queueDownload("./img/shipIdle.png");
-AM.queueDownload("./img/shipBoost.png");
-AM.queueDownload("./img/shipRoll.png");
-AM.queueDownload("./img/shipBoostRoll.png");
+AM.queueDownload("./img/shipIdleSpeed0.png");
+AM.queueDownload("./img/shipBoostSpeed0.png");
+AM.queueDownload("./img/shipRollSpeed0.png");
+AM.queueDownload("./img/shipBoostRollSpeed0.png");
+
+AM.queueDownload("./img/shipIdleSpeed1.png");
+AM.queueDownload("./img/shipBoostSpeed1.png");
+AM.queueDownload("./img/shipRollSpeed1.png");
+AM.queueDownload("./img/shipBoostRollSpeed1.png");
+
+AM.queueDownload("./img/shipIdleSpeed2.png");
+AM.queueDownload("./img/shipBoostSpeed2.png");
+AM.queueDownload("./img/shipRollSpeed2.png");
+AM.queueDownload("./img/shipBoostRollSpeed2.png");
+
 AM.queueDownload("./img/shipReticle.png");
 AM.queueDownload("./img/shipPrimary0.png");
 AM.queueDownload("./img/shipPrimary1.png");
@@ -516,8 +530,12 @@ AM.queueDownload("./img/shipPrimary3Burst.png");
 AM.queueDownload("./img/shipSecondary0.png");
 AM.queueDownload("./img/shipSecondary1Idle.png");
 AM.queueDownload("./img/shipSecondary1Homing.png");
-AM.queueDownload("./img/shipSecondary2Charging.png");
+AM.queueDownload("./img/shipCharge1.png");
+AM.queueDownload("./img/shipCharge2.png");
+AM.queueDownload("./img/shipCharge3.png");
 AM.queueDownload("./img/shipSecondary3.png");
+AM.queueDownload("./img/shipDamage1.png");
+AM.queueDownload("./img/shipDamage2.png");
 
 //Allies
 AM.queueDownload("./img/GreenChroma.png");
@@ -540,8 +558,10 @@ AM.queueDownload("./img/MechanicalResourceGatherer.png");
 AM.queueDownload("./img/SpaceStation.png");
 
 //drops and powerups
-AM.queueDownload("./img/RepairDrop.png");
-AM.queueDownload("./img/spreader.png");
+AM.queueDownload("./img/healthRefill.png");
+AM.queueDownload("./img/multishot.png");
+AM.queueDownload("./img/speedUp.png");
+AM.queueDownload("./img/damageUp.png");
 AM.queueDownload("./img/scrap.png");
 
 // enemies
