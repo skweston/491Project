@@ -8,7 +8,7 @@ function Reticle(game) {
 	this.scale = 0.25;
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, this.scale);
 
-	this.name = "Extra";
+	this.name = "Reticle";
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;

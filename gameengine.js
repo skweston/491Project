@@ -40,6 +40,7 @@ function GameEngine() {
 	this.elements = [];
 	this.resources = [];
 	this.terrain = [];
+	this.reticle = [];
 	this.playerResources = 0;
 	this.enemyResources = 0;
 
@@ -263,7 +264,9 @@ GameEngine.prototype.addEntity = function (entity) {
 	if(entity.name == "Terrain") {
 		this.terrain.push(entity);
 	}
-
+	if(entity.name == "Reticle") {
+		this.reticle.push(entity);
+	}
 	if (entity.name === "Level") {
 		this.levels.push(entity);
 	}
@@ -328,27 +331,35 @@ GameEngine.prototype.draw = function () {
 
 
 
-	for (var i = 0; i < this.playerProjectiles.length; i++) {
-		this.playerProjectiles[i].draw(this.ctx);
-	}
+
 	for (var i = 0; i < this.enemyProjectiles.length; i++) {
 		this.enemyProjectiles[i].draw(this.ctx);
 	}
-	for (var i = 0; i < this.extras.length; i++) {
-		this.extras[i].draw(this.ctx);
-	}
+
 	for (var i = 0; i < this.enemies.length; i++) {
 		this.enemies[i].draw(this.ctx);
 	}
+	for (var i = 0; i < this.extras.length; i++) {
+			this.extras[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.playerProjectiles.length; i++) {
+			this.playerProjectiles[i].draw(this.ctx);
+	}
+
 	for (var i = 0; i < this.effects.length; i++) {
 		this.effects[i].draw(this.ctx);
 	}
+
 	for(var i = 0; i < this.elements.length; i++) {
 		this.elements[i].draw(this.ctx);
 	}
 	for (var i = 0; i < this.player.length; i++) {
 		this.player[i].draw(this.ctx);
 	}
+	for (var i = 0; i < this.reticle.length; i++) {
+		this.reticle[i].draw(this.ctx);
+	}
+
 
 	this.ctx.restore();
 	this.camera.draw(this.cameraCtx);
@@ -505,7 +516,7 @@ GameEngine.prototype.update = function () {
 	for (var i = 0; i < count; i++) {
 		var entity = this.enemies[i];
 		if (entity.removeFromWorld) {
-			// entity.generateItem();
+			entity.generateItem();
 			this.enemies.splice(i, 1);
 			count--;
 			i--;
@@ -527,6 +538,19 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
+	count = this.reticle.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.reticle[i];
+		if (entity.removeFromWorld) {
+			this.reticle.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
 	this.camera.update();
 
 	this.wasclicked = false;

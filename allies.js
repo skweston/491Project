@@ -71,7 +71,17 @@ SpaceStation.prototype.update = function () {
 		this.gatherers++;
 	}
     if (this.chromaTimer < 1 && this.spawns < this.maxSpawn && this.game.playerResources > 100 ){
-		var ent = new PurpleChroma(this.game, this);
+		var dice = Math.floor(Math.random()*100);
+		if(dice < 50){
+			var ent = new PurpleChroma(this.game, this);
+		} else if (dice < 70){
+			var ent = new RedChroma(this.game, this);
+		} else if(dice < 90){
+			var ent = new GreenChroma(this.game, this);
+		} else {
+			var ent = new BlackWhiteChroma(this.game, this);
+		}
+
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
@@ -984,7 +994,7 @@ function BlackWhiteChroma(game, spawner) {
 	this.angle = 0;
 	this.spawner = spawner;
 	this.name = "Ally";
-	this.weaponType = "P1";
+	this.weaponType = "S1";
 	this.maxSpeed = 0.5;
 	this.speed = this.maxSpeed;
 	this.x = 0;
