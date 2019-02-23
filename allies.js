@@ -669,7 +669,7 @@ function GreenChroma(game, spawner) {
 	this.target = null;
 	this.fullShootCooldown = 35;
 	this.shootCooldown = this.fullShootCooldown;
-	this.powerLevel = 0;
+	this.powerLevel = -1;
 	//console.log("starting health: " + this.health);
 	Entity.call(this, game, this.x, this.y);
 }
@@ -742,13 +742,12 @@ GreenChroma.prototype.update = function () {
 		this.shootCooldown = this.fullShootCooldown;
 	}
 	if(this.target && 300 > distance(this,this.target)){
-		this.speed = -this.maxSpeed * .5;
+		this.x += Math.cos(this.angle + Math.PI/2) * 10 * this.speed;
+		this.y += Math.sin(this.angle - Math.PI/2) * 10 * this.speed;
 	}else if (this.target && 500 < distance(this, this.target)){
-		this.speed = this.maxSpeed;
+		this.x += Math.cos(this.angle) * 10 * this.speed;
+		this.y += Math.sin(this.angle) * 10 * this.speed;
 	}
-	this.x += Math.cos(this.angle) * 10 * this.speed;
-	this.y += Math.sin(this.angle) * 10 * this.speed;
-
 	//update its hitbox
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
@@ -839,7 +838,7 @@ function RedChroma(game, spawner) {
 	this.target = null;
 	this.fullShootCooldown = 35;
 	this.shootCooldown = this.fullShootCooldown;
-	this.powerLevel = 0;
+	this.powerLevel = -1.5;
 	//console.log("starting health: " + this.health);
 	Entity.call(this, game, this.x, this.y);
 }
@@ -911,14 +910,13 @@ RedChroma.prototype.update = function () {
 		this.createProjectile(this.weaponType, 0, 0);
 		this.shootCooldown = this.fullShootCooldown;
 	}
-	if(this.target && 300 > distance(this,this.target)){
-		this.speed = -this.maxSpeed * .5;
+	if(this.target && 400 > distance(this,this.target)){
+		this.x += Math.cos(this.angle + Math.PI/2) * 10 * this.speed;
+		this.y += Math.sin(this.angle + Math.PI/2) * 10 * this.speed;
 	}else if (this.target && 500 < distance(this, this.target)){
-		this.speed = this.maxSpeed;
+		this.x += Math.cos(this.angle) * 10 * this.speed;
+		this.y += Math.sin(this.angle) * 10 * this.speed;
 	}
-	this.x += Math.cos(this.angle) * 10 * this.speed;
-	this.y += Math.sin(this.angle) * 10 * this.speed;
-
 	//update its hitbox
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
@@ -1010,7 +1008,7 @@ function BlackWhiteChroma(game, spawner) {
 	this.target = null;
 	this.fullShootCooldown = 35;
 	this.shootCooldown = this.fullShootCooldown;
-	this.powerLevel = 0;
+	this.powerLevel = -1;
 	//console.log("starting health: " + this.health);
 	Entity.call(this, game, this.x, this.y);
 }
@@ -1083,12 +1081,13 @@ BlackWhiteChroma.prototype.update = function () {
 		this.shootCooldown = this.fullShootCooldown;
 	}
 	if(this.target && 300 > distance(this,this.target)){
-		this.speed = -this.maxSpeed * .5;
+		this.x += Math.cos(this.angle - Math.PI/2) * 10 * this.speed;
+		this.y += Math.sin(this.angle - Math.PI/2) * 10 * this.speed;
 	}else if (this.target && 500 < distance(this, this.target)){
-		this.speed = this.maxSpeed;
+		this.x += Math.cos(this.angle) * 10 * this.speed;
+		this.y += Math.sin(this.angle) * 10 * this.speed;
 	}
-	this.x += Math.cos(this.angle) * 10 * this.speed;
-	this.y += Math.sin(this.angle) * 10 * this.speed;
+
 
 	//update its hitbox
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
