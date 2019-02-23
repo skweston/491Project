@@ -416,6 +416,7 @@ AM.queueDownload("./img/shipSecondary0.png");
 AM.queueDownload("./img/shipSecondary1Idle.png");
 AM.queueDownload("./img/shipSecondary1Homing.png");
 AM.queueDownload("./img/shipSecondary2Charging.png");
+AM.queueDownload("./img/shipSecondary3.png");
 
 //drops and powerups
 AM.queueDownload("./img/RepairDrop.png");

@@ -14,7 +14,7 @@ function TheShip(game) {
 	this.boostRollAnimation = new Animation(AM.getAsset("./img/shipBoostRoll.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, 0.25);
 	this.chargeAnimation = new Animation(AM.getAsset("./img/shipSecondary2Charging.png"), this.pWidth, this.pHeight, 768, 0.05, 6, true, 1);
-	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipIdle.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, 0.3);
+	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipSecondary3.png"), this.pWidth, this.pHeight, 768, 0.15, 6, true, 0.3);
 
 	this.invincible = false;
 	this.name = "Player";
@@ -265,13 +265,13 @@ TheShip.prototype.update = function () {
 				}
 				else if (this.spreaderLevel === 1) {
 					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P1", 0, ((Math.PI / 24) * Math.pow(-1, i)));
+						this.createOrbiterProjectile("P1", 0, ((Math.PI / 30) * Math.pow(-1, i)));
 					}
 				}
 				else {
-					this.createOrbiterProjectile("P0", 0, 0);
+					this.createOrbiterProjectile("P1", 0, 0);
 					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P1", 0, ((Math.PI / 24) * Math.pow(-1, i)));
+						this.createOrbiterProjectile("P1", 0, ((Math.PI / 20) * Math.pow(-1, i)));
 					}
 				}
 			}
@@ -289,7 +289,20 @@ TheShip.prototype.update = function () {
 				}
 			}
 			if (this.secondaryType === 3) { // orbiters
-				this.createOrbiterProjectile("P2", 0, 0);
+				if (this.spreaderLevel === 0) {
+					this.createOrbiterProjectile("P2", 0, 0);
+				}
+				else if (this.spreaderLevel === 1) {
+					for (var i = 0; i < 2; i++) {
+						this.createOrbiterProjectile("P2", 0, ((Math.PI / 24) * Math.pow(-1, i)));
+					}
+				}
+				else {
+					this.createOrbiterProjectile("P2", 0, 0);
+					for (var i = 0; i < 2; i++) {
+						this.createOrbiterProjectile("P2", 0, ((Math.PI / 24) * Math.pow(-1, i)));
+					}
+				}
 			}
 		}
 		if (this.primaryType === 3) { // burst
@@ -310,7 +323,20 @@ TheShip.prototype.update = function () {
 				}
 			}
 			if (this.secondaryType === 3) { // orbiters
-				this.createOrbiterProjectile("P3", 0, 0);
+				if (this.spreaderLevel === 0) {
+					this.createOrbiterProjectile("P3", 0, 0);
+				}
+				else if (this.spreaderLevel === 1) {
+					for (var i = 0; i < 2; i++) {
+						this.createOrbiterProjectile("P3", 0, ((Math.PI / 16) * Math.pow(-1, i)));
+					}
+				}
+				else {
+					this.createOrbiterProjectile("P3", 0, 0);
+					for (var i = 0; i < 2; i++) {
+						this.createOrbiterProjectile("P3", 0, ((Math.PI / 8) * Math.pow(-1, i)));
+					}
+				}
 			}
 		}
 	}
@@ -560,16 +586,16 @@ TheShip.prototype.createOrbiterProjectile = function(type, offset, adjustAngle) 
 		var projectile2 = new ShipPrimary0(this.game, 0.6);
 	}
 	if (type === "P1") {
-		var projectile1 = new ShipPrimary1(this.game, 0.6);
-		var projectile2 = new ShipPrimary1(this.game, 0.6);
+		var projectile1 = new ShipPrimary1(this.game, 0.3);
+		var projectile2 = new ShipPrimary1(this.game, 0.3);
 	}
 	if (type === "P2") {
-		var projectile1 = new ShipPrimary2(this.game, 0.6);
-		var projectile2 = new ShipPrimary2(this.game, 0.6);
+		var projectile1 = new ShipPrimary2(this.game, 0.8);
+		var projectile2 = new ShipPrimary2(this.game, 0.8);
 	}
 	if (type === "P3") {
-		var projectile1 = new ShipPrimary3(this.game, 0.6);
-		var projectile2 = new ShipPrimary3(this.game, 0.6);
+		var projectile1 = new ShipPrimary3(this.game, 0.5);
+		var projectile2 = new ShipPrimary3(this.game, 0.5);
 	}
 	var target1 = {x: Math.cos(angle) * dist + this.orbiter1.x,
 				   y: Math.sin(angle) * dist + this.orbiter1.y};
@@ -661,7 +687,7 @@ function ShipPrimary0(game, adjustScale) {	// laser
 	this.pierce = false;
 	this.angle = 0;
 	this.lifetime = 300;
-	this.damage = 5;
+	this.damage = 4;
 	this.maxSpeed = 1500;
 	this.velocity = {x: 0, y: 0};
 
@@ -903,7 +929,7 @@ function ShipPrimary3Blast(game, adjustScale) {	// burst blast
 	this.pierce = true;
 	this.angle = 0;
 	this.lifetime = 16;
-	this.damage = .15;
+	this.damage = 0.35;
 	this.maxSpeed = 0;
 	this.velocity = {x: 0, y: 0};
 
