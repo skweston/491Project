@@ -384,7 +384,7 @@ StoryScroll1.prototype.update = function () {
 
 function PrototypeLevel(game) {
 	console.log("prototype");
-	this.name = "Element";
+	this.name = "Level";
 	this.game = game;
 	this.bossTimerStart = 1000;
 	this.bossTimer = 0;
@@ -477,8 +477,8 @@ function PrototypeLevel(game) {
 PrototypeLevel.prototype.update = function(){
 	//this.removeFromWorld = true;
 	//console.log("health: " + this.game.ship.health);
-	this.victory = false;
-	var destroyed = 0;
+	this.victory = true;
+
 	if (this.game.ship.health < 1){
 		//console.log("dead");
 		//this.victory = false;
@@ -488,21 +488,13 @@ PrototypeLevel.prototype.update = function(){
 	}
 
 	for(var i = 0; i < this.game.terrain.length; i++){
-		console.log("hasbase: " + this.game.terrain[i].hasbase);
-		if(this.game.terrain[i].hasbase) {
-			console.log("name: " + this.game.terrain[i].base.name);
-			console.log("hasbeen: " + this.game.terrain[i].base.hasBeenDestroyed);
-		}
-		if(this.game.terrain[i].hasbase && (this.game.terrain[i].base.name === "Enemy" && this.game.terrain[i].base.hasBeenDestroyed)) {
-			console.log("DESTROYED");
-			//this.removeFromWorld = false;
-			//this.victory = true;
-			destroyed++;
-		}
-	}
 
-	if(destroyed === 2) {
-		this.victory = true;
+		if(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy") {
+
+			//this.removeFromWorld = false;
+			this.victory = false;
+
+		}
 	}
 
 	//if (this.removeFromWorld && !this.game.menu){
@@ -538,6 +530,11 @@ function VictoryScrollScene(game) {
 	this.scroll = new VictoryStoryScroll1(this.game, this.leve);
 	this.entities.push(this.scroll);
 	this.game.addEntity(this.scroll);
+
+	for (var i = 0; i < this.game.levels.length; i++) {
+		this.game.levels[i].removeFromWorld = true;
+	}
+
 }
 
 function VictoryStoryScroll1(game) {

@@ -571,6 +571,18 @@ if(this.paused === false) {
 			entity.update();
 		}
 	}
+	count = this.levels.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.levels[i];
+		if (entity.removeFromWorld) {
+			this.levels.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
 
 	this.camera.update();
 
