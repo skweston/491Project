@@ -158,6 +158,14 @@ HUD.prototype.draw = function() {
 	this.game.ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
 	this.game.ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
 
+
+	//Idea has not yet been discussed but should be tested for quick implementation
+	this.game.ctx.textAlign = "right";
+	this.game.ctx.font = "24pt Impact";
+	//Stays in bottom right corner of screen
+	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
+
+
 	Entity.prototype.draw.call(this);
 }
 
@@ -333,7 +341,7 @@ HowTo.prototype.draw = function() {
 	this.game.ctx.textAlign = "right";
 	ctx.font = "24pt Impact";
 	//Stays in bottom right corner of screen
-	this.game.ctx.fillText("Main Menu: P", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
+	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
 
 	Entity.prototype.draw.call(this);
 }
