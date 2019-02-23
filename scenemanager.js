@@ -482,6 +482,7 @@ PrototypeLevel.prototype.update = function(){
 	if (this.game.ship.health < 1){
 		//console.log("dead");
 		//this.victory = false;
+		this.victory = false;
 		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(new SplashScene(this.game));
 		return;
