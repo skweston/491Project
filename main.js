@@ -289,13 +289,6 @@ Camera.prototype.draw = function (cameraCtx) {
 };
 
 Camera.prototype.update = function () {
-	//console.log(`${this.x} x, ${this.y} y,
-	//	 				${this.ctx.canvas.width} CW, ${this.ctx.canvas.height} CH`);
-	// this.game.reticle.x =
-	// this.game.reticle.y =
-	// this.x = this.game.ship.xMid - this.ctx.canvas.width/2;
-	// this.y = this.game.ship.yMid - this.ctx.canvas.height/2;
-
 
 
 	//deadzone bounding box logic

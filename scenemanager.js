@@ -67,13 +67,11 @@ SceneManager.prototype.update = function () {
 		this.changeScenes(new StoryScrollScene(this.game));
 	}
 
-	if (this.game.ship.health < 0) {
-		//var audio = document.createElement('audio');
-		//audio.src = "./img/Die.wav";
-		//audio.play();
-		this.game.menu = true;
+	if (this.game.ship.health < 1) {
 
+		this.reset();
 	}
+
 }
 
 SceneManager.prototype.loadPlayer = function () {
@@ -382,7 +380,7 @@ StoryScroll1.prototype.update = function () {
 
 
 function PrototypeLevel(game) {
-	this.name = "Element";
+	this.name = "Level";
 	this.game = game;
 	this.bossTimerStart = 1000;
 	this.bossTimer = 0;
@@ -476,11 +474,7 @@ function PrototypeLevel(game) {
 }
 PrototypeLevel.prototype.update = function(){
 	this.removeFromWorld = true;
-	if (this.game.ship.health < 1){
-		this.game.sceneManager.reset();
-		this.game.sceneManager.changeScenes(new SplashScene(this.game));
-		return;
-	}
+
 	for(var i = 0; i < this.game.terrain.length; i++){
 		if(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy"){
 			this.removeFromWorld = false;
@@ -490,6 +484,7 @@ PrototypeLevel.prototype.update = function(){
 
 		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
+		this.game.clicked = false;
 	}
 
 }
@@ -518,7 +513,7 @@ function VictoryScrollScene(game) {
 	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
-	this.scroll = new VictoryStoryScroll1(this.game, this.leve);
+	this.scroll = new VictoryStoryScroll1(this.game);
 	this.entities.push(this.scroll);
 	this.game.addEntity(this.scroll);
 }
@@ -549,7 +544,7 @@ VictoryStoryScroll1.prototype.draw = function () {
 	this.line = 0;
 
 	this.game.ctx.textAlign = "center";
-	this.game.ctx.fillText("Press Enter to Skip", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 50 + this.offset + this.lift, 650);
+	this.game.ctx.fillText("Press Esc to Skip", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 50 + this.offset + this.lift, 650);
 	this.game.ctx.fillText("Victory", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
 	this.line++;
 	this.game.ctx.fillText("Victory in the Kuiper Belt over the space lice was not without losses.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
