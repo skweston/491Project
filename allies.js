@@ -126,8 +126,8 @@ PurpleChroma.prototype.update = function () {
 		// check health
 	if (this.health < 1) {
 		//SCORE++; //how many points is it worth
-		for(var i = 0; i < 1; i++){
-			var scrap = new Scrap(this.game);
+		for(var i = 0; i < 3; i++){
+			var scrap = new Scrap(this.game, Math.floor(10 + Math.random() * 10));
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
 			scrap.xMid = this.xMid;
@@ -169,7 +169,7 @@ PurpleChroma.prototype.draw = function () {
 /* ========================================================================================================== */
 function SpaceStation(game, x, y, rock) {
     //Specific to spawners:
-    this.gathererTimerReset = 100;
+    this.gathererTimerReset = 200;
     this.generateGatherer = this.gathererTimerReset;
     this.maxSpawn = 3; // maybe make this a difficulty variable.
 
@@ -437,7 +437,7 @@ MechanicalResourceGatherer.prototype.update = function () {
 			this.target.isTargettedAlly = false;
 		}
 		for(var i = 0; i< 3; i++){
-			var scrap = new Scrap(this.game);
+			var scrap = new Scrap(this.game, 3);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
 			scrap.xMid = this.xMid;
@@ -600,8 +600,8 @@ PlayerBuilder.prototype.update = function () {
 	if (this.health < 1) {
 		//SCORE++; //how many points is it worth
 
-		for(var i = 0; i< 3; i++){
-			var scrap = new Scrap(this.game);
+		for(var i = 0; i< 5; i++){
+			var scrap = new Scrap(this.game, 7);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
 			scrap.xMid = this.xMid;

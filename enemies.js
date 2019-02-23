@@ -5,7 +5,7 @@ function AlienSpaceStation(game, x, y, rock) {
 
     this.pWidth = 260;
     this.pHeight = 260;
-    this.scale = 1.5;
+    this.scale = 1;
 	this.animation = new Animation(AM.getAsset("./img/AlienSpaceStation.png"), this.pWidth, this.pHeight, 780, 0.175, 3, true, this.scale);
     this.name = "Enemy";
     this.x = x;
@@ -22,8 +22,8 @@ function AlienSpaceStation(game, x, y, rock) {
     this.health = 1000;
 
 	//Specific to spawners:
-	this.timerReset = 100;
-	this.generateGatherer = this.timerReset;
+	this.gathererTimerReset = 200;
+	this.generateGatherer = this.gathererTimerReset;
 	this.scourgeTimerReset = 75;
 	this.leechTimerReset = 100;
 	this.stalkerTimerReset = 125;
@@ -62,7 +62,7 @@ AlienSpaceStation.prototype.update = function () {
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
-		this.generateGatherer = this.timerReset;
+		this.generateGatherer = this.gathererTimerReset;
 		this.gatherers++;
 	}
 
@@ -297,7 +297,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 			this.target.isTargettedEnemy = false;
 		}
 		for(var i = 0; i < 1; i++){
-			var scrap = new Scrap(this.game);
+			var scrap = new Scrap(this.game, 3);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
 			scrap.xMid = this.xMid;
@@ -461,8 +461,8 @@ AlienBuilder.prototype.update = function () {
 	if (this.health < 1) {
 		//SCORE++; //how many points is it worth
 
-		for(var i = 0; i< 3; i++){
-			var scrap = new Scrap(this.game);
+		for(var i = 0; i< 5; i++){
+			var scrap = new Scrap(this.game, 7);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
 			scrap.xMid = this.xMid;
@@ -540,7 +540,7 @@ Boss1.prototype.update = function () {
 		}
 		if (this.deathTimer < 1){
 			for(var i = 0; i < 10; i++){
-				var scrap = new Scrap(this.game);
+				var scrap = new Scrap(this.game, 11);
 				scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 				scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
 				scrap.xMid = this.xMid;
@@ -669,7 +669,7 @@ BossTurret.prototype.update = function () {
 		var dice = Math.random()*100;
 		if (true) {
 			for(var i = 0; i< 2; i++){
-				var scrap = new Scrap(this.game);
+				var scrap = new Scrap(this.game, 7);
 				scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 				scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
 				scrap.xMid = this.xMid;
@@ -890,6 +890,7 @@ function Leech(game, xIn, yIn, spawner) {
 	this.health = 50;
 	this.damage = 5;
 	this.target = null;
+	this.scrapValue =
 
 	this.maxDamageCooldown = 50;
 	this.damageCooldown = 0;
@@ -995,8 +996,8 @@ Leech.prototype.update = function () {
 	if (this.health < 1) {
 		SCORE++;
 
-		for(var i = 0; i< 1; i++){
-			var scrap = new Scrap(this.game);
+		for(var i = 0; i< 2; i++){
+			var scrap = new Scrap(this.game, 6);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
 			scrap.xMid = this.xMid;
@@ -1159,7 +1160,7 @@ Scourge.prototype.update = function () {
 			this.game.addEntity(spreader);
 		}
 		for(var i = 0; i< 1; i++){
-			var scrap = new Scrap(this.game);
+			var scrap = new Scrap(this.game, 7);
 			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
 			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
 			scrap.xMid = this.xMid;
@@ -1395,7 +1396,15 @@ Stalker.prototype.update = function () {
 
 	if(this.health < 1) {
 		SCORE += 3;
+		for(var i = 0; i< 3; i++){
+			var scrap = new Scrap(this.game, (5 + Math.floor(Math.random() * 5)));
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
 
+			this.game.addEntity(scrap);
+		}
         this.removeFromWorld = true;
     }
 
