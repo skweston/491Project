@@ -56,6 +56,10 @@ AlienSpaceStation.prototype.update = function () {
       this.removeFromWorld = true;
 	  this.asteroid.hasbase = false;
 	  this.asteroid.base = null;
+	  this.generateItem(25);
+	  this.generateScrap(15, 13);
+
+
 	}
 	if(!this.removeFromWorld && this.health < this.maxHealth){
 		this.health += 0.5;
@@ -178,7 +182,10 @@ AlienSpaceStation.prototype.update = function () {
 			}
 		}
 	}
-
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		this.game.addEntity(explosion);
+	}
 
     Entity.prototype.update.call(this);
 }
@@ -361,25 +368,9 @@ BiologicalResourceGatherer.prototype.update = function () {
 		if(this.target){
 			this.target.isTargettedEnemy = false;
 		}
-		for(var i = 0; i < 1; i++){
-			var scrap = new Scrap(this.game, 3);
-			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-			scrap.xMid = this.xMid;
-			scrap.yMid = this.yMid;
+		// this.generateItem(0);
+  	  	this.generateScrap(3, 3);
 
-			this.game.addEntity(scrap);
-		}
-		//does it drop a powerup?
-		// if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
-		// 	var spreader = new Spreader(this.game);
-		// 	spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-		// 	spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-		// 	spreader.xMid = this.xMid;
-		// 	spreader.yMid = this.yMid;
-		//
-		// 	this.game.addEntity(spreader);
-		// }
 
 		this.removeFromWorld = true;
 	}
@@ -525,15 +516,8 @@ AlienBuilder.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		//SCORE++; //how many points is it worth
-
-		for(var i = 0; i< 5; i++){
-			var scrap = new Scrap(this.game, 7);
-			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-			scrap.xMid = this.xMid;
-			scrap.yMid = this.yMid;
-			this.game.addEntity(scrap);
-		}
+		this.generateItem(0);
+		this.generateScrap(5, 7);
 
 		this.removeFromWorld = true;
 	}
@@ -604,37 +588,10 @@ Boss1.prototype.update = function () {
 
 		}
 		if (this.deathTimer < 1){
-			for(var i = 0; i < 10; i++){
-				var scrap = new Scrap(this.game, 11);
-				scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-				scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-				scrap.xMid = this.xMid;
-				scrap.yMid = this.yMid;
 
-				this.game.addEntity(scrap);
-			}
 			this.removeFromWorld = true;
-			var dice = Math.random()*100;
-			if (dice < 100) { //the boss always drops something
-
-				if(dice < 85){
-					var repair = new RepairDrop(this.game);
-					repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
-					repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
-					repair.xMid = this.xMid;
-					repair.yMid = this.yMid;
-					this.game.addEntity(repair);
-
-				}else{
-					var spreader = new Spreader(this.game);
-					spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-					spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-					spreader.xMid = this.xMid;
-					spreader.yMid = this.yMid;
-
-					this.game.addEntity(spreader);
-				}
-			}
+			this.generateItem(0);
+			this.generateScrap(10, 11);
 
 
 
@@ -731,35 +688,9 @@ BossTurret.prototype.update = function () {
 		this.boss.turretsRemaining--;
 		var explosion = new BossExplosion(this.game, this.x - this.pWidth, this.y, 0, this.boss);
 		this.game.addEntity(explosion);
-		var dice = Math.random()*100;
-		if (true) {
-			for(var i = 0; i< 2; i++){
-				var scrap = new Scrap(this.game, 7);
-				scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-				scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-				scrap.xMid = this.xMid;
-				scrap.yMid = this.yMid;
+		this.generateItem(0);
+	  	this.generateScrap(2, 7);
 
-				this.game.addEntity(scrap);
-			}
-			if(dice < 50){
-				var repair = new RepairDrop(this.game);
-				repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
-				repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
-				repair.xMid = this.xMid;
-				repair.yMid = this.yMid;
-				this.game.addEntity(repair);
-
-			}else{
-				var spreader = new Spreader(this.game);
-				spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-				spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-				spreader.xMid = this.xMid;
-				spreader.yMid = this.yMid;
-
-				this.game.addEntity(spreader);
-			}
-		}
         this.removeFromWorld = true;
     }
 	for (var i = 0; i<this.game.playerProjectiles.length; i++){
@@ -986,35 +917,8 @@ Leech.prototype.update = function () {
 	if (this.health < 1) {
 		SCORE++;
 
-		for(var i = 0; i< 2; i++){
-			var scrap = new Scrap(this.game, 6);
-			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-			scrap.xMid = this.xMid;
-			scrap.yMid = this.yMid;
-
-			this.game.addEntity(scrap);
-		}
-		var dice = Math.random()*100;
-		if (dice < 10) {
-			if(dice < 6){
-				var repair = new RepairDrop(this.game);
-				repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
-				repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
-				repair.xMid = this.xMid;
-				repair.yMid = this.yMid;
-				this.game.addEntity(repair);
-
-			}else{
-				var spreader = new Spreader(this.game);
-				spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-				spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-				spreader.xMid = this.xMid;
-				spreader.yMid = this.yMid;
-
-				this.game.addEntity(spreader);
-			}
-		}
+		this.generateItem(0);
+  	  	this.generateScrap(2, 6);
 
 		this.removeFromWorld = true;
 	}
@@ -1139,25 +1043,8 @@ Scourge.prototype.update = function () {
 	// check health
 	if (this.health < 1) {
 		SCORE++;
-
-		if (Math.random() * 100 < 7) {
-			var spreader = new Spreader(this.game);
-			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			spreader.xMid = this.xMid;
-			spreader.yMid = this.yMid;
-
-			this.game.addEntity(spreader);
-		}
-		for(var i = 0; i< 1; i++){
-			var scrap = new Scrap(this.game, 7);
-			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-			scrap.xMid = this.xMid;
-			scrap.yMid = this.yMid;
-
-			this.game.addEntity(scrap);
-		}
+		this.generateItem(0);
+		this.generateScrap(1, 7);
 
 		this.removeFromWorld = true;
 	}
@@ -1342,20 +1229,7 @@ Stalker.prototype.update = function () {
 
 
 ///////////////////////////////////
-	//
-	// var currentDistance = distance(this, this.target);
-	//
-	// // Change will be -/+ depending on radius from ship.
-	// var changeX = Math.cos(this.angle) * 10 * this.speed;
-	// var changeY = Math.sin(this.angle) * 10 * this.speed;
-	//
-	// if(currentDistance > 300 && currentDistance < 500) {
-	// 	this.x += changeX;
-	// 	this.y += changeY;
-	// } else {
-	// 	this.x -= changeX;
-	// 	this.y -= changeY;
-	// }
+
 	if(this.target && 300 < distance(this, this.target)){
 		// move the thing normally
 		this.x += Math.cos(this.angle) * 10 * this.speed;
@@ -1386,16 +1260,9 @@ Stalker.prototype.update = function () {
 
 	if(this.health < 1) {
 		SCORE += 3;
-		for(var i = 0; i< 3; i++){
-			var scrap = new Scrap(this.game, (5 + Math.floor(Math.random() * 5)));
-			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-			scrap.xMid = this.xMid;
-			scrap.yMid = this.yMid;
-
-			this.game.addEntity(scrap);
-		}
-        this.removeFromWorld = true;
+		this.generateItem(0);
+		this.generateScrap(3, 7.5);
+		this.removeFromWorld = true;
     }
 
     // this should be the angle in radians

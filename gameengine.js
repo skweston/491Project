@@ -646,55 +646,41 @@ Entity.prototype.takeDamage = function(damage) {
 		}
 	}
 }
+Entity.prototype.generateScrap = function (count, value){
+	for(var i = 0; i< count; i++){
+		var scrap = new Scrap(this.game, value);
+		scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+		scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+		scrap.xMid = this.xMid;
+		scrap.yMid = this.yMid;
 
-Entity.prototype.generateItem = function() {
-	//can use this.name to check for enemy or boss to change odds or item drop potential
-	//console.log(`${dice} ${this.name}`);
-	var dice = Math.random()*100;
-	switch (this.name) {
-		case 'Enemy':
-			if (dice < 50) {
-							var repair = new RepairDrop(this.game);
-							repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
-							repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
-							repair.xMid = this.xMid;
-							repair.yMid = this.yMid;
-							this.game.addEntity(repair);
-
-			} else {
-							var spreader = new Spreader(this.game);
-							spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-							spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-							spreader.xMid = this.xMid;
-							spreader.yMid = this.yMid;
-
-							this.game.addEntity(spreader);
-			}
-			break;
-		case 'Boss':
-			if (dice < 100) { //the boss always drops something
-				if(dice < 85){
-					var repair = new RepairDrop(this.game);
-					repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
-					repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
-					repair.xMid = this.xMid;
-					repair.yMid = this.yMid;
-					this.game.addEntity(repair);
-
-				} else {
-					var spreader = new Spreader(this.game);
-					spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-					spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-					spreader.xMid = this.xMid;
-					spreader.yMid = this.yMid;
-
-					this.game.addEntity(spreader);
-				}
-			}
-			break;
-		default:
-			break;
-
+		this.game.addEntity(scrap);
 	}
+}
+Entity.prototype.generateItem = function(bonusChance) {
+	var dice = Math.random()*100 + bonusChance;
+	if (dice < 15) {
+		if(dice > 12){
+			var repair = new RepairDrop(this.game);
+			repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
+			repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
+			repair.xMid = this.xMid;
+			repair.yMid = this.yMid;
+			this.game.addEntity(repair);
+		} else {
+			var repair = new Spreader(this.game);
+			repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
+			repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
+			repair.xMid = this.xMid;
+			repair.yMid = this.yMid;
+			this.game.addEntity(repair);
+		}
 
+		var spreader = new Spreader(this.game);
+		spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
+		spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
+		spreader.xMid = this.xMid;
+		spreader.yMid = this.yMid;
+		this.game.addEntity(spreader);
+	}
 }
