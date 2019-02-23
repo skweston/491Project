@@ -275,6 +275,7 @@ function Camera(game){
 	this.x = this.game.ship.xMid - this.ctx.canvas.width/2;
 	this.y = this.game.ship.yMid - this.ctx.canvas.height/2;
 	this.isScrolling = false;
+	this.scrollCheck = 0;
 	this.deadzoneRatio = 3;
 
 
@@ -289,7 +290,6 @@ Camera.prototype.draw = function (cameraCtx) {
 };
 
 Camera.prototype.update = function () {
-	console.log(this.isScrolling);
 	//console.log(`${this.x} x, ${this.y} y,
 	//	 				${this.ctx.canvas.width} CW, ${this.ctx.canvas.height} CH`);
 	// this.game.reticle.x =
@@ -300,21 +300,37 @@ Camera.prototype.update = function () {
 
 
 	//deadzone bounding box logic
-	if(this.game.ship.xMid > this.x + this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio)){
-		this.x = this.game.ship.xMid - (this.ctx.canvas.width-(this.ctx.canvas.width/this.deadzoneRatio));
-		this.isScrolling = true;
+	this.scrollCheck--;
+
+	if (this.scrollCheck < 0) {
+		this.scrollCheck = 5;
 	}
-	if(this.game.ship.yMid > this.y + this.ctx.canvas.height-(this.ctx.canvas.height/this.deadzoneRatio)){
-		this.y = this.game.ship.yMid - (this.ctx.canvas.height-(this.ctx.canvas.height/this.deadzoneRatio));
+
+	var reset = true;
+
+	if(this.game.ship.xMid > this.x + this.ctx.canvas.width - (this.ctx.canvas.width / this.deadzoneRatio)) {
+		this.x = this.game.ship.xMid - (this.ctx.canvas.width - (this.ctx.canvas.width / this.deadzoneRatio));
 		this.isScrolling = true;
+		reset = false;
 	}
-	if(this.game.ship.xMid < this.x + (this.ctx.canvas.width/this.deadzoneRatio)){
-		this.x = this.game.ship.xMid - (this.ctx.canvas.width/this.deadzoneRatio);
+	if(this.game.ship.yMid > this.y + this.ctx.canvas.height - (this.ctx.canvas.height / this.deadzoneRatio)) {
+		this.y = this.game.ship.yMid - (this.ctx.canvas.height - (this.ctx.canvas.height / this.deadzoneRatio));
 		this.isScrolling = true;
+		reset = false;
 	}
-	if(this.game.ship.yMid < this.y + (this.ctx.canvas.height/this.deadzoneRatio)){
-		this.y = this.game.ship.yMid - (this.ctx.canvas.height/this.deadzoneRatio);
+	if(this.game.ship.xMid < this.x + (this.ctx.canvas.width / this.deadzoneRatio)) {
+		this.x = this.game.ship.xMid - (this.ctx.canvas.width / this.deadzoneRatio);
 		this.isScrolling = true;
+		reset = false;
+	}
+	if(this.game.ship.yMid < this.y + (this.ctx.canvas.height / this.deadzoneRatio)) {
+		this.y = this.game.ship.yMid - (this.ctx.canvas.height / this.deadzoneRatio);
+		this.isScrolling = true;
+		reset = false;
+	}
+
+	if (this.scrollCheck === 0 && reset) {
+		this.isScrolling = false;
 	}
 
 	//bounds the edge of the background so we don't draw in the void
