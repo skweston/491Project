@@ -26,6 +26,12 @@ function SpaceStation(game, x, y, rock) {
 	this.maxHealth = 1000;
     this.health = this.maxHealth;
 
+	this.weaponType = "P0";
+	this.shootCooldownReset = 10;
+	this.shootCooldown = this.shootCooldownReset;
+	this.shootAngle = 0;
+	this.target = null;
+	this.powerLevel = -1;
 
 	//the spawns that the spawner 'owns'
 	this.chromaTimerReset = 500;
@@ -50,17 +56,37 @@ SpaceStation.prototype.update = function () {
 		this.health += 0.5;
 	}
 
-/* Dont need this as the spawner should remain stationary
-    //this.x += this.game.clockTick * this.speed;
-    //if (this.x > 800) this.x = -230;
-    var dx = this.game.mouseX - this.xMid-1;
-    var dy = (this.yMid - this.game.mouseY)-1;
-    // this should be the angle in radians
-    this.angle = -Math.atan2(dy,dx);
-    //if we want it in degrees
-    //this.angle *= 180 / Math.PI;
-*/
-	//timer reaches 0 Enter
+//Shooting
+	if (true){
+		var closest = 100000000;
+
+		//find the closest resource node to gather from
+		for (var i = 0; i<this.game.enemies.length; i++){
+			var ent = this.game.enemies[i];
+			var d = distance(this, ent);
+			if(d < closest){
+				closest = d;
+				this.target = ent;
+				}
+		}
+	}
+
+	// update shootingangle
+	if(this.target){
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.shootAngle = -Math.atan2(dy,dx);
+	}
+
+	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
+		this.createProjectile(this.weaponType, 0, 0);
+		this.shootCooldown = this.shootCooldownReset;
+	}
+	this.shootCooldown--;
+
+
+//Spawning
+
 	if(this.gatherers < this.maxGatherers && this.generateGatherer <1){
 		var ent = new MechanicalResourceGatherer(this.game, this);
 
@@ -127,6 +153,44 @@ SpaceStation.prototype.update = function () {
 	this.angle += 0.01;
     Entity.prototype.update.call(this);
 }
+
+SpaceStation.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
+	var angle = this.shootAngle + adjustAngle;
+	if (type === "P0") {
+		var projectile = new ShipPrimary0(this.game, 1);
+	}
+	if (type === "P1") {
+		var projectile = new ShipPrimary1(this.game, 1);
+	}
+	if (type === "P2") {
+		var projectile = new ShipPrimary2(this.game, 1);
+	}
+	if (type === "P3") {
+		var projectile = new ShipPrimary3(this.game, 1);
+	}
+	if (type === "S0") {
+		var projectile = new ShipSecondary0(this.game);
+	}
+	if (type === "S1") {
+		var projectile = new ShipSecondary1(this.game);
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
+	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
+	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset)) + this.radius / 2 *  Math.sin(angle);
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
+}
+
 
 SpaceStation.prototype.draw = function () {
 	if(onCamera(this)){
