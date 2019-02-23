@@ -1,169 +1,3 @@
-function PurpleChroma(game, spawner) {
-
-	this.pWidth = 32;
-	this.pHeight = 32;
-	this.scale = 2;
-	this.animation = new Animation(AM.getAsset("./img/PurpleChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
-	this.angle = 0;
-	this.spawner = spawner;
-	this.name = "Ally";
-	this.weaponType = "P2";
-	this.maxSpeed = 0.5;
-	this.speed = this.maxSpeed;
-	this.x = 0;
-	this.y = 0;
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 5.4 * this.scale;
-	this.game = game;
-	this.ctx = game.ctx;
-	this.removeFromWorld = false;
-	this.health = 75;
-	this.damage = 20;
-	this.target = null;
-	this.fullShootCooldown = 35;
-	this.shootCooldown = this.fullShootCooldown;
-	this.powerLevel = 0;
-	//console.log("starting health: " + this.health);
-	Entity.call(this, game, this.x, this.y);
-}
-
-PurpleChroma.prototype = new Entity();
-PurpleChroma.prototype.constructor = PurpleChroma;
-PurpleChroma.prototype.createProjectile = function(type, offset, adjustAngle) {
-	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
-							   {xMid: this.target.xMid, yMid: this.target.yMid});
-	var angle = this.angle + adjustAngle;
-	if (type === "P0") {
-		var projectile = new ShipPrimary0(this.game, 1);
-	}
-	if (type === "P1") {
-		var projectile = new ShipPrimary1(this.game, 1);
-	}
-	if (type === "P2") {
-		var projectile = new ShipPrimary2(this.game, 1);
-	}
-	if (type === "P3") {
-		var projectile = new ShipPrimary3(this.game, 1);
-	}
-	if (type === "S0") {
-		var projectile = new ShipSecondary0(this.game);
-	}
-	if (type === "S1") {
-		var projectile = new ShipSecondary1(this.game);
-	}
-	var target = {x: Math.cos(angle) * dist + this.xMid,
-				  y: Math.sin(angle) * dist + this.yMid};
-	var dir = direction(target, {x: this.xMid, y: this.yMid});
-	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
-	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
-	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
-				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset)) + this.radius / 2 *  Math.sin(angle);
-	projectile.velocity.x = dir.x * projectile.maxSpeed;
-	projectile.velocity.y = dir.y * projectile.maxSpeed;
-	projectile.angle = angle;
-
-	this.game.addEntity(projectile);
-}
-PurpleChroma.prototype.update = function () {
-
-	this.shootCooldown--;
-
-	//if it hasn't found its target yet, or its target has become undefined
-	if (true){
-		var closest = 100000000;
-
-		//find the closest resource node to gather from
-		for (var i = 0; i<this.game.enemies.length; i++){
-			var ent = this.game.enemies[i];
-			var d = distance(this, ent);
-			if(d < closest){
-				closest = d;
-				this.target = ent;
-				}
-		}
-	}
-
-	// update angle
-	if(this.target){
-		var dx = this.target.xMid - this.xMid;
-		var dy = this.yMid - this.target.yMid;
-		this.angle = -Math.atan2(dy,dx);
-	}
-	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
-		this.createProjectile(this.weaponType, 0, 0);
-		this.shootCooldown = this.fullShootCooldown;
-	}
-	if(this.target && 300 > distance(this,this.target)){
-		this.speed = -this.maxSpeed * .5;
-	}else if (this.target && 500 < distance(this, this.target)){
-		this.speed = this.maxSpeed;
-	}
-	this.x += Math.cos(this.angle) * 10 * this.speed;
-	this.y += Math.sin(this.angle) * 10 * this.speed;
-
-	//update its hitbox
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-
-	// check collision with enemy projectiles
-	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
-		var ent = this.game.enemyProjectiles[i];
-		if (Collide(this, ent)) {
-			this.takeDamage(ent.damage);
-			ent.removeFromWorld = true;
-			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-			splatter.angle = this.angle;
-			this.game.addEntity (splatter);
-			if (this.health < 1) {
-				break;
-			}
-		}
-	}
-
-
-		// check health
-	if (this.health < 1) {
-		//SCORE++; //how many points is it worth
-		for(var i = 0; i < 3; i++){
-			var scrap = new Scrap(this.game, Math.floor(10 + Math.random() * 10));
-			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-			scrap.xMid = this.xMid;
-			scrap.yMid = this.yMid;
-			this.game.addEntity(scrap);
-		}
-		this.removeFromWorld = true;
-
-	}
-		//does it blow up when it dies?
-	if (this.removeFromWorld) {
-		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
-		this.game.addEntity(explosion);
-		this.spawner.spawns--;
-	}
-
-		Entity.prototype.update.call(this);
-
-
-	}
-
-PurpleChroma.prototype.draw = function () {
-	if(onCamera(this)){
-		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-	}
-	if (SHOW_HITBOX) {
-		this.ctx.beginPath();
-		this.ctx.strokeStyle = "Red";
-		this.ctx.lineWidth = 1;
-		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
-		this.ctx.stroke();
-		this.ctx.closePath();
-	}
-
-  Entity.prototype.draw.call(this);
-}
 /* ========================================================================================================== */
 // Spawner - allied space station
 /* ========================================================================================================== */
@@ -213,7 +47,7 @@ SpaceStation.prototype.update = function () {
 	  this.asteroid.base = null;
 	}
 	if(this.health < this.maxHealth){
-		this.health += 0.05;
+		this.health += 0.5;
 	}
 
 /* Dont need this as the spawner should remain stationary
@@ -539,7 +373,7 @@ PlayerBuilder.prototype.update = function () {
 		this.target = null;
 	}
 	//if it hasn't found its target yet, or its target has become undefined
-	if (!this.target){
+	if (true){
 		this.angle += 0.0125;
 		var closest = 100000000;
 
@@ -622,4 +456,688 @@ PlayerBuilder.prototype.update = function () {
 	Entity.prototype.update.call(this);
 
 
+}
+
+/* ========================================================================================================== */
+// Purple Chroma ship shoots pea shooters
+/* ========================================================================================================== */
+
+function PurpleChroma(game, spawner) {
+
+	this.pWidth = 32;
+	this.pHeight = 32;
+	this.scale = 2;
+	this.animation = new Animation(AM.getAsset("./img/PurpleChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
+	this.angle = 0;
+	this.spawner = spawner;
+	this.name = "Ally";
+	this.weaponType = "P2";
+	this.maxSpeed = 0.5;
+	this.speed = this.maxSpeed;
+	this.x = 0;
+	this.y = 0;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.radius = 5.4 * this.scale;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+	this.health = 75;
+	this.damage = 20;
+	this.target = null;
+	this.fullShootCooldown = 35;
+	this.shootCooldown = this.fullShootCooldown;
+	this.powerLevel = 0;
+	//console.log("starting health: " + this.health);
+	Entity.call(this, game, this.x, this.y);
+}
+
+PurpleChroma.prototype = new Entity();
+PurpleChroma.prototype.constructor = PurpleChroma;
+PurpleChroma.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
+	var angle = this.angle + adjustAngle;
+	if (type === "P0") {
+		var projectile = new ShipPrimary0(this.game, 1);
+	}
+	if (type === "P1") {
+		var projectile = new ShipPrimary1(this.game, 1);
+	}
+	if (type === "P2") {
+		var projectile = new ShipPrimary2(this.game, 1);
+	}
+	if (type === "P3") {
+		var projectile = new ShipPrimary3(this.game, 1);
+	}
+	if (type === "S0") {
+		var projectile = new ShipSecondary0(this.game);
+	}
+	if (type === "S1") {
+		var projectile = new ShipSecondary1(this.game);
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
+	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
+	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset)) + this.radius / 2 *  Math.sin(angle);
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
+}
+PurpleChroma.prototype.update = function () {
+
+	this.shootCooldown--;
+
+	//if it hasn't found its target yet, or its target has become undefined
+	if (true){
+		var closest = 100000000;
+
+		//find the closest resource node to gather from
+		for (var i = 0; i<this.game.enemies.length; i++){
+			var ent = this.game.enemies[i];
+			var d = distance(this, ent);
+			if(d < closest){
+				closest = d;
+				this.target = ent;
+				}
+		}
+	}
+
+	// update angle
+	if(this.target){
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.angle = -Math.atan2(dy,dx);
+	}
+	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
+		this.createProjectile(this.weaponType, 0, 0);
+		this.shootCooldown = this.fullShootCooldown;
+	}
+	if(this.target && 300 > distance(this,this.target)){
+		this.speed = -this.maxSpeed * .5;
+	}else if (this.target && 500 < distance(this, this.target)){
+		this.speed = this.maxSpeed;
+	}
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	//update its hitbox
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	// check collision with enemy projectiles
+	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
+		var ent = this.game.enemyProjectiles[i];
+		if (Collide(this, ent)) {
+			this.takeDamage(ent.damage);
+			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
+			this.game.addEntity (splatter);
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+
+		// check health
+	if (this.health < 1) {
+		//SCORE++; //how many points is it worth
+		for(var i = 0; i < 3; i++){
+			var scrap = new Scrap(this.game, Math.floor(10 + Math.random() * 10));
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
+			this.game.addEntity(scrap);
+		}
+		this.removeFromWorld = true;
+
+	}
+		//does it blow up when it dies?
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		this.game.addEntity(explosion);
+		this.spawner.spawns--;
+	}
+
+		Entity.prototype.update.call(this);
+
+
+	}
+
+PurpleChroma.prototype.draw = function () {
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+  Entity.prototype.draw.call(this);
+}
+
+/* ========================================================================================================== */
+// Green Chroma ship shoots pea shooters
+/* ========================================================================================================== */
+
+
+function GreenChroma(game, spawner) {
+
+	this.pWidth = 32;
+	this.pHeight = 32;
+	this.scale = 2;
+	this.animation = new Animation(AM.getAsset("./img/GreenChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
+	this.angle = 0;
+	this.spawner = spawner;
+	this.name = "Ally";
+	this.weaponType = "S0";
+	this.maxSpeed = 0.5;
+	this.speed = this.maxSpeed;
+	this.x = 0;
+	this.y = 0;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.radius = 5.4 * this.scale;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+	this.health = 75;
+	this.damage = 20;
+	this.target = null;
+	this.fullShootCooldown = 35;
+	this.shootCooldown = this.fullShootCooldown;
+	this.powerLevel = 0;
+	//console.log("starting health: " + this.health);
+	Entity.call(this, game, this.x, this.y);
+}
+
+GreenChroma.prototype = new Entity();
+GreenChroma.prototype.constructor = GreenChroma;
+GreenChroma.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
+	var angle = this.angle + adjustAngle;
+	if (type === "P0") {
+		var projectile = new ShipPrimary0(this.game, 1);
+	}
+	if (type === "P1") {
+		var projectile = new ShipPrimary1(this.game, 1);
+	}
+	if (type === "P2") {
+		var projectile = new ShipPrimary2(this.game, 1);
+	}
+	if (type === "P3") {
+		var projectile = new ShipPrimary3(this.game, 1);
+	}
+	if (type === "S0") {
+		var projectile = new ShipSecondary0(this.game);
+	}
+	if (type === "S1") {
+		var projectile = new ShipSecondary1(this.game);
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
+	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
+	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset)) + this.radius / 2 *  Math.sin(angle);
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
+}
+GreenChroma.prototype.update = function () {
+
+	this.shootCooldown--;
+
+	//if it hasn't found its target yet, or its target has become undefined
+	if (true){
+		var closest = 100000000;
+
+		//find the closest resource node to gather from
+		for (var i = 0; i<this.game.enemies.length; i++){
+			var ent = this.game.enemies[i];
+			var d = distance(this, ent);
+			if(d < closest){
+				closest = d;
+				this.target = ent;
+				}
+		}
+	}
+
+	// update angle
+	if(this.target){
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.angle = -Math.atan2(dy,dx);
+	}
+	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
+		this.createProjectile(this.weaponType, 0, 0);
+		this.shootCooldown = this.fullShootCooldown;
+	}
+	if(this.target && 300 > distance(this,this.target)){
+		this.speed = -this.maxSpeed * .5;
+	}else if (this.target && 500 < distance(this, this.target)){
+		this.speed = this.maxSpeed;
+	}
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	//update its hitbox
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	// check collision with enemy projectiles
+	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
+		var ent = this.game.enemyProjectiles[i];
+		if (Collide(this, ent)) {
+			this.takeDamage(ent.damage);
+			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
+			this.game.addEntity (splatter);
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+
+		// check health
+	if (this.health < 1) {
+		//SCORE++; //how many points is it worth
+		for(var i = 0; i < 3; i++){
+			var scrap = new Scrap(this.game, Math.floor(10 + Math.random() * 10));
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
+			this.game.addEntity(scrap);
+		}
+		this.removeFromWorld = true;
+
+	}
+		//does it blow up when it dies?
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		this.game.addEntity(explosion);
+		this.spawner.spawns--;
+	}
+
+		Entity.prototype.update.call(this);
+
+
+	}
+
+GreenChroma.prototype.draw = function () {
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+  Entity.prototype.draw.call(this);
+}
+/* ========================================================================================================== */
+// Red Chroma ship shoots pea shooters
+/* ========================================================================================================== */
+
+function RedChroma(game, spawner) {
+
+	this.pWidth = 32;
+	this.pHeight = 32;
+	this.scale = 2;
+	this.animation = new Animation(AM.getAsset("./img/RedChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
+	this.angle = 0;
+	this.spawner = spawner;
+	this.name = "Ally";
+	this.weaponType = "P1";
+	this.maxSpeed = 0.5;
+	this.speed = this.maxSpeed;
+	this.x = 0;
+	this.y = 0;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.radius = 5.4 * this.scale;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+	this.health = 75;
+	this.damage = 20;
+	this.target = null;
+	this.fullShootCooldown = 35;
+	this.shootCooldown = this.fullShootCooldown;
+	this.powerLevel = 0;
+	//console.log("starting health: " + this.health);
+	Entity.call(this, game, this.x, this.y);
+}
+
+RedChroma.prototype = new Entity();
+RedChroma.prototype.constructor = RedChroma;
+RedChroma.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
+	var angle = this.angle + adjustAngle;
+	if (type === "P0") {
+		var projectile = new ShipPrimary0(this.game, 1);
+	}
+	if (type === "P1") {
+		var projectile = new ShipPrimary1(this.game, 1);
+	}
+	if (type === "P2") {
+		var projectile = new ShipPrimary2(this.game, 1);
+	}
+	if (type === "P3") {
+		var projectile = new ShipPrimary3(this.game, 1);
+	}
+	if (type === "S0") {
+		var projectile = new ShipSecondary0(this.game);
+	}
+	if (type === "S1") {
+		var projectile = new ShipSecondary1(this.game);
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
+	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
+	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset)) + this.radius / 2 *  Math.sin(angle);
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
+}
+RedChroma.prototype.update = function () {
+
+	this.shootCooldown--;
+
+	//if it hasn't found its target yet, or its target has become undefined
+	if (true){
+		var closest = 100000000;
+
+		//find the closest resource node to gather from
+		for (var i = 0; i<this.game.enemies.length; i++){
+			var ent = this.game.enemies[i];
+			var d = distance(this, ent);
+			if(d < closest){
+				closest = d;
+				this.target = ent;
+				}
+		}
+	}
+
+	// update angle
+	if(this.target){
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.angle = -Math.atan2(dy,dx);
+	}
+	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
+		this.createProjectile(this.weaponType, 0, 0);
+		this.shootCooldown = this.fullShootCooldown;
+	}
+	if(this.target && 300 > distance(this,this.target)){
+		this.speed = -this.maxSpeed * .5;
+	}else if (this.target && 500 < distance(this, this.target)){
+		this.speed = this.maxSpeed;
+	}
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	//update its hitbox
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	// check collision with enemy projectiles
+	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
+		var ent = this.game.enemyProjectiles[i];
+		if (Collide(this, ent)) {
+			this.takeDamage(ent.damage);
+			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
+			this.game.addEntity (splatter);
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+
+		// check health
+	if (this.health < 1) {
+		//SCORE++; //how many points is it worth
+		for(var i = 0; i < 3; i++){
+			var scrap = new Scrap(this.game, Math.floor(10 + Math.random() * 10));
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
+			this.game.addEntity(scrap);
+		}
+		this.removeFromWorld = true;
+
+	}
+		//does it blow up when it dies?
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		this.game.addEntity(explosion);
+		this.spawner.spawns--;
+	}
+
+		Entity.prototype.update.call(this);
+
+
+	}
+
+RedChroma.prototype.draw = function () {
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+  Entity.prototype.draw.call(this);
+}
+
+/* ========================================================================================================== */
+// BlackWhiteChroma ship shoots pea shooters
+/* ========================================================================================================== */
+
+function BlackWhiteChroma(game, spawner) {
+
+	this.pWidth = 32;
+	this.pHeight = 32;
+	this.scale = 2;
+	this.animation = new Animation(AM.getAsset("./img/BlackWhiteChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
+	this.angle = 0;
+	this.spawner = spawner;
+	this.name = "Ally";
+	this.weaponType = "P1";
+	this.maxSpeed = 0.5;
+	this.speed = this.maxSpeed;
+	this.x = 0;
+	this.y = 0;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+	this.radius = 5.4 * this.scale;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+	this.health = 75;
+	this.damage = 20;
+	this.target = null;
+	this.fullShootCooldown = 35;
+	this.shootCooldown = this.fullShootCooldown;
+	this.powerLevel = 0;
+	//console.log("starting health: " + this.health);
+	Entity.call(this, game, this.x, this.y);
+}
+
+BlackWhiteChroma.prototype = new Entity();
+BlackWhiteChroma.prototype.constructor = BlackWhiteChroma;
+BlackWhiteChroma.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.target.xMid, yMid: this.target.yMid});
+	var angle = this.angle + adjustAngle;
+	if (type === "P0") {
+		var projectile = new ShipPrimary0(this.game, 1);
+	}
+	if (type === "P1") {
+		var projectile = new ShipPrimary1(this.game, 1);
+	}
+	if (type === "P2") {
+		var projectile = new ShipPrimary2(this.game, 1);
+	}
+	if (type === "P3") {
+		var projectile = new ShipPrimary3(this.game, 1);
+	}
+	if (type === "S0") {
+		var projectile = new ShipSecondary0(this.game);
+	}
+	if (type === "S1") {
+		var projectile = new ShipSecondary1(this.game);
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
+	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
+				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
+	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
+				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset)) + this.radius / 2 *  Math.sin(angle);
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
+}
+BlackWhiteChroma.prototype.update = function () {
+
+	this.shootCooldown--;
+
+	//if it hasn't found its target yet, or its target has become undefined
+	if (true){
+		var closest = 100000000;
+
+		//find the closest resource node to gather from
+		for (var i = 0; i<this.game.enemies.length; i++){
+			var ent = this.game.enemies[i];
+			var d = distance(this, ent);
+			if(d < closest){
+				closest = d;
+				this.target = ent;
+				}
+		}
+	}
+
+	// update angle
+	if(this.target){
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.angle = -Math.atan2(dy,dx);
+	}
+	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
+		this.createProjectile(this.weaponType, 0, 0);
+		this.shootCooldown = this.fullShootCooldown;
+	}
+	if(this.target && 300 > distance(this,this.target)){
+		this.speed = -this.maxSpeed * .5;
+	}else if (this.target && 500 < distance(this, this.target)){
+		this.speed = this.maxSpeed;
+	}
+	this.x += Math.cos(this.angle) * 10 * this.speed;
+	this.y += Math.sin(this.angle) * 10 * this.speed;
+
+	//update its hitbox
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	// check collision with enemy projectiles
+	for (var i = 0; i < this.game.enemyProjectiles.length; i++ ) {
+		var ent = this.game.enemyProjectiles[i];
+		if (Collide(this, ent)) {
+			this.takeDamage(ent.damage);
+			ent.removeFromWorld = true;
+			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			splatter.angle = this.angle;
+			this.game.addEntity (splatter);
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+
+		// check health
+	if (this.health < 1) {
+		//SCORE++; //how many points is it worth
+		for(var i = 0; i < 3; i++){
+			var scrap = new Scrap(this.game, Math.floor(10 + Math.random() * 10));
+			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+			scrap.xMid = this.xMid;
+			scrap.yMid = this.yMid;
+			this.game.addEntity(scrap);
+		}
+		this.removeFromWorld = true;
+
+	}
+		//does it blow up when it dies?
+	if (this.removeFromWorld) {
+		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		this.game.addEntity(explosion);
+		this.spawner.spawns--;
+	}
+
+		Entity.prototype.update.call(this);
+
+
+	}
+
+BlackWhiteChroma.prototype.draw = function () {
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+  Entity.prototype.draw.call(this);
 }
