@@ -29,6 +29,7 @@ function GameEngine() {
 	// this.entities = [];
 	this.levels = [];
 	this.background = [];
+	this.layers = [];
 	this.player = [];
 	this.enemies = [];
 	this.allies = [];
@@ -39,12 +40,17 @@ function GameEngine() {
 	this.elements = [];
 	this.resources = [];
 	this.terrain = [];
+	this.reticle = [];
 	this.playerResources = 0;
 	this.enemyResources = 0;
 
 	// start the game
 	this.mouse = false;
 	this.clicked = false;
+	this.paused = false;
+	this.tutrl = false;
+	this.level = false;
+	this.menu = false;
 
 	// player input
 	this.mouseX = 0;
@@ -195,7 +201,7 @@ GameEngine.prototype.startInput = function () {
 			that.moveRight = true;
 		}
 
-		if (e.code === "ShiftLeft") {
+		if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
 			that.boost = true;
 		}
 		if (e.code === "Space") {
@@ -203,6 +209,21 @@ GameEngine.prototype.startInput = function () {
 		}
 		if (e.code === "Enter") {
 			that.clicked = true;
+		}
+		if(e.code === "KeyP") {
+			if(that.paused === true) {
+				that.paused = false;
+			} else {
+				that.paused = true;
+			}
+		}
+		if(e.code === "KeyO") {
+			//console.log("O detected");
+			that.tutrl = true;
+		}
+		if(e.code === "Escape") {
+			//console.log("menu");
+			that.menu = true;
 		}
 	}, false);
 
@@ -228,7 +249,7 @@ GameEngine.prototype.startInput = function () {
 			that.moveRight = false;
 		}
 
-		if (e.code === "ShiftLeft") {
+		if (e.code === "ShiftLeft"|| e.code === "ShiftRight") {
 			that.boost = false;
 		}
 		if (e.code === "AltLeft") {
@@ -236,7 +257,7 @@ GameEngine.prototype.startInput = function () {
 		}
 		if (e.code === "KeyV") {
 			//console.log("V detected");
-			that.gameStart = true;
+			that.level = true;
 		}
 		if (e.code === "Digit1") {
 			that.swapPrimary = true;
@@ -262,7 +283,9 @@ GameEngine.prototype.addEntity = function (entity) {
 	if(entity.name == "Terrain") {
 		this.terrain.push(entity);
 	}
-
+	if(entity.name == "Reticle") {
+		this.reticle.push(entity);
+	}
 	if (entity.name === "Level") {
 		this.levels.push(entity);
 	}
@@ -271,6 +294,9 @@ GameEngine.prototype.addEntity = function (entity) {
 	}
 	if (entity.name === "Background") {
 		this.background.push(entity);
+	}
+	if (entity.name === "Layer") {
+		this.layers.push(entity);
 	}
 	if (entity.name === "Player") {
 		this.player.push(entity);
@@ -304,6 +330,10 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.background.length; i++) {
 		this.background[i].draw(this.ctx);
 	}
+	/*for (var i = 0; i < this.layers.length; i++) {
+		this.layers[i].draw(this.ctx);
+		console.log(`drawing ${this.layers[i].name}`);
+	}*/
 	for (var i = 0; i < this.levels.length; i++) {
 		this.levels[i].draw(this.ctx);
 	}
@@ -318,28 +348,37 @@ GameEngine.prototype.draw = function () {
 		this.allies[i].draw(this.ctx);
 	}
 
-	for(var i = 0; i < this.elements.length; i++) {
-		this.elements[i].draw(this.ctx);
-	}
 
-	for (var i = 0; i < this.playerProjectiles.length; i++) {
-		this.playerProjectiles[i].draw(this.ctx);
-	}
+
+
 	for (var i = 0; i < this.enemyProjectiles.length; i++) {
 		this.enemyProjectiles[i].draw(this.ctx);
 	}
-	for (var i = 0; i < this.extras.length; i++) {
-		this.extras[i].draw(this.ctx);
-	}
+
 	for (var i = 0; i < this.enemies.length; i++) {
 		this.enemies[i].draw(this.ctx);
 	}
+	for (var i = 0; i < this.extras.length; i++) {
+			this.extras[i].draw(this.ctx);
+	}
+	for (var i = 0; i < this.playerProjectiles.length; i++) {
+			this.playerProjectiles[i].draw(this.ctx);
+	}
+
 	for (var i = 0; i < this.effects.length; i++) {
 		this.effects[i].draw(this.ctx);
+	}
+
+	for(var i = 0; i < this.elements.length; i++) {
+		this.elements[i].draw(this.ctx);
 	}
 	for (var i = 0; i < this.player.length; i++) {
 		this.player[i].draw(this.ctx);
 	}
+	for (var i = 0; i < this.reticle.length; i++) {
+		this.reticle[i].draw(this.ctx);
+	}
+
 
 	this.ctx.restore();
 	this.camera.draw(this.cameraCtx);
@@ -347,6 +386,7 @@ GameEngine.prototype.draw = function () {
 }
 
 GameEngine.prototype.update = function () {
+if(this.paused === false) {
 	// var entitiesCount = this.entities.length;
 
 	// for (var i = 0; i < entitiesCount; i++) {
@@ -496,7 +536,7 @@ GameEngine.prototype.update = function () {
 	for (var i = 0; i < count; i++) {
 		var entity = this.enemies[i];
 		if (entity.removeFromWorld) {
-			entity.generateItem();
+			// entity.generateItem();
 			this.enemies.splice(i, 1);
 			count--;
 			i--;
@@ -518,6 +558,19 @@ GameEngine.prototype.update = function () {
 			entity.update();
 		}
 	}
+	count = this.reticle.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.reticle[i];
+		if (entity.removeFromWorld) {
+			this.reticle.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
+
 	this.camera.update();
 
 	this.wasclicked = false;
@@ -525,6 +578,7 @@ GameEngine.prototype.update = function () {
 	this.bomb = false;
 	this.swapPrimary = false;
 	this.swapSecondary = false;
+	} //end of if
 }
 
 GameEngine.prototype.loop = function () {
@@ -592,55 +646,40 @@ Entity.prototype.takeDamage = function(damage) {
 		}
 	}
 }
+Entity.prototype.generateScrap = function (count, value){
+	for(var i = 0; i < count; i++){
+		var scrap = new Scrap(this.game, value);
+		scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
+		scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
+		scrap.xMid = this.xMid;
+		scrap.yMid = this.yMid;
 
-Entity.prototype.generateItem = function() {
-	//can use this.name to check for enemy or boss to change odds or item drop potential
-	//console.log(`${dice} ${this.name}`);
-	var dice = Math.random()*100;
-	switch (this.name) {
-		case 'Enemy':
-			if (dice < 50) {
-							var repair = new RepairDrop(this.game);
-							repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
-							repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
-							repair.xMid = this.xMid;
-							repair.yMid = this.yMid;
-							this.game.addEntity(repair);
-
-			} else {
-							var spreader = new Spreader(this.game);
-							spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-							spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-							spreader.xMid = this.xMid;
-							spreader.yMid = this.yMid;
-
-							this.game.addEntity(spreader);
-			}
-			break;
-		case 'Boss':
-			if (dice < 100) { //the boss always drops something
-				if(dice < 85){
-					var repair = new RepairDrop(this.game);
-					repair.x = this.xMid - (repair.pWidth * repair.scale / 2);
-					repair.y = this.yMid - (repair.pHeight * repair.scale / 2);
-					repair.xMid = this.xMid;
-					repair.yMid = this.yMid;
-					this.game.addEntity(repair);
-
-				} else {
-					var spreader = new Spreader(this.game);
-					spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-					spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-					spreader.xMid = this.xMid;
-					spreader.yMid = this.yMid;
-
-					this.game.addEntity(spreader);
-				}
-			}
-			break;
-		default:
-			break;
-
+		this.game.addEntity(scrap);
 	}
+}
 
+Entity.prototype.generateItem = function(bonusChance) {
+	var dice = Math.random() * 100 - bonusChance;
+
+	if (dice < 20) {
+		dice = Math.random() * 100;
+
+		if (dice < 20) {
+			var powerUp = new HealthRefill(this.game);
+		}
+		else if (dice < 45) {
+			var powerUp = new SpeedUp(this.game);
+		}
+		else if (dice < 70) {
+			var powerUp = new Multishot(this.game);
+		}
+		else {
+			var powerUp = new DamageUp(this.game);
+		}
+
+		powerUp.x = this.xMid - (powerUp.pWidth * powerUp.scale / 2);
+		powerUp.y = this.yMid - (powerUp.pHeight * powerUp.scale / 2);
+
+		this.game.addEntity(powerUp);
+	}
 }
