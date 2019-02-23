@@ -49,16 +49,17 @@ function TheShip(game) {
 	this.orbiterAngle = 0;
 	this.orbiter1 = {x: 0, y: 0};
 	this.orbiter2 = {x: 0, y: 0};
+	this.orbiter3 = {x: 0, y: 0};
 	this.bombType = 0;
 	this.bombTimer = 0;
 
 	// power ups
-	this.boostLevel = 0;
-	this.boostTimer = 0;
-	this.powerLevel = 0;
-	this.powerTimer = 0;
-	this.spreaderLevel = 0;
-	this.spreaderTimer = 0;
+	this.speedLevel = 0;
+	this.speedTimer = 0;
+	this.damageLevel = 0;
+	this.damageTimer = 0;
+	this.multishotLevel = 0;
+	this.multishotTimer = 0;
 
 	// miscellaneous
 	this.boostGainRate = 1;
@@ -111,22 +112,22 @@ TheShip.prototype.update = function () {
 	var yMove = 0;
 	if (this.game.moveUp) {
 		if (this.yMid - this.radius > 0){
-			yMove -= 10 * this.speed;
+			yMove -= 10 * (this.speed + this.speed * speedLevel / 2);
 		}
 	}
 	if (this.game.moveLeft) {
 		if (this.xMid - this.radius > 0) {
-			xMove -= 10 * this.speed;
+			xMove -= 10 * (this.speed + this.speed * speedLevel / 2);
 		}
 	}
 	if (this.game.moveDown) {
 		if (this.yMid + this.radius < this.game.ctx.canvas.height) {
-			yMove += 10 * this.speed;
+			yMove += 10 * (this.speed + this.speed * speedLevel / 2);
 		}
 	}
 	if (this.game.moveRight) {
 		if (this.xMid + this.radius < this.game.ctx.canvas.width) {
-			xMove += 10 * this.speed;
+			xMove += 10 * (this.speed + this.speed * speedLevel / 2);
 		}
 	}
 	if (xMove === 0) {
@@ -182,6 +183,29 @@ TheShip.prototype.update = function () {
 		}
 	}
 
+	// power ups
+	if (this.speedTimer > 0) {
+		this.speedTimer -= 1;
+	}
+	if (this.speedLevel > 0 && this.speedTimer <= 0) {
+		this.speedTimer = 1000;
+		this.speedLevel--;
+	}
+	if (this.damageTimer > 0) {
+		this.damageTimer -= 1;
+	}
+	if (this.damageLevel > 0 && this.damageTimer <= 0) {
+		this.damageTimer = 1000;
+		this.damageLevel--;
+	}
+	if (this.multishotTimer > 0) {
+		this.multishotTimer -= 1;
+	}
+	if (this.multishotLevel > 0 && this.multishotTimer <= 0) {
+		this.multishotTimer = 1000;
+		this.multishotLevel--;
+	}
+
 	// shooting
 	if (this.primaryTimer > 0) {
 		this.primaryTimer -= 1;
@@ -192,22 +216,25 @@ TheShip.prototype.update = function () {
 	if (this.bombTimer > 0) {
 		this.bombTimer -= 1;
 	}
-	if (this.spreader > 0) {
-		this.spreader -= 1;
-	}
-	if (this.spreader <= 0) {
-		this.spreaderLevel = 0;
-	}
 
 	// primary weapons
-	this.orbiterAngle += 0.1;
-	if (this.orbiterAngle >= 360) {
+	this.orbiterAngle += 0.05;
+	if (this.orbiterAngle >= (2 * Math.PI)) {
 		this.orbiterAngle = 0;
 	}
-	this.orbiter1.x = this.xMid + 100 * Math.cos(this.orbiterAngle / Math.PI);
-	this.orbiter1.y = this.yMid + 100 * Math.sin(this.orbiterAngle / Math.PI);
-	this.orbiter2.x = this.xMid - 100 * Math.cos(this.orbiterAngle / Math.PI);
-	this.orbiter2.y = this.yMid - 100 * Math.sin(this.orbiterAngle / Math.PI);
+	this.orbiter1.x = this.xMid + 100 * Math.cos(this.orbiterAngle);
+	this.orbiter1.y = this.yMid + 100 * Math.sin(this.orbiterAngle);
+	if (this.multishotLevel === 1) {
+		this.orbiter2.x = this.xMid + 100 * Math.cos(this.orbiterAngle + Math.PI);
+		this.orbiter2.y = this.yMid + 100 * Math.sin(this.orbiterAngle + Math.PI);
+	}
+	else {
+		this.orbiter2.x = this.xMid + 100 * Math.cos(this.orbiterAngle + (Math.PI * 2 / 3));
+		this.orbiter2.y = this.yMid + 100 * Math.sin(this.orbiterAngle + (Math.PI * 2 / 3));
+	}
+	this.orbiter3.x = this.xMid + 100 * Math.cos(this.orbiterAngle + (Math.PI * 4 / 3));
+	this.orbiter3.y = this.yMid + 100 * Math.sin(this.orbiterAngle + (Math.PI * 4 / 3));
+
 
 	if (this.game.firePrimary && this.primaryTimer === 0) {
 		if (this.primaryType === 0) { // laser
@@ -217,13 +244,13 @@ TheShip.prototype.update = function () {
 				var offset = (0.5 * Math.pow(-1, i));
 				this.createProjectile("P0", offset, 0);
 			}
-			if (this.spreaderLevel > 0) {
+			if (this.multishotLevel > 0) {
 				for (var i = 0; i < 2; i++) {
 					for (var j = 0; j < 2; j++) {
 						var offset = (0.5 * Math.pow(-1, j));
 						this.createProjectile("P0", offset, ((Math.PI / 12) * Math.pow(-1, i)));
 					}
-					if (this.spreaderLevel > 1) {
+					if (this.multishotLevel > 1) {
 						for (var j = 0; j < 2; j++) {
 							var offset = (0.5 * Math.pow(-1, j));
 							this.createProjectile("P0", offset, ((Math.PI / 6) * Math.pow(-1, i)));
@@ -232,29 +259,16 @@ TheShip.prototype.update = function () {
 				}
 			}
 			if (this.secondaryType === 3) { // orbiters
-				if (this.spreaderLevel === 0) {
-					this.createOrbiterProjectile("P0", 0, 0);
-				}
-				else if (this.spreaderLevel === 1) {
-					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P0", 0, ((Math.PI / 24) * Math.pow(-1, i)));
-					}
-				}
-				else {
-					this.createOrbiterProjectile("P0", 0, 0);
-					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P0", 0, ((Math.PI / 24) * Math.pow(-1, i)));
-					}
-				}
+				this.createOrbiterProjectile("P0", 0, 0);
 			}
 		}
 		if (this.primaryType === 1) { // wave
 			this.primaryTimer = 20;
 
-			if (this.spreaderLevel === 0) {
+			if (this.multishotLevel === 0) {
 				this.createProjectile("P1", 0, 0);
 			}
-			else if (this.spreaderLevel === 1) {
+			else if (this.multishotLevel === 1) {
 				for (var i = 0; i < 2; i++) {
 					this.createProjectile("P1", 0, ((Math.PI / 30) * Math.pow(-1, i)));
 				}
@@ -266,58 +280,32 @@ TheShip.prototype.update = function () {
 				}
 			}
 			if (this.secondaryType === 3) { // orbiters
-				if (this.spreaderLevel === 0) {
-					this.createOrbiterProjectile("P1", 0, 0);
-				}
-				else if (this.spreaderLevel === 1) {
-					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P1", 0, ((Math.PI / 30) * Math.pow(-1, i)));
-					}
-				}
-				else {
-					this.createOrbiterProjectile("P1", 0, 0);
-					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P1", 0, ((Math.PI / 20) * Math.pow(-1, i)));
-					}
-				}
+				this.createOrbiterProjectile("P1", 0, 0);
 			}
 		}
 		if (this.primaryType === 2) { // bullets
 			this.primaryTimer = 5;
 
 			this.createProjectile("P2", 0, 0);
-			if (this.spreaderLevel > 0) {
+			if (this.multishotLevel > 0) {
 				for (var i = 0; i < 2; i++) {
 					this.createProjectile("P2", 0, ((Math.PI / 24) * Math.pow(-1, i)));
-					if (this.spreaderLevel > 1) {
+					if (this.multishotLevel > 1) {
 						this.createProjectile("P2", 0, ((Math.PI / 12) * Math.pow(-1, i)));
 					}
 				}
 			}
 			if (this.secondaryType === 3) { // orbiters
-				if (this.spreaderLevel === 0) {
-					this.createOrbiterProjectile("P2", 0, 0);
-				}
-				else if (this.spreaderLevel === 1) {
-					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P2", 0, ((Math.PI / 24) * Math.pow(-1, i)));
-					}
-				}
-				else {
-					this.createOrbiterProjectile("P2", 0, 0);
-					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P2", 0, ((Math.PI / 24) * Math.pow(-1, i)));
-					}
-				}
+				this.createOrbiterProjectile("P2", 0, 0);
 			}
 		}
 		if (this.primaryType === 3) { // burst
 			this.primaryTimer = 50;
 
-			if (this.spreaderLevel === 0) {
+			if (this.multishotLevel === 0) {
 				this.createProjectile("P3", 0, 0);
 			}
-			else if (this.spreaderLevel === 1) {
+			else if (this.multishotLevel === 1) {
 				for (var i = 0; i < 2; i++) {
 					this.createProjectile("P3", 0, ((Math.PI / 16) * Math.pow(-1, i)));
 				}
@@ -329,20 +317,7 @@ TheShip.prototype.update = function () {
 				}
 			}
 			if (this.secondaryType === 3) { // orbiters
-				if (this.spreaderLevel === 0) {
-					this.createOrbiterProjectile("P3", 0, 0);
-				}
-				else if (this.spreaderLevel === 1) {
-					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P3", 0, ((Math.PI / 16) * Math.pow(-1, i)));
-					}
-				}
-				else {
-					this.createOrbiterProjectile("P3", 0, 0);
-					for (var i = 0; i < 2; i++) {
-						this.createOrbiterProjectile("P3", 0, ((Math.PI / 8) * Math.pow(-1, i)));
-					}
-				}
+				this.createOrbiterProjectile("P3", 0, 0);
 			}
 		}
 	}
@@ -353,10 +328,10 @@ TheShip.prototype.update = function () {
 			this.secondaryTimer = 50;
 
 			this.createProjectile("S0", 0, 0);
-			if (this.spreaderLevel > 0) {
+			if (this.multishotLevel > 0) {
 				for (var i = 0; i < 2; i++) {
 					this.createProjectile("S0", 0, ((Math.PI / 20) * Math.pow(-1, i)));
-					if (this.spreaderLevel > 1) {
+					if (this.multishotLevel > 1) {
 						this.createProjectile("S0", 0, ((Math.PI / 10) * Math.pow(-1, i)));
 					}
 				}
@@ -365,10 +340,10 @@ TheShip.prototype.update = function () {
 		if (this.secondaryType === 1) { // homing missile
 			this.secondaryTimer = 70;
 
-			if (this.spreaderLevel === 0) {
+			if (this.multishotLevel === 0) {
 				this.createProjectile("S1", 0, 0);
 			}
-			else if (this.spreaderLevel === 1) {
+			else if (this.multishotLevel === 1) {
 				for (var i = 0; i < 2; i++) {
 					this.createProjectile("S1", 0, ((Math.PI / 8) * Math.pow(-1, i)));
 				}
@@ -391,12 +366,12 @@ TheShip.prototype.update = function () {
 				for (var i = 0; i < 10; i++) {
 					this.createChargeShot("P0", Math.random() * Math.pow(-1, i) / 4, 0, 0);
 				}
-				if (this.spreaderLevel > 0) {
+				if (this.multishotLevel > 0) {
 					for (var i = 0; i < 10; i++) {
 						this.createChargeShot("P0", Math.random() * Math.pow(-1, i) / 4, 0, 0);
 					}
 				}
-				if (this.spreaderLevel > 1) {
+				if (this.multishotLevel > 1) {
 					for (var i = 0; i < 10; i++) {
 						this.createChargeShot("P0", Math.random() * Math.pow(-1, i) / 4, 0, 0);
 					}
@@ -406,12 +381,12 @@ TheShip.prototype.update = function () {
 				if (this.charge > 1.5) {
 					this.charge = 1.5;
 				}
-				if (this.spreaderLevel === 0) {
+				if (this.multishotLevel === 0) {
 					this.createChargeShot("P1", 0, 0, 0);
 					this.createChargeShot("P1", 0, 0, 1);
 					this.createChargeShot("P1", 0, 0, 2);
 				}
-				else if (this.spreaderLevel === 1) {
+				else if (this.multishotLevel === 1) {
 					for (var i = 0; i < 2; i++) {
 						this.createChargeShot("P1", 0, ((Math.PI / 30) * Math.pow(-1, i)), 0);
 						this.createChargeShot("P1", 0, ((Math.PI / 30) * Math.pow(-1, i)), 1);
@@ -436,12 +411,12 @@ TheShip.prototype.update = function () {
 				for (var i = 0; i < 15; i++) {
 					this.createChargeShot("P2", 0, (Math.random() - 0.5) / 2, 0);
 				}
-				if (this.spreaderLevel > 0) {
+				if (this.multishotLevel > 0) {
 					for (var i = 0; i < 15; i++) {
 						this.createChargeShot("P2", 0, (Math.random() - 0.5) / 2, 0);
 					}
 				}
-				if (this.spreaderLevel > 1) {
+				if (this.multishotLevel > 1) {
 					for (var i = 0; i < 15; i++) {
 						this.createChargeShot("P2", 0, (Math.random() - 0.5) / 2, 0);
 					}
@@ -449,10 +424,10 @@ TheShip.prototype.update = function () {
 			}
 			if (this.primaryType === 3) {	// burst
 				this.createChargeShot("P3", 0, 0, 0);
-				if (this.spreaderLevel > 0) {
+				if (this.multishotLevel > 0) {
 					this.createChargeShot("P3", 0, 0, 1);
 				}
-				if (this.spreaderLevel > 1) {
+				if (this.multishotLevel > 1) {
 					this.createChargeShot("P3", 0, 0, 2);
 				}
 			}
@@ -519,7 +494,7 @@ TheShip.prototype.createProjectile = function(type, offset, adjustAngle) {
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
 	var dir = direction(target, {x: this.xMid, y: this.yMid});
-	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
+	projectile.damage = projectile.damage + (projectile.damage * this.damageLevel / 2);
 	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
 				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
 	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
@@ -571,7 +546,7 @@ TheShip.prototype.createChargeShot = function(type, offset, adjustAngle, spreadN
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
 	var dir = direction(target, {x: this.xMid, y: this.yMid});
-	projectile.damage = (projectile.damage + (projectile.damage * this.powerLevel / 2)) * this.charge * this.charge;
+	projectile.damage = (projectile.damage + (projectile.damage * this.damageLevel / 2)) * this.charge * this.charge;
 	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
 				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
 	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
@@ -590,18 +565,22 @@ TheShip.prototype.createOrbiterProjectile = function(type, offset, adjustAngle) 
 	if (type === "P0") {
 		var projectile1 = new ShipPrimary0(this.game, 0.6);
 		var projectile2 = new ShipPrimary0(this.game, 0.6);
+		var projectile3 = new ShipPrimary0(this.game, 0.6);
 	}
 	if (type === "P1") {
 		var projectile1 = new ShipPrimary1(this.game, 0.3);
 		var projectile2 = new ShipPrimary1(this.game, 0.3);
+		var projectile3 = new ShipPrimary1(this.game, 0.3);
 	}
 	if (type === "P2") {
 		var projectile1 = new ShipPrimary2(this.game, 0.8);
 		var projectile2 = new ShipPrimary2(this.game, 0.8);
+		var projectile3 = new ShipPrimary2(this.game, 0.8);
 	}
 	if (type === "P3") {
 		var projectile1 = new ShipPrimary3(this.game, 0.5);
 		var projectile2 = new ShipPrimary3(this.game, 0.5);
+		var projectile3 = new ShipPrimary3(this.game, 0.5);
 	}
 	var target1 = {x: Math.cos(angle) * dist + this.orbiter1.x,
 				   y: Math.sin(angle) * dist + this.orbiter1.y};
@@ -609,24 +588,35 @@ TheShip.prototype.createOrbiterProjectile = function(type, offset, adjustAngle) 
 				   y: Math.sin(angle) * dist + this.orbiter2.y};
 	var dir = direction(target1, this.orbiter1);
 
-	projectile1.damage = (projectile1.damage + (projectile1.damage * this.powerLevel / 2)) * 0.6;
-	projectile2.damage = (projectile2.damage + (projectile2.damage * this.powerLevel / 2)) * 0.6;
+	projectile1.damage = (projectile1.damage + (projectile1.damage * this.damageLevel / 2)) * 0.6;
+	projectile2.damage = (projectile2.damage + (projectile2.damage * this.damageLevel / 2)) * 0.6;
+	projectile3.damage = (projectile2.damage + (projectile2.damage * this.damageLevel / 2)) * 0.6;
 
 	projectile1.x = this.orbiter1.x - (projectile1.pWidth * projectile1.scale / 2);
 	projectile1.y = this.orbiter1.y - (projectile1.pHeight * projectile1.scale / 2);
 	projectile2.x = this.orbiter2.x - (projectile2.pWidth * projectile2.scale / 2);
 	projectile2.y = this.orbiter2.y - (projectile2.pHeight * projectile2.scale / 2);
+	projectile3.x = this.orbiter3.x - (projectile2.pWidth * projectile2.scale / 2);
+	projectile3.y = this.orbiter3.y - (projectile2.pHeight * projectile2.scale / 2);
 
 	projectile1.velocity.x = dir.x * projectile1.maxSpeed;
 	projectile1.velocity.y = dir.y * projectile1.maxSpeed;
-	projectile2.velocity.x = dir.x * projectile1.maxSpeed;
+	projectile2.velocity.x = dir.x * projectile2.maxSpeed;
 	projectile2.velocity.y = dir.y * projectile2.maxSpeed;
+	projectile3.velocity.x = dir.x * projectile3.maxSpeed;
+	projectile3.velocity.y = dir.y * projectile3.maxSpeed;
 
 	projectile1.angle = angle;
 	projectile2.angle = angle;
+	projectile3.angle = angle;
 
 	this.game.addEntity(projectile1);
-	this.game.addEntity(projectile2);
+	if (this.multishotLevel > 0) {
+		this.game.addEntity(projectile2);
+	}
+	if (this.multishotLevel > 1) {
+		this.game.addEntity(projectile3);
+	}
 }
 
 TheShip.prototype.draw = function () {
@@ -656,10 +646,18 @@ TheShip.prototype.draw = function () {
 										this.orbiter1.x - (this.pWidth * 0.3 / 2),
 										this.orbiter1.y - (this.pHeight * 0.3 / 2),
 										this.angle);
-		this.orbiterAnimation.drawFrame(this.game.clockTick, this.ctx,
-										this.orbiter2.x - (this.pWidth * 0.3 / 2),
-										this.orbiter2.y - (this.pHeight * 0.3 / 2),
-										this.angle);
+		if (this.multishotLevel > 0) {
+			this.orbiterAnimation.drawFrame(this.game.clockTick, this.ctx,
+											this.orbiter2.x - (this.pWidth * 0.3 / 2),
+											this.orbiter2.y - (this.pHeight * 0.3 / 2),
+											this.angle);
+		}
+		if (this.multishotLevel > 1) {
+			this.orbiterAnimation.drawFrame(this.game.clockTick, this.ctx,
+											this.orbiter3.x - (this.pWidth * 0.3 / 2),
+											this.orbiter3.y - (this.pHeight * 0.3 / 2),
+											this.angle);
+		}
 	}
 
 	if (SHOW_HITBOX) {

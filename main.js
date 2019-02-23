@@ -156,13 +156,13 @@ sampleEntity.prototype.update = function () {
 
 		//does it drop a powerup?
 		if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
-			var spreader = new Spreader(this.game);
-			spreader.x = this.xMid - (spreader.pWidth * spreader.scale / 2);
-			spreader.y = this.yMid - (spreader.pHeight * spreader.scale / 2);
-			spreader.xMid = this.xMid;
-			spreader.yMid = this.yMid;
+			var multishot = new multishot(this.game);
+			multishot.x = this.xMid - (multishot.pWidth * multishot.scale / 2);
+			multishot.y = this.yMid - (multishot.pHeight * multishot.scale / 2);
+			multishot.xMid = this.xMid;
+			multishot.yMid = this.yMid;
 
-			this.game.addEntity(spreader);
+			this.game.addEntity(multishot);
 		}
 
 		this.removeFromWorld = true;
@@ -540,8 +540,10 @@ AM.queueDownload("./img/MechanicalResourceGatherer.png");
 AM.queueDownload("./img/SpaceStation.png");
 
 //drops and powerups
-AM.queueDownload("./img/RepairDrop.png");
-AM.queueDownload("./img/spreader.png");
+AM.queueDownload("./img/healthRefill.png");
+AM.queueDownload("./img/multishot.png");
+AM.queueDownload("./img/speedUp.png");
+AM.queueDownload("./img/damageUp.png");
 AM.queueDownload("./img/scrap.png");
 
 // enemies
