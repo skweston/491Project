@@ -112,22 +112,22 @@ TheShip.prototype.update = function () {
 	var yMove = 0;
 	if (this.game.moveUp) {
 		if (this.yMid - this.radius > 0){
-			yMove -= 10 * (this.speed + this.speed * speedLevel / 2);
+			yMove -= 10 * (this.speed + this.speed * this.speedLevel / 2);
 		}
 	}
 	if (this.game.moveLeft) {
 		if (this.xMid - this.radius > 0) {
-			xMove -= 10 * (this.speed + this.speed * speedLevel / 2);
+			xMove -= 10 * (this.speed + this.speed * this.speedLevel / 2);
 		}
 	}
 	if (this.game.moveDown) {
 		if (this.yMid + this.radius < this.game.ctx.canvas.height) {
-			yMove += 10 * (this.speed + this.speed * speedLevel / 2);
+			yMove += 10 * (this.speed + this.speed * this.speedLevel / 2);
 		}
 	}
 	if (this.game.moveRight) {
 		if (this.xMid + this.radius < this.game.ctx.canvas.width) {
-			xMove += 10 * (this.speed + this.speed * speedLevel / 2);
+			xMove += 10 * (this.speed + this.speed * this.speedLevel / 2);
 		}
 	}
 	if (xMove === 0) {

@@ -225,7 +225,7 @@ function HealthRefill(game) {
 	this.pWidth = 128;
 	this.pHeight = 128;
 	this.scale = 0.75;
-	this.animation = new Animation(AM.getAsset("./img/healthRefill.png"), this.pWidth, this.pHeight, 512, 0.15, 4, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/healthRefill.png"), this.pWidth, this.pHeight, 512, 0.25, 4, true, this.scale);
 
 	this.name = "Extra";
 	this.x = 0;
