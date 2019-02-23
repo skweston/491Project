@@ -17,7 +17,7 @@ function LaserBlast(game, angle){
 	this.radius = 4 * this.scale;
 	this.angle = angle;
 
-	this.lifetime = 500;
+	this.lifetime = 300;
 	this.damage = 7;
 	this.maxSpeed = 300;
 	this.velocity = {x: 10, y: 10};

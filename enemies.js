@@ -89,12 +89,12 @@ AlienSpaceStation.prototype.update = function () {
 		this.shootAngle = -Math.atan2(dy,dx);
 	}
 
-	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
+	if (this.target && 900 > distance(this, this.target) && this.shootCooldown < 1){
 		this.createProjectile("LaserBlast", 0, -Math.PI/2);
 		this.shootCooldown = this.shootCooldownReset;
 	}
 	this.shootCooldown--;
-	
+
 
 
 
@@ -187,10 +187,10 @@ AlienSpaceStation.prototype.createProjectile = function(type, offset, adjustAngl
 							   {xMid: this.target.xMid, yMid: this.target.YMid});
 	var angle = this.shootAngle + adjustAngle;
 	if (type === "LaserBlast") {
-		var projectile = new LaserBlast(this.game, this.angle);
+		var projectile = new LaserBlast(this.game, angle);
 	}
 	if (type === "BossMissle") {
-		var projectile = new BossMissle(this.game, this.angle);
+		var projectile = new BossMissle(this.game, angle);
 	}
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
