@@ -196,7 +196,7 @@ GameEngine.prototype.startInput = function () {
 			that.moveRight = true;
 		}
 
-		if (e.code === "ShiftLeft") {
+		if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
 			that.boost = true;
 		}
 		if (e.code === "Space") {
@@ -229,7 +229,7 @@ GameEngine.prototype.startInput = function () {
 			that.moveRight = false;
 		}
 
-		if (e.code === "ShiftLeft") {
+		if (e.code === "ShiftLeft"|| e.code === "ShiftRight") {
 			that.boost = false;
 		}
 		if (e.code === "AltLeft") {

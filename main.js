@@ -516,6 +516,8 @@ AM.queueDownload("./img/shipPrimary3Burst.png");
 AM.queueDownload("./img/shipSecondary0.png");
 AM.queueDownload("./img/shipSecondary1Idle.png");
 AM.queueDownload("./img/shipSecondary1Homing.png");
+AM.queueDownload("./img/shipSecondary2Charging.png");
+AM.queueDownload("./img/shipSecondary3.png");
 
 //Allies
 AM.queueDownload("./img/GreenChroma.png");
