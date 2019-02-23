@@ -349,6 +349,8 @@ GameEngine.prototype.draw = function () {
 	}
 
 
+
+
 	for (var i = 0; i < this.enemyProjectiles.length; i++) {
 		this.enemyProjectiles[i].draw(this.ctx);
 	}
@@ -415,6 +417,19 @@ if(this.paused === false) {
 		}
 	}
 
+/*
+	count = this.levels.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.levels[i];
+		if (entity.removeFromWorld) {
+			this.levels.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}*/
 	count = this.resources.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.resources[i];
@@ -523,19 +538,6 @@ if(this.paused === false) {
 		if (entity.removeFromWorld) {
 			// entity.generateItem();
 			this.enemies.splice(i, 1);
-			count--;
-			i--;
-		}
-		else {
-			entity.update();
-		}
-	}
-
-	count = this.levels.length;
-	for (var i = 0; i < count; i++) {
-		var entity = this.levels[i];
-		if (entity.removeFromWorld) {
-			this.levels.splice(i, 1);
 			count--;
 			i--;
 		}
