@@ -15,6 +15,9 @@ SceneManager.prototype.reset = function () {
 	this.game.playerResources = 0;
 	this.game.enemyResources = 0;
 
+	for (var i = 0; i < this.game.player.length; i++) {
+		this.game.player[i].removeFromWorld = true;
+	}
 	for (var i = 0; i < this.game.extras.length; i++) {
 		this.game.extras[i].removeFromWorld = true;
 	}
@@ -24,32 +27,21 @@ SceneManager.prototype.reset = function () {
 	for (var i = 0; i < this.game.enemies.length; i++){
 		this.game.enemies[i].removeFromWorld = true;
 	}
-	for(var i = 0; i< this.game.enemyProjectiles.length; i++){
+	for(var i = 0; i < this.game.enemyProjectiles.length; i++){
 		this.game.enemyProjectiles[i].removeFromWorld = true;
 	}
-	for(var i = 0; i< this.game.playerProjectiles.length; i++){
+	for(var i = 0; i < this.game.playerProjectiles.length; i++){
 		this.game.playerProjectiles[i].removeFromWorld = true;
 	}
-	for(var i = 0; i< this.game.resources.length; i++){
+	for(var i = 0; i < this.game.resources.length; i++){
 		this.game.resources[i].removeFromWorld = true;
 	}
 	for (var i = 0; i < this.game.effects.length; i++) {
 		this.game.effects[i].removeFromWorld = true;
 	}
-
-	/*var ship = new TheShip(this.game);
-	var reticle = new Reticle(this.game);
-	this.game.addEntity(ship);
-	this.game.addEntity(reticle);
-	this.game.ship = ship;*/
-
-	//back to title screen on death
-	//this.changeScenes(new SplashScene(this.game));
 }
 
 SceneManager.prototype.update = function () {
-	//console.log("current scene: " + this.currentScene.name);
-	//console.log(this.game.tutrl);
 	if (!this.game.running && this.game.gameStart) {
 		this.game.gameStart = false;
 	}
@@ -282,15 +274,19 @@ HowTo.prototype.update = function() {
 
 HowTo.prototype.draw = function() {
 	var ctx = this.game.ctx;
-	ctx.font = "26pt Helvetica";
+	ctx.font = "26pt Impact";
 	this.game.ctx.fillStyle = "Grey";
 	this.offset = 35;
-	this.line = 1;
+	this.line = 2;
 
 	this.game.ctx.textAlign = "center";
 	this.game.ctx.fillText("Welcome to SPACEFIGHT!", 600, (this.offset * this.line++), 800);
-	this.game.ctx.fillText("Your goal is to take revenge on Earth for demoting the seat of the Empire to \"dwarf\" planet.", 600, (this.offset * this.line++), 800);
-	this.game.ctx.fillText("As you travel to Earth, your caravan will build bases, harvest materials and fight the scum of the Sol System.", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("Your goal is to take revenge on Earth for demoting", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("the seat of the Empire to \"dwarf\" planet.", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("As you travel to Earth, your caravan will build bases,", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("harvest materials and fight the scum of the Sol System.", 600, (this.offset * this.line), 800);
+
+	this.point = this.line;
 
 
 	//Basic Controls
@@ -298,37 +294,41 @@ HowTo.prototype.draw = function() {
 	this.line += 3;
 	this.game.ctx.textAlign = "left";
 	this.game.ctx.fillStyle = "Blue";
-	ctx.font = "20pt Impact";
-	this.game.ctx.fillText("To Move: W A S D", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("To Dodge: SPACEBAR", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("To Boost Speed: SHIFT", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("To aim: Place cursor on target", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Cycle Primary Weapons: 1", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (this.offset * this.line++), 650);
+	ctx.font = "22pt Impact";
+	this.game.ctx.fillText("To Move: W A S D", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Dodge: SPACEBAR", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Boost Speed: SHIFT", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To aim: Place cursor on target", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("Cycle Primary Weapons: 1", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 0, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (this.offset * this.line++), 400); 
 
 	//Weapons
+	/*
 	this.game.ctx.textAlign = "right";
-	this.game.ctx.fillText("Primary Weapons", 1200, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Laser", 1200, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Wave", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Bullet", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Burst", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Secondary Weapons", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Missle", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Homing Missle", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Orbiters", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Charge Shot", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("In Game Power Ups", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Spreader", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Repair", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("Enemies", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("", 0, (this.offset * this.line++), 650);
-	this.game.ctx.fillText("", 0, (this.offset * this.line++), 650);
-
+	this.game.ctx.fillText("Primary Weapons", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Laser", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Wave", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Bullet", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Burst", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550); //blank line
+	this.game.ctx.fillText("Secondary Weapons", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Missle", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Homing Missle", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Orbiters", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Charge Shot", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550); //blank line
+	this.game.ctx.fillText("In Game Power Ups", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Spreader", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("Repair", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550); //blank wline
+	this.game.ctx.fillText("Enemies", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
+	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
+	*/
 
 	this.game.ctx.textAlign = "right";
 	ctx.font = "24pt Impact";
