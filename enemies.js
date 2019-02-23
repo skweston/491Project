@@ -2,6 +2,7 @@
 // Spawner - alien space station
 /* ========================================================================================================== */
 function AlienSpaceStation(game, x, y, rock) {
+	console.log("new enemy station");
 
     this.pWidth = 260;
     this.pHeight = 260;
@@ -21,6 +22,7 @@ function AlienSpaceStation(game, x, y, rock) {
     this.removeFromWorld = false;
 	this.maxHealth = 1000;
 	this.health = this.maxHealth;
+	this.hasBeenDestroyed = false;
 
 	this.shootCooldownReset = 25;
 	this.shootCooldown = this.shootCooldownReset;
@@ -53,13 +55,13 @@ AlienSpaceStation.prototype.constructor = AlienSpaceStation;
 AlienSpaceStation.prototype.update = function () {
 	// this.game.enemyResources++;
     if(this.health < 1){
+      console.log("destroyed");
       this.removeFromWorld = true;
 	  this.asteroid.hasbase = false;
 	  this.asteroid.base = null;
 	  this.generateItem(25);
 	  this.generateScrap(15, 13);
-
-
+	  this.hasBeenDestroyed = true;
 	}
 	if(!this.removeFromWorld && this.health < this.maxHealth){
 		this.health += 0.5;
