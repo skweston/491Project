@@ -94,11 +94,11 @@ AlienSpaceStation.prototype.update = function () {
 		this.shootCooldown = this.shootCooldownReset;
 	}
 	this.shootCooldown--;
-	}
+	
 
 
 
-
+	//spawning
 	if(this.gatherers < this.maxGatherers && this.generateGatherer <1){
 		var ent = new BiologicalResourceGatherer(this.game, this);
 
