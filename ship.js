@@ -24,9 +24,12 @@ function TheShip(game) {
 	this.rollSpeed2Animation = new Animation(AM.getAsset("./img/shipRollSpeed2.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
 	this.boostRollSpeed2Animation = new Animation(AM.getAsset("./img/shipBoostRollSpeed2.png"), this.pWidth, this.pHeight, 256, 0.03, 22, false, this.scale);
 
-	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, 0.25);
-	this.chargeAnimation = new Animation(AM.getAsset("./img/shipSecondary2Charging.png"), this.pWidth, this.pHeight, 768, 0.05, 6, true, 1);
+	this.charge1Animation = new Animation(AM.getAsset("./img/shipCharge1.png"), this.pWidth, this.pHeight, 768, 0.05, 6, true, 1);
+	this.charge2Animation = new Animation(AM.getAsset("./img/shipCharge2.png"), this.pWidth, this.pHeight, 768, 0.05, 6, true, 1);
+	this.charge3Animation = new Animation(AM.getAsset("./img/shipCharge3.png"), this.pWidth, this.pHeight, 768, 0.05, 6, true, 1);
 	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipSecondary3.png"), this.pWidth, this.pHeight, 768, 0.15, 6, true, 0.3);
+	this.damage1Animation = new Animation(AM.getAsset("./img/shipDamage1.png"), this.pWidth, this.pHeight, 384, 0.1, 3, true, 2);
+	this.damage2Animation = new Animation(AM.getAsset("./img/shipDamage2.png"), this.pWidth, this.pHeight, 384, 0.1, 3, true, 2);
 
 	if (DEBUG) {
 		this.invincible = true;
@@ -59,6 +62,7 @@ function TheShip(game) {
 	this.secondaryTimer = 0;
 	this.charging = true;
 	this.charge = 0.5;
+	this.maxCharge = 2.5;
 	this.orbiterAngle = 0;
 	this.orbiter1 = {x: 0, y: 0};
 	this.orbiter2 = {x: 0, y: 0};
@@ -365,7 +369,7 @@ TheShip.prototype.update = function () {
 				}
 			}
 		}
-		if (this.secondaryType === 2 && this.charge < 3) { // charge shot
+		if (this.secondaryType === 2 && this.charge < 2.5) { // charge shot
 			this.charging = true;
 			this.charge += 0.01;
 		}
@@ -388,9 +392,6 @@ TheShip.prototype.update = function () {
 				}
 			}
 			if (this.primaryType === 1) {	// wave
-				if (this.charge > 1.5) {
-					this.charge = 1.5;
-				}
 				if (this.multishotLevel === 0) {
 					this.createChargeShot("P1", 0, 0, 0);
 					this.createChargeShot("P1", 0, 0, 1);
@@ -415,9 +416,6 @@ TheShip.prototype.update = function () {
 				}
 			}
 			if (this.primaryType === 2) {	// bullet
-				if (this.charge > 2) {
-					this.charge = 2;
-				}
 				for (var i = 0; i < 15; i++) {
 					this.createChargeShot("P2", 0, (Math.random() - 0.5) / 2, 0);
 				}
@@ -632,8 +630,24 @@ TheShip.prototype.createOrbiterProjectile = function(type, offset, adjustAngle) 
 TheShip.prototype.draw = function () {
 	if (!this.game.running) return;
 	if (this.charging) {
-		this.chargeAnimation.drawFrame(this.game.clockTick, this.ctx, this.x - (this.pWidth * 0.5 / 2), this.y - (this.pHeight * 0.5 / 2), this.angle);
+		if (this.charge < 1.5) {
+			this.charge1Animation.drawFrame(this.game.clockTick, this.ctx, this.x - (this.pWidth * 0.5 / 2), this.y - (this.pHeight * 0.5 / 2), this.angle);
+		}
+		else if (this.charge < 2.5) {
+			this.charge2Animation.drawFrame(this.game.clockTick, this.ctx, this.x - (this.pWidth * 0.5 / 2), this.y - (this.pHeight * 0.5 / 2), this.angle);
+		}
+		else {
+			this.charge3Animation.drawFrame(this.game.clockTick, this.ctx, this.x - (this.pWidth * 0.5 / 2), this.y - (this.pHeight * 0.5 / 2), this.angle);
+		}
 	}
+
+	if (this.damageLevel === 1) {
+		this.damage1Animation.drawFrame(this.game.clockTick, this.ctx, this.x - (this.pWidth * 0.75), this.y - (this.pHeight * 0.75), this.orbiterAngle);
+	}
+	else if (this.damageLevel === 2) {
+		this.damage2Animation.drawFrame(this.game.clockTick, this.ctx, this.x - (this.pWidth * 0.75), this.y - (this.pHeight * 0.75), this.orbiterAngle);
+	}
+
 	if (this.rolling) {
 		if (this.boosting) {
 			if (this.speedLevel === 0) {

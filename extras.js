@@ -9,6 +9,8 @@ function Reticle(game) {
 	this.reticleAnimation = new Animation(AM.getAsset("./img/shipReticle.png"), this.pWidth, this.pHeight, 256, 0.5, 2, true, this.scale);
 
 	this.name = "Reticle";
+	this.x = 0;
+	this.y = 0;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -18,13 +20,14 @@ Reticle.prototype = new Entity();
 Reticle.prototype.constructor = Reticle;
 
 Reticle.prototype.update = function () {
+	this.x = this.game.mouseX - (this.pWidth * this.scale / 2);
+	this.y = this.game.mouseY - (this.pHeight * this.scale / 2);
+
 	Entity.prototype.update.call(this);
 }
 
 Reticle.prototype.draw = function () {
-	this.reticleAnimation.drawFrame(this.game.clockTick, this.ctx,
-								   (this.game.mouseX - (this.pWidth * this.scale / 2) - 1),
-								   (this.game.mouseY - (this.pHeight * this.scale / 2) - 1), 0);
+	this.reticleAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, 0);
 
 	Entity.prototype.draw.call(this);
 }
