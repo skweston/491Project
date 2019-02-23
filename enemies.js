@@ -22,6 +22,11 @@ function AlienSpaceStation(game, x, y, rock) {
 	this.maxHealth = 1000;
 	this.health = this.maxHealth;
 
+	this.shootCooldownReset = 25;
+	this.shootCooldown = this.shootCooldownReset;
+	this.shootAngle = 0;
+	this.target = null;
+
 
 	//Specific to spawners:
 	this.gathererTimerReset = 200;
@@ -55,6 +60,42 @@ AlienSpaceStation.prototype.update = function () {
 	if(!this.removeFromWorld && this.health < this.maxHealth){
 		this.health += 0.5;
 	}
+	//shooting
+	var closest = 100000000;
+	if (true){
+
+
+
+	//find the player allied ship
+		for (var i = 0; i < this.game.allies.length; i++){
+			var ent = this.game.allies[i];
+			var d = distance(this, ent);
+			if(d < closest){
+				closest = d;
+				this.target = ent;
+
+			}
+		}
+	}
+
+	if(distance(this, this.game.ship) < closest){
+		this.target = this.game.ship;
+	}
+
+	// update shootingangle
+	if(this.target){
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.shootAngle = -Math.atan2(dy,dx);
+	}
+
+	if (this.target && 500 > distance(this, this.target) && this.shootCooldown < 1){
+		this.createProjectile("LaserBlast", 0, -Math.PI/2);
+		this.shootCooldown = this.shootCooldownReset;
+	}
+	this.shootCooldown--;
+	}
+
 
 
 
@@ -140,6 +181,28 @@ AlienSpaceStation.prototype.update = function () {
 
 
     Entity.prototype.update.call(this);
+}
+AlienSpaceStation.prototype.createProjectile = function(type, offset, adjustAngle) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: this.target.xMid, yMid: this.target.YMid});
+	var angle = this.shootAngle + adjustAngle;
+	if (type === "LaserBlast") {
+		var projectile = new LaserBlast(this.game, this.angle);
+	}
+	if (type === "BossMissle") {
+		var projectile = new BossMissle(this.game, this.angle);
+	}
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(this.target, this);
+
+	projectile.x = this.xMid;
+	projectile.y = this.yMid;
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = angle;
+
+	this.game.addEntity(projectile);
 }
 
 AlienSpaceStation.prototype.draw = function () {
@@ -789,82 +852,7 @@ BossTurret.prototype.draw = function () {
 	Entity.prototype.draw.call(this);
 }
 
-/* ========================================================================================================== */
-// BossTurret LaserBlaste
-/* ========================================================================================================== */
 
-
-function LaserBlast(game, angle){
-	this.pWidth = 32;
-	this.pHeight = 32;
-	this.scale = 1;
-	this.animation = new Animation(AM.getAsset("./img/LaserBlast.png"), this.pWidth, this.pHeight, 128, 0.15, 4, true, this.scale);
-	this.name = "EnemyProjectile";
-
-	this.x = 0;
-	this.y = 0;
-	this.xMid = -100;
-	this.yMid = -100;
-	this.radius = 4 * this.scale;
-	this.angle = angle;
-
-	this.lifetime = 500;
-	this.damage = 7;
-	this.maxSpeed = 300;
-	this.velocity = {x: 10, y: 10};
-
-	this.game = game;
-	this.ctx = game.ctx;
-	this.removeFromWorld = false;
-  }
-
-LaserBlast.prototype = new Entity();
-LaserBlast.prototype.constructor = LaserBlast;
-
-LaserBlast.prototype.update = function () {
-	this.x += this.velocity.x * this.game.clockTick;
-	this.y += this.velocity.y * this.game.clockTick;
-
-	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
-	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-
-	var speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y);
-	if(speed > this.maxSpeed) {
-		var ratio = this.maxSpeed / speed;
-		this.velocity.x *= ratio;
-		this.velocity.y *= ratio;
-	  }
-
-
-	  var ent = this.game.ship;
-	  if(!ent.rolling && Collide(this, ent)) {
-		  ent.takeDamage(this.damage);
-		  this.removeFromWorld = true;
-	  }
-
-	  this.lifetime -= 1;
-	  if (this.lifetime < 0) {
-		  this.removeFromWorld = true;
-	  }
-
-	  Entity.prototype.update.call(this);
-  }
-
-LaserBlast.prototype.draw = function () {
-	if(onCamera(this)){
-		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-	}
-	if (SHOW_HITBOX) {
-		this.ctx.beginPath();
-		this.ctx.strokeStyle = "Red";
-		this.ctx.lineWidth = 1;
-		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
-		this.ctx.stroke();
-		this.ctx.closePath();
-	}
-
-	Entity.prototype.draw.call(this);
-}
 
 
 /* ========================================================================================================== */
