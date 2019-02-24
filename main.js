@@ -506,6 +506,7 @@ BackgroundLayer.prototype.update = function () {
 
 var AM = new AssetManager();
 //Background
+AM.queueDownload("./img/level1main.png");
 AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/PScroll1/space.png");
 AM.queueDownload("./img/PScroll1/cloud.png");
@@ -610,7 +611,8 @@ AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
 AM.queueDownload("./img/SPACEFIGHT.png");
-AM.queueDownload("./img/splash.png")
+AM.queueDownload("./img/plutoSplash.png");
+//AM.queueDownload("./img/splash.png")
 
 AM.downloadAll(function () {
 	console.log("starting up da sheild");

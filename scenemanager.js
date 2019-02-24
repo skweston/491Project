@@ -186,7 +186,7 @@ function SplashScene(game) {
 	this.game = game;
 	this.entities = [];
 
-	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/plutoSplash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 
@@ -205,7 +205,7 @@ function TutorialScene(game) {
 	this.ctx = this.game.ctx;
 	this.entities = [];
 
-	this.background = new MainBackground(this.game, AM.getAsset("./img/PScroll1/Background_1.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/level1main.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
@@ -314,7 +314,7 @@ function StoryScrollScene(game) {
 	this.name = "Scroll";
 	this.game = game;
 	this.entities = [];
-	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/plutoSplash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.scroll = new StoryScroll1(this.game, this.leve);
@@ -393,7 +393,7 @@ function PrototypeLevel(game) {
 	this.counter = 0;
 
 	this.entities = [];
-	this.background = new MainBackground(this.game, AM.getAsset("./img/PScroll1/Background_1.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/level1main.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
@@ -525,7 +525,7 @@ function VictoryScrollScene(game) {
 	this.name = "VictoryScroll";
 	this.game = game;
 	this.entities = [];
-	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/plutoSplash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.scroll = new VictoryStoryScroll1(this.game, this.leve);
