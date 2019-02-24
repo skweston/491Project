@@ -554,6 +554,11 @@ AM.queueDownload("./img/shipDamage1.png");
 AM.queueDownload("./img/shipDamage2.png");
 
 //Allies
+AM.queueDownload("./img/allyDrone.png");
+AM.queueDownload("./img/allyShip1.png");
+AM.queueDownload("./img/allyShip2.png");
+AM.queueDownload("./img/allyBase.png");
+
 AM.queueDownload("./img/GreenChroma.png");
 AM.queueDownload("./img/PurpleChroma.png");
 AM.queueDownload("./img/RedChroma.png");
@@ -581,6 +586,15 @@ AM.queueDownload("./img/damageUp.png");
 AM.queueDownload("./img/scrap.png");
 
 // enemies
+AM.queueDownload("./img/enemyScourge.png");
+AM.queueDownload("./img/enemyDefiler.png");
+AM.queueDownload("./img/enemyGuardian.png");
+AM.queueDownload("./img/enemyDrone.png");
+AM.queueDownload("./img/enemyQueen.png");
+AM.queueDownload("./img/enemyBase.png");
+
+
+
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
 AM.queueDownload("./img/LaserBlast.png");
