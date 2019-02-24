@@ -3,10 +3,10 @@
 /* ========================================================================================================== */
 function AlienSpaceStation(game, x, y, rock) {
 
-    this.pWidth = 260;
-    this.pHeight = 260;
+    this.pWidth = 256;
+    this.pHeight = 256;
     this.scale = 1;
-	this.animation = new Animation(AM.getAsset("./img/AlienSpaceStation.png"), this.pWidth, this.pHeight, 780, 0.175, 3, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/enemyBase.png"), this.pWidth, this.pHeight, 2048, 0.175, 8, true, this.scale);
     this.name = "Enemy";
     this.x = x;
     this.y = y;
@@ -176,7 +176,7 @@ AlienSpaceStation.prototype.update = function () {
 	this.scourgeTimer--;
 	this.leechTimer--;
 	this.stalkerTimer--;
-	this.angle += 0.0075;
+	this.angle += 0.000125;
 
 	for (var i = 0; i<this.game.playerProjectiles.length; i++){
 		var ent = this.game.playerProjectiles[i];
@@ -235,16 +235,14 @@ AlienSpaceStation.prototype.draw = function () {
 function BiologicalResourceGatherer(game, spawner) {
 
 
-	this.pWidth = 54;
-	this.pHeight = 51;
-	this.scale = 1;
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.65;
 
   	// Stuff gets passed into an animation object in this order:
   	// spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
 
-	this.animation = new Animation(AM.getAsset("./img/BiologicalResourceGatherer.png"),
-								 this.pWidth, this.pHeight,
-								 324, .125, 6, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/enemyDrone.png"), this.pWidth, this.pHeight, 768, 0.125, 6, true, this.scale);
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Enemy";
@@ -393,16 +391,14 @@ BiologicalResourceGatherer.prototype.update = function () {
 function AlienBuilder(game, spawner) {
 
 
-	this.pWidth = 300;
-	this.pHeight = 284;
-	this.scale = .5;
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 1;
 
   	// Stuff gets passed into an animation object in this order:
   	// spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
 
-	this.animation = new Animation(AM.getAsset("./img/AlienBuilder.png"),
-								 this.pWidth, this.pHeight,
-								 1500, .125, 5, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/enemyQueen.png"), this.pWidth, this.pHeight, 1408, 0.08, 11, true, this.scale);
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Enemy";
@@ -790,10 +786,10 @@ BossTurret.prototype.draw = function () {
 /* ========================================================================================================== */
 function Leech(game, xIn, yIn, spawner) {
 
-	this.pWidth = 32;
-	this.pHeight = 32;
-	this.scale = 1;
-	this.animation = new Animation(AM.getAsset("./img/Leech.png"), this.pWidth, this.pHeight,448, 0.1, 14, true, this.scale);
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.4;
+	this.animation = new Animation(AM.getAsset("./img/enemyDefiler.png"), this.pWidth, this.pHeight, 1024, 0.08, 8, true, this.scale);
 	this.angle = 0;
 	this.spawner = spawner;
 	this.name = "Enemy";
@@ -954,8 +950,8 @@ function Scourge(game, xIn, yIn, spawner) {
 
 	this.pWidth = 128;
 	this.pHeight = 128;
-	this.scale = .5;
-	this.animation = new Animation(AM.getAsset("./img/scourge.png"), this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
+	this.scale = 0.35;
+	this.animation = new Animation(AM.getAsset("./img/enemyScourge.png"), this.pWidth, this.pHeight, 640, 0.1, 5, true, this.scale);
 	this.angle = 0;
 	this.spawner = spawner;
 	this.name = "Enemy";
@@ -1163,11 +1159,10 @@ Spawner.prototype.draw = function () {
 
 function Stalker(game, xIn, yIn, spawner){
 
-		this.pWidth = 32;
-		this.pHeight = 32;
-		this.scale = 2;
-		this.animation = new Animation(AM.getAsset("./img/stalker32.png"), this.pWidth, this.pHeight,
-										512, 0.1, 5, true, this.scale);
+		this.pWidth = 128;
+		this.pHeight = 128;
+		this.scale = 1;
+		this.animation = new Animation(AM.getAsset("./img/enemyGuardian.png"), this.pWidth, this.pHeight, 896, 0.08, 7, true, this.scale);
 										/*swap these two for HD sprite*/
 										//976, 0.1, 5, true, this.scale);
 		this.angle = 0;
