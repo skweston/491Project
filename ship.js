@@ -169,13 +169,13 @@ TheShip.prototype.update = function () {
 	}
 	if (xMove === 0) {
 		this.y += yMove;
-		if(this.game.camera.isScrolling) {
+		if(this.game.camera.isScrolling){
 			this.game.mouseY += yMove;
 		}
 	}
 	else if (yMove === 0) {
 		this.x += xMove;
-		if(this.game.camera.isScrolling) {
+		if(this.game.camera.isScrolling){
 			this.game.mouseX += xMove;
 		}
 	}
