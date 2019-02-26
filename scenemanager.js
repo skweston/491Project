@@ -205,23 +205,24 @@ function TutorialScene(game) {
 	this.ctx = this.game.ctx;
 	this.entities = [];
 
-	this.background = new MainBackground(this.game, AM.getAsset("./img/PScroll1/Background_1.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/TutorialSceneLines.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
-	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
-	this.game.addEntity(this.layer1);
-	this.entities.push(this.layer1);
+	//this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
+	//this.game.addEntity(this.layer1);
+	//this.entities.push(this.layer1);
 
-	this.tutorial = new HowTo(this.game);
-	this.game.addEntity(this.tutorial);
-	this.entities.push(this.tutorial);
+	//this.tutorial = new HowTo(this.game);
+	//this.game.addEntity(this.tutorial);
+	//this.entities.push(this.tutorial);
 
-	this.hud = new HUD(this.game);
-	this.game.addEntity(this.hud);
-	this.entities.push(this.hud);
-	this.game.sceneManager.loadPlayer();
+	//this.hud = new HUD(this.game);
+	//this.game.addEntity(this.hud);
+	//this.entities.push(this.hud);
+	//this.game.sceneManager.loadPlayer();
 }
 
+/*
 function HowTo(game) {
 	this.game = game;
 	this.ctx = game.ctx;
@@ -240,7 +241,7 @@ HowTo.prototype.update = function() {
 		//this.removeFromWorld = true; - Will be in changeScenes
 	}*/
 
-	Entity.prototype.update.call(this);
+	/*Entity.prototype.update.call(this);
 }
 
 HowTo.prototype.draw = function() {
@@ -255,7 +256,9 @@ HowTo.prototype.draw = function() {
 	this.game.ctx.fillText("Your goal is to take revenge on Earth for demoting", 600, (this.offset * this.line++), 800);
 	this.game.ctx.fillText("the seat of the Empire to \"dwarf\" planet.", 600, (this.offset * this.line++), 800);
 	this.game.ctx.fillText("As you travel to Earth, your caravan will build bases,", 600, (this.offset * this.line++), 800);
-	this.game.ctx.fillText("harvest materials and fight the scum of the Sol System.", 600, (this.offset * this.line), 800);
+	this.game.ctx.fillText("harvest materials and fight the scum of the Sol System.", 600, (this.offset * this.line++), 800);
+	this.game.ctx.fillStyle = "Blue";
+	this.game.ctx.fillText("Follow the path to learn the ways of Pluto.", 600, (this.offset * this.line), 800);
 
 	this.point = this.line;
 
@@ -266,16 +269,54 @@ HowTo.prototype.draw = function() {
 	this.game.ctx.textAlign = "left";
 	this.game.ctx.fillStyle = "Blue";
 	ctx.font = "22pt Impact";
+	this.game.ctx.fillText("Basic Controls", 0, (this.offset * this.line++), 400);
 	this.game.ctx.fillText("To Move: W A S D", 0, (this.offset * this.line++), 400);
 	this.game.ctx.fillText("To Dodge: SPACEBAR", 0, (this.offset * this.line++), 400);
 	this.game.ctx.fillText("To Boost Speed: SHIFT", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To aim: Place cursor on target", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("Cycle Primary Weapons: 1", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 0, (this.offset * this.line++), 400);
+
 	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (this.offset * this.line++), 400);
 
+	this.pathStartX = 400;
+	this.pathStartY = 400;
+	//x + 1500 for first checkpoint
+	this.pathStopX = this.pathStartX + 800;
+	this.pathStopY = this.pathStartY;
+	this.game.ctx.beginPath();
+
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
+
+	//weapons
+	this.game.ctx.fillStyle = "Blue";
+	this.line = 2; //resetline to top of screen
+	this.game.ctx.fillText("Learn To Shoot!", 1500, (this.offset * this.line), 800);
+	this.line =+ 17;
+	this.game.ctx.fillText("To aim: Place cursor on target", 1200, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", 1200, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 1200, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("Cycle Primary Weapons: 1", 1200, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 1200, (this.offset * this.line++), 400);
+	//add enemy here.
+	//add weapons here as well
+	this.pathStartX = 1200;
+	this.pathStartY = 400;
+	this.pathStopX = this.pathStartX + 1200;
+	this.pathStopY = this.pathStartY;
+	this.game.ctx.beginPath();
+
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
 	//Weapons
 	/*
 	this.game.ctx.textAlign = "right";
@@ -301,13 +342,20 @@ HowTo.prototype.draw = function() {
 	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
 	*/
 
+	//enemies
+	/*this.game.ctx.fillStyle = "Blue";
+	this.line = 2;
+	this.game.ctx.fillText("These Are Your Foes", 1500 + 1200, (this.offset * this.line), 800);
+
+
+
 	this.game.ctx.textAlign = "right";
 	ctx.font = "24pt Impact";
 	//Stays in bottom right corner of screen
 	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
 
 	Entity.prototype.draw.call(this);
-}
+}*/
 
 function StoryScrollScene(game) {
 	console.log("scroll");
@@ -391,6 +439,7 @@ function PrototypeLevel(game) {
 	this.spawnNum = 1;
 	this.spawnTimerStart = 100;
 	this.counter = 0;
+	this.enemyBaseCreated = false;
 
 	this.entities = [];
 	this.background = new MainBackground(this.game, AM.getAsset("./img/PScroll1/Background_1.png"));
@@ -430,6 +479,7 @@ function PrototypeLevel(game) {
 	this.enemySpaceStation = new AlienSpaceStation(this.game, 3000, 3000, this.rock2);
 	this.game.addEntity(this.enemySpaceStation);
 	this.entities.push(this.enemySpaceStation);
+	this.enemyBaseCreated = true;
 
 	this.rock2.hasbase = true;
 	this.rock2.base = this.enemySpaceStation;
@@ -488,21 +538,25 @@ PrototypeLevel.prototype.update = function(){
 		return;
 	}
 
-	for(var i = 0; i < this.game.terrain.length; i++){
+	if(this.enemyBaseCreated) {
+		for(var i = 0; i < this.game.terrain.length; i++){
 
-		if(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy") {
+			if(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy") {
 
-			//this.removeFromWorld = false;
-			this.victory = false;
-
+				//this.removeFromWorld = false;
+				this.victory = false;
+			}
 		}
-	}
 
-	//if (this.removeFromWorld && !this.game.menu){
-	console.log("victory: " + this.victory);
-	if(this.victory) {
-		this.game.sceneManager.reset();
-		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
+		//if (this.removeFromWorld && !this.game.menu){
+		console.log("victory: " + this.victory);
+		if(this.victory) {
+			this.victory = false;
+			this.enemyBaseCreated = false;
+			this.game.sceneManager.reset();
+			//this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
+			this.game.sceneManager.changeScenes(new SplashScene(this.game));
+		}
 	}
 }
 
@@ -538,6 +592,7 @@ function VictoryScrollScene(game) {
 
 }
 
+/*
 function VictoryStoryScroll1(game) {
 	//is an entity but doesn't contain an animation
 	this.game = game;
@@ -596,3 +651,4 @@ VictoryStoryScroll1.prototype.update = function () {
 	}
 	Entity.prototype.update.call(this);
 }
+*/
