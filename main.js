@@ -611,7 +611,7 @@ AM.queueDownload("./img/SpawnDoor.png");
 AM.queueDownload("./img/SpaceExplosion.png");
 AM.queueDownload("./img/SPACEFIGHT.png");
 AM.queueDownload("./img/splash.png");
-AM.queueDownload("./img/TutorialScene.png");
+AM.queueDownload("./img/TutorialSceneLines.png");
 
 
 AM.downloadAll(function () {

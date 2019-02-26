@@ -205,7 +205,7 @@ function TutorialScene(game) {
 	this.ctx = this.game.ctx;
 	this.entities = [];
 
-	this.background = new MainBackground(this.game, AM.getAsset("./img/TutorialScene.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/TutorialSceneLines.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	//this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
