@@ -7,10 +7,10 @@ function SpaceStation(game, x, y, rock) {
     this.generateGatherer = this.gathererTimerReset;
     this.maxSpawn = 3; // maybe make this a difficulty variable.
 
-    this.pWidth = 512;
-    this.pHeight = 512;
-    this.scale = .5;
-	this.animation = new Animation(AM.getAsset("./img/SpaceStation.png"), this.pWidth, this.pHeight, 1024, 0.25, 2, true, this.scale);
+    this.pWidth = 256;
+    this.pHeight = 256;
+    this.scale = 1;
+	this.animation = new Animation(AM.getAsset("./img/allyBase.png"), this.pWidth, this.pHeight, 2048, 0.2, 8, true, this.scale);
     this.name = "Ally";
     this.x = x;
     this.y = y;
@@ -150,7 +150,7 @@ SpaceStation.prototype.update = function () {
 
 	this.generateGatherer -= 1;
 	this.chromaTimer--;
-	this.angle += 0.01;
+	this.angle -= 0.001;
     Entity.prototype.update.call(this);
 }
 
@@ -214,16 +214,14 @@ SpaceStation.prototype.draw = function () {
 function MechanicalResourceGatherer(game, spawner) {
 
 
-	this.pWidth = 40;
-	this.pHeight = 40;
-	this.scale = 1;
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.6;
 
   	// Stuff gets passed into an animation object in this order:
   	// spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
 
-	this.animation = new Animation(AM.getAsset("./img/MechanicalResourceGatherer.png"),
-								 this.pWidth, this.pHeight,
-								 80, .125, 2, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/allyDrone.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Ally";
@@ -387,14 +385,12 @@ function PlayerBuilder(game, spawner) {
 
 	this.pWidth = 250;
 	this.pHeight = 268;
-	this.scale = .5;
+	this.scale = 0.5;
 
   	// Stuff gets passed into an animation object in this order:
   	// spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
 
-	this.animation = new Animation(AM.getAsset("./img/PlayerBuilder.png"),
-								 this.pWidth, this.pHeight,
-								 1500, .125, 6, true, this.scale);
+	this.animation = new Animation(AM.getAsset("./img/PlayerBuilder.png"), this.pWidth, this.pHeight, 1500, .125, 6, true, this.scale);
 	this.game = game;
 	this.ctx = game.ctx;
 	this.name = "Ally";
@@ -538,10 +534,10 @@ PlayerBuilder.prototype.update = function () {
 
 function PurpleChroma(game, spawner) {
 
-	this.pWidth = 32;
-	this.pHeight = 32;
-	this.scale = 2;
-	this.animation = new Animation(AM.getAsset("./img/PurpleChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.5;
+	this.animation = new Animation(AM.getAsset("./img/allyShip1.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
 	this.angle = 0;
 	this.spawner = spawner;
 	this.name = "Ally";
@@ -710,10 +706,10 @@ PurpleChroma.prototype.draw = function () {
 
 function GreenChroma(game, spawner) {
 
-	this.pWidth = 32;
-	this.pHeight = 32;
-	this.scale = 2;
-	this.animation = new Animation(AM.getAsset("./img/GreenChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.75;
+	this.animation = new Animation(AM.getAsset("./img/allyShip2.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
 	this.angle = 0;
 	this.spawner = spawner;
 	this.name = "Ally";
@@ -879,10 +875,10 @@ GreenChroma.prototype.draw = function () {
 
 function RedChroma(game, spawner) {
 
-	this.pWidth = 32;
-	this.pHeight = 32;
-	this.scale = 2;
-	this.animation = new Animation(AM.getAsset("./img/RedChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.5;
+	this.animation = new Animation(AM.getAsset("./img/allyShip1.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
 	this.angle = 0;
 	this.spawner = spawner;
 	this.name = "Ally";
@@ -1049,10 +1045,10 @@ RedChroma.prototype.draw = function () {
 
 function BlackWhiteChroma(game, spawner) {
 
-	this.pWidth = 32;
-	this.pHeight = 32;
-	this.scale = 2;
-	this.animation = new Animation(AM.getAsset("./img/BlackWhiteChroma.png"), this.pWidth, this.pHeight, 64, 0.2, 2, true, this.scale);
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.75;
+	this.animation = new Animation(AM.getAsset("./img/allyShip2.png"), this.pWidth, this.pHeight, 256, 0.03, 2, true, this.scale);
 	this.angle = 0;
 	this.spawner = spawner;
 	this.name = "Ally";
