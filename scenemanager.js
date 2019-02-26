@@ -205,23 +205,24 @@ function TutorialScene(game) {
 	this.ctx = this.game.ctx;
 	this.entities = [];
 
-	this.background = new MainBackground(this.game, AM.getAsset("./img/PScroll1/Background_1.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/TutorialScene.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
-	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
-	this.game.addEntity(this.layer1);
-	this.entities.push(this.layer1);
+	//this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
+	//this.game.addEntity(this.layer1);
+	//this.entities.push(this.layer1);
 
-	this.tutorial = new HowTo(this.game);
-	this.game.addEntity(this.tutorial);
-	this.entities.push(this.tutorial);
+	//this.tutorial = new HowTo(this.game);
+	//this.game.addEntity(this.tutorial);
+	//this.entities.push(this.tutorial);
 
 	//this.hud = new HUD(this.game);
 	//this.game.addEntity(this.hud);
 	//this.entities.push(this.hud);
-	this.game.sceneManager.loadPlayer();
+	//this.game.sceneManager.loadPlayer();
 }
 
+/*
 function HowTo(game) {
 	this.game = game;
 	this.ctx = game.ctx;
@@ -240,7 +241,7 @@ HowTo.prototype.update = function() {
 		//this.removeFromWorld = true; - Will be in changeScenes
 	}*/
 
-	Entity.prototype.update.call(this);
+	/*Entity.prototype.update.call(this);
 }
 
 HowTo.prototype.draw = function() {
@@ -342,7 +343,7 @@ HowTo.prototype.draw = function() {
 	*/
 
 	//enemies
-	this.game.ctx.fillStyle = "Blue";
+	/*this.game.ctx.fillStyle = "Blue";
 	this.line = 2;
 	this.game.ctx.fillText("These Are Your Foes", 1500 + 1200, (this.offset * this.line), 800);
 
@@ -354,7 +355,7 @@ HowTo.prototype.draw = function() {
 	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
 
 	Entity.prototype.draw.call(this);
-}
+}*/
 
 function StoryScrollScene(game) {
 	console.log("scroll");
