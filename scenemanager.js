@@ -531,7 +531,7 @@ PrototypeLevel.prototype.update = function(){
 
 	if (this.game.ship.health < 1){
 		//console.log("dead");
-		//this.victory = false;
+		this.victory = false;
 		this.victory = false;
 		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(new SplashScene(this.game));
@@ -551,10 +551,10 @@ PrototypeLevel.prototype.update = function(){
 		//if (this.removeFromWorld && !this.game.menu){
 		console.log("victory: " + this.victory);
 		if(this.victory) {
-			this.victory = false;
+			//this.victory = false;
 			this.enemyBaseCreated = false;
 			this.game.sceneManager.reset();
-			//this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
+			this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
 			this.game.sceneManager.changeScenes(new SplashScene(this.game));
 		}
 	}
@@ -592,7 +592,7 @@ function VictoryScrollScene(game) {
 
 }
 
-/*
+
 function VictoryStoryScroll1(game) {
 	//is an entity but doesn't contain an animation
 	this.game = game;
@@ -651,4 +651,3 @@ VictoryStoryScroll1.prototype.update = function () {
 	}
 	Entity.prototype.update.call(this);
 }
-*/
