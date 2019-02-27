@@ -183,6 +183,10 @@ GameEngine.prototype.startInput = function () {
 		that.wheel = e;
 	}, false);
 
+	this.cameraCtx.canvas.addEventListener("mouseout", function (e) {
+			that.paused = true;
+	}, false);
+
 	this.cameraCtx.canvas.addEventListener("keydown", function (e) {
 		//console.log("input: " + e.code);
 		e.preventDefault();

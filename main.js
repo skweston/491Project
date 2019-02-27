@@ -226,12 +226,14 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle, game) {
 	} else if ((this.frameWidth*this.scale) < (this.frameHeight * this.scale)) {
 	  xOffset = (this.frameHeight * this.scale) - (this.frameWidth * this.scale);
 	}
-
+	// console.log(`${this.window.width} ${this.window.height} offScreen check
+	// 			${this.size} = size`);
 	offscreenCanvas.width = size;
 	offscreenCanvas.height = size;
 	var offscreenCtx = offscreenCanvas.getContext('2d');
 
 	var thirdCanvas = document.createElement('canvas');
+
 	thirdCanvas.width = size;
 	thirdCanvas.height = size;
 	var thirdCtx = thirdCanvas.getContext('2d');
