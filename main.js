@@ -615,6 +615,9 @@ AM.queueDownload("./img/SpaceExplosion.png");
 AM.queueDownload("./img/SPACEFIGHT.png");
 AM.queueDownload("./img/plutoSplash.png");
 //AM.queueDownload("./img/splash.png")
+AM.queueDownload("./img/splash.png");
+AM.queueDownload("./img/TutorialSceneLines.png");
+
 
 AM.downloadAll(function () {
 	console.log("starting up da sheild");

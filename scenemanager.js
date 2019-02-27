@@ -125,12 +125,12 @@ HUD.prototype.draw = function() {
 	this.game.ctx.font = "24pt Impact";
 	//Stays in bottom right corner of screen
 	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
-	if(this.game.paused) {
-		this.game.ctx.center = "center";
+	if (this.game.paused) {
+		this.game.ctx.textAlign = "center";
 		this.game.ctx.font = "12pt Impact";
-		this.game.ctx.fillText("Unpause: P", this.game.camera.width / 2, this.game.camera.height / 2 + 15, 200);
+		this.game.ctx.fillText("Unpause: P", this.game.camera.x + (this.game.camera.width / 2), this.game.camera.y + (this.game.camera.height / 2) + 15, 200);
 		this.game.ctx.font = "50pt Impact";
-		this.game.ctx.fillText("PAUSED", this.game.camera.width / 2 + 50, this.game.camera.height / 2, 200);
+		this.game.ctx.fillText("PAUSED", this.game.camera.x + (this.game.camera.width / 2), this.game.camera.y + (this.game.camera.height / 2), 200);
 	}
 	Entity.prototype.draw.call(this);
 }
