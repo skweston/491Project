@@ -538,7 +538,7 @@ TheShip.prototype.createChargeShot = function(type, offset, adjustAngle, spreadN
 	}
 	if (type === "P2") {
 		var projectile = new ShipPrimary2(this.game, 1 * this.charge);
-		projectile.maxSpeed *= Math.random();
+		projectile.maxSpeed *= 0.5 + Math.random();
 	}
 	if (type === "P3") {
 		var projectile = new ShipPrimary3(this.game, 1 * this.charge);
