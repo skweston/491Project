@@ -184,7 +184,9 @@ GameEngine.prototype.startInput = function () {
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("mouseout", function (e) {
+		if (that.running) {
 			that.paused = true;
+		}
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("keydown", function (e) {

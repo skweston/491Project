@@ -556,6 +556,17 @@ AM.queueDownload("./img/shipSecondary3.png");
 AM.queueDownload("./img/shipDamage1.png");
 AM.queueDownload("./img/shipDamage2.png");
 
+// HUD
+AM.queueDownload("./img/hudLaserIcon.png");
+AM.queueDownload("./img/hudWaveIcon.png");
+AM.queueDownload("./img/hudBulletIcon.png");
+AM.queueDownload("./img/hudBurstIcon.png");
+AM.queueDownload("./img/hudMissileIcon.png");
+AM.queueDownload("./img/hudHomingIcon.png");
+AM.queueDownload("./img/hudChargeIcon.png");
+AM.queueDownload("./img/hudOrbiterIcon.png");
+
+
 //Allies
 AM.queueDownload("./img/allyDrone.png");
 AM.queueDownload("./img/allyShip1.png");

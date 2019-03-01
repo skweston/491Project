@@ -93,6 +93,10 @@ TheShip.prototype.constructor = TheShip;
 TheShip.prototype.update = function () {
 	if (!this.game.running) return;
 
+	var a = 1;
+	a = a / 2;
+	console.log("a? " + a);
+
 	if(this.health < 1){
 		this.removeFromWorld = true;
 	}
