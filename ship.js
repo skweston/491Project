@@ -30,7 +30,7 @@ function TheShip(game) {
 	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipSecondary3.png"), this.pWidth, this.pHeight, 768, 0.15, 6, true, 0.3);
 	this.damage1Animation = new Animation(AM.getAsset("./img/shipDamage1.png"), this.pWidth, this.pHeight, 384, 0.1, 3, true, 2);
 	this.damage2Animation = new Animation(AM.getAsset("./img/shipDamage2.png"), this.pWidth, this.pHeight, 384, 0.1, 3, true, 2);
-
+	
 	if (DEBUG) {
 		this.invincible = true;
 	}

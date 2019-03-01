@@ -106,6 +106,19 @@ function HUD(game) {
 }
 
 HUD.prototype.draw = function() {
+	// HUD top
+	this.game.ctx.fillStyle = "LightSteelBlue";
+	this.game.ctx.fillRect(0, 0, 400, 120);
+	this.game.ctx.fillRect(400, 0, 400, 60);
+	this.game.ctx.fillRect(800, 0, 400, 120);
+
+	// HUD minimap
+	this.game.ctx.fillStyle = "rgba(176, 196, 222, 0.5)";
+	this.game.ctx.fillRect(950, 550, 250, 250);
+
+
+
+
 	this.game.ctx.font = "24pt Impact";
 	this.game.ctx.fillStyle = "Red";
 	this.game.ctx.textAlign = "left";
