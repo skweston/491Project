@@ -113,6 +113,8 @@ HUD.prototype.draw = function() {
 	this.game.ctx.fillText("Score: " + SCORE, this.game.camera.x + 10, this.game.camera.y + 70);
 
 	//Boost meter
+	this.game.ctx.fillStyle = "Red";
+	this.game.ctx.lineWidth = 1;
 	this.game.ctx.fillText("Boost Meter: ",this.game.camera.x + 10, this.game.camera.y + 100);
 	this.game.ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
 	this.game.ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
@@ -205,24 +207,25 @@ function TutorialScene(game) {
 	this.ctx = this.game.ctx;
 	this.entities = [];
 
-	this.background = new MainBackground(this.game, AM.getAsset("./img/TutorialSceneLines.png"));
+	//this.background = new MainBackground(this.game, AM.getAsset("./img/TutorialSceneLines.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/PScroll1/Background_1.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
-	//this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
-	//this.game.addEntity(this.layer1);
-	//this.entities.push(this.layer1);
+	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
+	this.game.addEntity(this.layer1);
+	this.entities.push(this.layer1);
 
-	//this.tutorial = new HowTo(this.game);
-	//this.game.addEntity(this.tutorial);
-	//this.entities.push(this.tutorial);
+	this.tutorial = new HowTo(this.game);
+	this.game.addEntity(this.tutorial);
+	this.entities.push(this.tutorial);
 
-	//this.hud = new HUD(this.game);
-	//this.game.addEntity(this.hud);
-	//this.entities.push(this.hud);
-	//this.game.sceneManager.loadPlayer();
+	this.hud = new HUD(this.game);
+	this.game.addEntity(this.hud);
+	this.entities.push(this.hud);
+	this.game.sceneManager.loadPlayer();
 }
 
-/*
+
 function HowTo(game) {
 	this.game = game;
 	this.ctx = game.ctx;
@@ -236,12 +239,12 @@ function HowTo(game) {
 }
 
 HowTo.prototype.update = function() {
-	/*if(false) {
+	if(false) {
 		this.isDone = true;
 		//this.removeFromWorld = true; - Will be in changeScenes
-	}*/
+	}
 
-	/*Entity.prototype.update.call(this);
+	Entity.prototype.update.call(this);
 }
 
 HowTo.prototype.draw = function() {
@@ -262,53 +265,70 @@ HowTo.prototype.draw = function() {
 
 	this.point = this.line;
 
-
 	//Basic Controls
 	this.offset = 30;
 	this.line += 3;
 	this.game.ctx.textAlign = "left";
 	this.game.ctx.fillStyle = "Blue";
 	ctx.font = "22pt Impact";
-	this.game.ctx.fillText("Basic Controls", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Move: W A S D", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Dodge: SPACEBAR", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Boost Speed: SHIFT", 0, (this.offset * this.line++), 400);
-
-	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (this.offset * this.line++), 400);
+	var page = 0;
+	this.game.ctx.fillText("Basic Controls", page, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Move: W A S D", page, (this.offset * this.line), 400);
+	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (750), 400);
 
 	this.pathStartX = 400;
 	this.pathStartY = 400;
 	//x + 1500 for first checkpoint
-	this.pathStopX = this.pathStartX + 800;
+	this.pathStopX = this.pathStartX + 3250;
 	this.pathStopY = this.pathStartY;
 	this.game.ctx.beginPath();
-
 	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
 	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
-	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
-	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
-	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
-	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
-	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
 	this.game.ctx.lineWidth = 100;
 	this.game.ctx.strokeStyle = 'grey';
 	this.game.ctx.stroke();
 
+	page += 1200;
+	this.game.ctx.fillText("To Dodge: SPACEBAR", page, (this.offset * this.line--), 400);
+	this.game.ctx.fillText("To Boost Speed: SHIFT", page, (this.offset * this.line), 400);
+
+
+	page += 1200;
 	//weapons
 	this.game.ctx.fillStyle = "Blue";
 	this.line = 2; //resetline to top of screen
-	this.game.ctx.fillText("Learn To Shoot!", 1500, (this.offset * this.line), 800);
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Learn To Shoot!", page + 500, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("Don't worry, you can't die.", page + 500, (this.offset * this.line), 800);
 	this.line =+ 17;
-	this.game.ctx.fillText("To aim: Place cursor on target", 1200, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", 1200, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 1200, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("Cycle Primary Weapons: 1", 1200, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 1200, (this.offset * this.line++), 400);
-	//add enemy here.
-	//add weapons here as well
-	this.pathStartX = 1200;
+	this.game.ctx.fillText("To aim: Place cursor on target", page, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", page, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", page, (this.offset * this.line++), 400);
+	//need a stalker to get shot at
+
+	//vertical
+	this.pathStartX = 4000 - 400;
 	this.pathStartY = 400;
-	this.pathStopX = this.pathStartX + 1200;
+	this.pathStopX = this.pathStartX;
+	this.pathStopY = this.pathStartY + 800;
+	this.game.ctx.beginPath();
+
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
+
+	this.line += 4
+	this.game.ctx.fillText("Cycle Primary Weapons: 1", 3000, 1100, 400);
+	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 3000, 1140, 400);
+	this.game.ctx.fillText("There are 4 versions of each", 3000, 1300, 400);
+
+
+	//horizontal
+	this.pathStartX += 50;
+	this.pathStartY = 1200;
+	this.pathStopX = this.pathStartX - 3200;
 	this.pathStopY = this.pathStartY;
 	this.game.ctx.beginPath();
 
@@ -317,7 +337,48 @@ HowTo.prototype.draw = function() {
 	this.game.ctx.lineWidth = 100;
 	this.game.ctx.strokeStyle = 'grey';
 	this.game.ctx.stroke();
+
+	//Add asteroid
+	//add station
+	/*this.game.ctx.fillText("This is an allied space station.", 3000, 1300, 400);
+	this.game.ctx.fillText("Stations mine the asteriods they are built on.", 3000, 1300, 400);
+	this.game.ctx.fillText("They use the scrap then mine to build more units.", 3000, 1300, 400);
+	this.game.ctx.fillText("Defend your builders to increase .", 3000, 1300, 400);*/
+
+
+
+	//vertical
+	this.pathStartX = 400;
+	this.pathStartY = 1150;
+	this.pathStopX = this.pathStartX;
+	this.pathStopY = this.pathStartY + 800;
+	this.game.ctx.beginPath();
+
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
+
+	//horizontal
+	this.pathStartX = 350;
+	this.pathStartY =+ 2000;
+	this.pathStopX = this.pathStartX + 3200;
+	this.pathStopY = this.pathStartY;
+	this.game.ctx.beginPath();
+
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
+
+
+
+
 	//Weapons
+	//put these in weapons
+
 	/*
 	this.game.ctx.textAlign = "right";
 	this.game.ctx.fillText("Primary Weapons", 1200, (this.offset * this.point++), 550);
@@ -347,15 +408,19 @@ HowTo.prototype.draw = function() {
 	this.line = 2;
 	this.game.ctx.fillText("These Are Your Foes", 1500 + 1200, (this.offset * this.line), 800);
 
-
-
 	this.game.ctx.textAlign = "right";
 	ctx.font = "24pt Impact";
 	//Stays in bottom right corner of screen
 	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
 
-	Entity.prototype.draw.call(this);
-}*/
+		//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	//this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+
+	Entity.prototype.draw.call(this);*/
+}
 
 function StoryScrollScene(game) {
 	console.log("scroll");
@@ -427,6 +492,7 @@ StoryScroll1.prototype.update = function () {
 		this.game.sceneManager.changeScenes(level);
 		this.game.addEntity(level);
 	}
+
 	Entity.prototype.update.call(this);
 }
 
@@ -532,7 +598,6 @@ PrototypeLevel.prototype.update = function(){
 	if (this.game.ship.health < 1){
 		//console.log("dead");
 		this.victory = false;
-		this.victory = false;
 		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(new SplashScene(this.game));
 		return;
@@ -589,9 +654,7 @@ function VictoryScrollScene(game) {
 	for (var i = 0; i < this.game.levels.length; i++) {
 		this.game.levels[i].removeFromWorld = true;
 	}
-
 }
-
 
 function VictoryStoryScroll1(game) {
 	//is an entity but doesn't contain an animation

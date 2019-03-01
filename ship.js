@@ -80,7 +80,8 @@ function TheShip(game) {
 
 	// miscellaneous
 	this.boostGainRate = 1;
-	this.boostConsumeRate = 2;
+	//this.boostConsumeRate = 2;
+	this.boostConsumeRate = 0;
 	this.bombAmmo = 0;
 
 	this.removeFromWorld = false;
