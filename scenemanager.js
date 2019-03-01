@@ -125,7 +125,13 @@ HUD.prototype.draw = function() {
 	this.game.ctx.font = "24pt Impact";
 	//Stays in bottom right corner of screen
 	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
-
+	if (this.game.paused) {
+		this.game.ctx.textAlign = "center";
+		this.game.ctx.font = "12pt Impact";
+		this.game.ctx.fillText("Unpause: P", this.game.camera.x + (this.game.camera.width / 2), this.game.camera.y + (this.game.camera.height / 2) + 15, 200);
+		this.game.ctx.font = "50pt Impact";
+		this.game.ctx.fillText("PAUSED", this.game.camera.x + (this.game.camera.width / 2), this.game.camera.y + (this.game.camera.height / 2), 200);
+	}
 	Entity.prototype.draw.call(this);
 }
 
@@ -186,7 +192,7 @@ function SplashScene(game) {
 	this.game = game;
 	this.entities = [];
 
-	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/plutoSplash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 
@@ -205,7 +211,7 @@ function TutorialScene(game) {
 	this.ctx = this.game.ctx;
 	this.entities = [];
 
-	this.background = new MainBackground(this.game, AM.getAsset("./img/PScroll1/Background_1.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/level1main.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
@@ -314,7 +320,7 @@ function StoryScrollScene(game) {
 	this.name = "Scroll";
 	this.game = game;
 	this.entities = [];
-	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/plutoSplash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.scroll = new StoryScroll1(this.game, this.leve);
@@ -393,7 +399,7 @@ function PrototypeLevel(game) {
 	this.counter = 0;
 
 	this.entities = [];
-	this.background = new MainBackground(this.game, AM.getAsset("./img/PScroll1/Background_1.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/level1main.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
@@ -525,7 +531,7 @@ function VictoryScrollScene(game) {
 	this.name = "VictoryScroll";
 	this.game = game;
 	this.entities = [];
-	this.background = new MainBackground(this.game, AM.getAsset("./img/splash.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/plutoSplash.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.scroll = new VictoryStoryScroll1(this.game, this.leve);
