@@ -353,9 +353,6 @@ GameEngine.prototype.draw = function () {
 		this.allies[i].draw(this.ctx);
 	}
 
-
-
-
 	for (var i = 0; i < this.enemyProjectiles.length; i++) {
 		this.enemyProjectiles[i].draw(this.ctx);
 	}

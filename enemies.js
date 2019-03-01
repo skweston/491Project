@@ -391,7 +391,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 // AlienBase Builder
 /* ========================================================================================================== */
 function AlienBuilder(game, spawner) {
-
+	this.isBuilder = true;
 
 	this.pWidth = 128;
 	this.pHeight = 128;
