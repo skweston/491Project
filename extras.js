@@ -253,10 +253,10 @@ HealthRefill.prototype.update = function () {
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.ship)) {
-		if(this.game.ship.health <= 90){
+		if(this.game.ship.health <= this.game.ship.healthMax - 10){
 			this.game.ship.health += 10;
 		}else {
-			this.game.ship.health = 100;
+			this.game.ship.health = this.game.ship.healthMax;
 		}
 		this.removeFromWorld = true;
 	}
