@@ -557,6 +557,8 @@ AM.queueDownload("./img/shipDamage1.png");
 AM.queueDownload("./img/shipDamage2.png");
 
 // HUD
+AM.queueDownload("./img/hudOverlay.png");
+AM.queueDownload("./img/hudRollIcon.png");
 AM.queueDownload("./img/hudLaserIcon.png");
 AM.queueDownload("./img/hudWaveIcon.png");
 AM.queueDownload("./img/hudBulletIcon.png");
