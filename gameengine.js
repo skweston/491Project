@@ -184,7 +184,9 @@ GameEngine.prototype.startInput = function () {
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("mouseout", function (e) {
+		if (that.running) {
 			that.paused = true;
+		}
 	}, false);
 
 	this.cameraCtx.canvas.addEventListener("keydown", function (e) {
@@ -560,18 +562,6 @@ if(this.paused === false) {
 			entity.update();
 		}
 	}
-	count = this.reticle.length;
-	for (var i = 0; i < count; i++) {
-		var entity = this.reticle[i];
-		if (entity.removeFromWorld) {
-			this.reticle.splice(i, 1);
-			count--;
-			i--;
-		}
-		else {
-			entity.update();
-		}
-	}
 	count = this.levels.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.levels[i];
@@ -593,6 +583,19 @@ if(this.paused === false) {
 	this.swapPrimary = false;
 	this.swapSecondary = false;
 	} //end of if
+	// always draw reticle
+	count = this.reticle.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.reticle[i];
+		if (entity.removeFromWorld) {
+			this.reticle.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
 }
 
 GameEngine.prototype.loop = function () {

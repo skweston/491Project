@@ -102,37 +102,108 @@ SceneManager.prototype.changeScenes = function (newScene) {
 //Every playable level needs a hud.
 function HUD(game) {
 	this.name = "Element";
+
+	this.hudOverlay = new Animation(AM.getAsset("./img/hudOverlay.png"), 1200, 300, 1200, 1, 1, true, 1);
+	this.rollIcon = new Animation(AM.getAsset("./img/hudRollIcon.png"), 128, 128, 1408, 0.15, 11, true, 0.5);
+	this.laserIcon = new Animation(AM.getAsset("./img/hudLaserIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
+	this.waveIcon = new Animation(AM.getAsset("./img/hudWaveIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
+	this.bulletIcon = new Animation(AM.getAsset("./img/hudBulletIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
+	this.burstIcon = new Animation(AM.getAsset("./img/hudBurstIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
+	this.missileIcon = new Animation(AM.getAsset("./img/hudMissileIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
+	this.homingIcon = new Animation(AM.getAsset("./img/hudHomingIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
+	this.chargeIcon = new Animation(AM.getAsset("./img/hudChargeIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
+	this.orbiterIcon = new Animation(AM.getAsset("./img/hudOrbiterIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
+
 	this.game = game;
+	this.ctx = game.ctx;
 	this.removeFromWorld = false;
 }
 
 HUD.prototype.draw = function() {
-	this.game.ctx.font = "24pt Impact";
-	this.game.ctx.fillStyle = "Red";
-	this.game.ctx.textAlign = "left";
-	this.game.ctx.fillText("Health: " + this.game.ship.health,  this.game.camera.x + 10, this.game.camera.y + 40);
-	this.game.ctx.fillText("Score: " + SCORE, this.game.camera.x + 10, this.game.camera.y + 70);
+	// HUD top back panel
+	// this.game.ctx.fillStyle = "Black";
+	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 16, 320, 32);
+	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 64, 320, 32);
+	this.game.ctx.fillStyle = "DarkRed";
+	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 16, 320 * this.game.ship.health / this.game.ship.healthMax, 32);
+	this.game.ctx.fillStyle = "DarkBlue";
+	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 64, 320 * this.game.ship.boost / this.game.ship.boostMax, 32);
+	this.hudOverlay.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x, this.game.camera.y, 0);
+	
+	// HUD text fields
+	this.game.ctx.font = "16pt Impact";
+	this.game.ctx.fillStyle = "White";
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Hull Integrity", this.game.camera.x + 176, this.game.camera.y + 40);
+	this.game.ctx.fillText("Boost Fuel", this.game.camera.x + 176, this.game.camera.y + 88);
+	this.game.ctx.fillText("Score: " + (SCORE * 100), this.game.camera.x + 600, this.game.camera.y + 40);
+	this.game.ctx.fillStyle = "Black";
+	this.game.ctx.strokeText("Hull Integrity", this.game.camera.x + 176, this.game.camera.y + 40);
+	this.game.ctx.strokeText("Boost Fuel", this.game.camera.x + 176, this.game.camera.y + 88);
+	this.game.ctx.strokeText("Score: " + (SCORE * 100), this.game.camera.x + 600, this.game.camera.y + 40);
 
-	//Boost meter
-	this.game.ctx.fillText("Boost Meter: ",this.game.camera.x + 10, this.game.camera.y + 100);
-	this.game.ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
-	this.game.ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
-
-	//Player resource counter
-	this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
-
-	//Idea has not yet been discussed but should be tested for quick implementation
-	this.game.ctx.textAlign = "right";
-	this.game.ctx.font = "24pt Impact";
-	//Stays in bottom right corner of screen
-	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
-	if (this.game.paused) {
-		this.game.ctx.textAlign = "center";
-		this.game.ctx.font = "12pt Impact";
-		this.game.ctx.fillText("Unpause: P", this.game.camera.x + (this.game.camera.width / 2), this.game.camera.y + (this.game.camera.height / 2) + 15, 200);
-		this.game.ctx.font = "50pt Impact";
-		this.game.ctx.fillText("PAUSED", this.game.camera.x + (this.game.camera.width / 2), this.game.camera.y + (this.game.camera.height / 2), 200);
+	// Right Side HUD icons
+	if (this.game.ship.primaryType === 0) {
+		this.laserIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 880, this.game.camera.y + 16, 0);
 	}
+	else if (this.game.ship.primaryType === 1) {
+		this.waveIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 880, this.game.camera.y + 16, 0);
+	}
+	else if (this.game.ship.primaryType === 2) {
+		this.bulletIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 880, this.game.camera.y + 16, 0);
+	}
+	else {
+		this.burstIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 880, this.game.camera.y + 16, 0);
+	}
+
+	if (this.game.ship.secondaryType === 0) {
+		this.missileIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 992, this.game.camera.y + 16, 0);
+	}
+	else if (this.game.ship.secondaryType === 1) {
+		this.homingIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 992, this.game.camera.y + 16, 0);
+	}
+	else if (this.game.ship.secondaryType === 2) {
+		this.chargeIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 992, this.game.camera.y + 16, 0);
+	}
+	else {
+		this.orbiterIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 992, this.game.camera.y + 16, 0);
+	}
+
+	this.rollIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 1104, this.game.camera.y + 16, 0);
+	this.game.ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
+	this.game.ctx.fillRect(this.game.camera.x + 1101, this.game.camera.y + 16, 70 * this.game.ship.rollCooldown / 100 + 1, 64);
+
+	// HUD minimap
+	this.game.ctx.fillStyle = "rgba(176, 196, 222, 0.5)";
+	this.game.ctx.fillRect(this.game.camera.x + 934, this.game.camera.y + 534, 250, 250);
+
+
+	// Player resource counter
+	// this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
+
+	// Return to main menu
+	this.game.ctx.font = "16pt Impact";
+	this.game.ctx.fillStyle = "White";
+	this.game.ctx.textAlign = "left";
+	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 16, this.game.camera.y + 784);
+	this.game.ctx.fillStyle = "Black";
+	this.game.ctx.strokeText("Main Menu: ESC", this.game.camera.x + 16, this.game.camera.y + 784);
+	
+	// Pause
+	if (this.game.paused) {
+		this.game.ctx.font = "64pt Impact";
+		this.game.ctx.fillStyle = "Red";
+		this.game.ctx.textAlign = "center";
+		this.game.ctx.fillText("PAUSED", this.game.camera.x + 600, this.game.camera.y + 432);
+		this.game.ctx.fillStyle = "Black";
+		this.game.ctx.strokeText("PAUSED", this.game.camera.x + 600, this.game.camera.y + 432);
+		this.game.ctx.font = "16pt Impact";
+		this.game.ctx.fillStyle = "Red";
+		this.game.ctx.fillText("-Press P to unpause-", this.game.camera.x + 600, this.game.camera.y + 456);
+		this.game.ctx.fillStyle = "Black";
+		this.game.ctx.strokeText("-Press P to unpause-", this.game.camera.x + 600, this.game.camera.y + 456);
+	}
+
 	Entity.prototype.draw.call(this);
 }
 
@@ -216,7 +287,7 @@ function TutorialScene(game) {
 	this.ctx = this.game.ctx;
 	this.entities = [];
 
-	this.background = new MainBackground(this.game, AM.getAsset("./img/level1main.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/PScroll1/Background_1.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
@@ -242,14 +313,40 @@ function HowTo(game) {
 	this.removeFromWorld = false;
 	this.isDone = false;
 
+	this.entities = [];
+
+	this.asteroid1 = new Asteroid(this.game, 875, 1600);
+	this.station = new SpaceStation(this.game, 875, 1600, this.asteroid1);
+
+	this.asteroid2 = new Asteroid(this.game, 2500, 1600);
+	this.enemyStation = new AlienSpaceStation(this.game, 2500, 1600, this.asteroid2);
+
+
+	//infinite respawn
+	this.testEnemy = new Stalker(this.game, 2800, 700, this.enemyStation);
+	this.testEnemy.speed = 0;
+
+	this.game.addEntity(this.asteroid1);
+	this.game.addEntity(this.asteroid2);
+	this.game.addEntity(this.station);
+	this.game.addEntity(this.enemyStation);
+	this.game.addEntity(this.testEnemy);
+
+	this.entities.push(this.asteroid1);
+	this.entities.push(this.asteroid2);
+	this.entities.push(this.station);
+	this.entities.push(this.enemyStation);
+	this.entities.push(this.testEnemy);
+
 	Entity.call(this, this.game, this.x, this.y);
 }
 
 HowTo.prototype.update = function() {
-	/*if(false) {
+	this.game.ship.health = 1000;
+	if(false) { //?
 		this.isDone = true;
 		//this.removeFromWorld = true; - Will be in changeScenes
-	}*/
+	}
 
 	Entity.prototype.update.call(this);
 }
@@ -257,19 +354,20 @@ HowTo.prototype.update = function() {
 HowTo.prototype.draw = function() {
 	var ctx = this.game.ctx;
 	ctx.font = "26pt Impact";
-	this.game.ctx.fillStyle = "Grey";
+	this.game.ctx.fillStyle = "Blue";
 	this.offset = 35;
-	this.line = 2;
+	this.line = 4;
 
 	this.game.ctx.textAlign = "center";
 	this.game.ctx.fillText("Welcome to SPACEFIGHT!", 600, (this.offset * this.line++), 800);
-	this.game.ctx.fillText("Your goal is to take revenge on Earth for demoting", 600, (this.offset * this.line++), 800);
+	/*this.game.ctx.fillText("Your goal is to take revenge on Earth for demoting", 600, (this.offset * this.line++), 800);
 	this.game.ctx.fillText("the seat of the Empire to \"dwarf\" planet.", 600, (this.offset * this.line++), 800);
 	this.game.ctx.fillText("As you travel to Earth, your caravan will build bases,", 600, (this.offset * this.line++), 800);
-	this.game.ctx.fillText("harvest materials and fight the scum of the Sol System.", 600, (this.offset * this.line), 800);
+	this.game.ctx.fillText("harvest materials and fight the scum of the Sol System.", 600, (this.offset * this.line++), 800);*/
+	this.game.ctx.fillStyle = "Blue";
+	this.game.ctx.fillText("Follow the path to learn the ways of Pluto.", 600, (this.offset * this.line), 800);
 
 	this.point = this.line;
-
 
 	//Basic Controls
 	this.offset = 30;
@@ -277,45 +375,123 @@ HowTo.prototype.draw = function() {
 	this.game.ctx.textAlign = "left";
 	this.game.ctx.fillStyle = "Blue";
 	ctx.font = "22pt Impact";
-	this.game.ctx.fillText("To Move: W A S D", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Dodge: SPACEBAR", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Boost Speed: SHIFT", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To aim: Place cursor on target", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("Cycle Primary Weapons: 1", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 0, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, (this.offset * this.line++), 400);
+	var page = 0;
+	//this.game.ctx.fillText("Basic Controls", page, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Move: W A S D", page + 400, (this.offset * (this.line + 6)), 400);
+	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, 300, 400);
 
-	//Weapons
-	/*
-	this.game.ctx.textAlign = "right";
-	this.game.ctx.fillText("Primary Weapons", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Laser", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Wave", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Bullet", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Burst", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550); //blank line
-	this.game.ctx.fillText("Secondary Weapons", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Missle", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Homing Missle", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Orbiters", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Charge Shot", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550); //blank line
-	this.game.ctx.fillText("In Game Power Ups", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Spreader", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("Repair", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550); //blank wline
-	this.game.ctx.fillText("Enemies", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
-	this.game.ctx.fillText("", 1200, (this.offset * this.point++), 550);
-	*/
+	//horizontal
+	this.pathStartX = 400;
+	this.pathStartY = 400;
+	this.pathStopX = this.pathStartX + 3250;
+	this.pathStopY = this.pathStartY;
+	this.game.ctx.beginPath();
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
 
-	this.game.ctx.textAlign = "right";
-	ctx.font = "24pt Impact";
-	//Stays in bottom right corner of screen
-	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
+	page += 1200;
+	this.game.ctx.fillText("To Dodge: SPACEBAR", page, (this.offset * this.line--), 400);
+	this.game.ctx.fillText("To Boost Speed: SHIFT", page, (this.offset * this.line), 400);
+
+
+	page += 1200;
+	//weapons
+	this.game.ctx.fillStyle = "Blue";
+	this.line = 4; //resetline to top of screen
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Learn To Shoot!", page + 500, (this.offset * this.line++), 800);
+	this.game.ctx.fillText("Don't worry, you can't die.", page + 500, (this.offset * this.line++), 800);
+	this.line =+ 17;
+	this.game.ctx.fillText("To aim: Place cursor on target", page, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Primary Weapon: Left Click", page, (this.offset * this.line++), 400);
+	this.game.ctx.fillText("To Shoot Secondary Weapon: Right Click", page, (this.offset * this.line++), 400);
+
+	//vertical
+	this.pathStartX = 4000 - 400;
+	this.pathStartY = 400;
+	this.pathStopX = this.pathStartX;
+	this.pathStopY = this.pathStartY + 800;
+	this.game.ctx.beginPath();
+
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
+
+	this.game.ctx.fillText("Cycle Primary Weapons: 1", 3000, 1100, 400);
+	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 3000, 1140, 400);
+	this.game.ctx.fillText("There are 4 versions of each", 3000, 1300, 400);
+
+
+	this.game.ctx.fillText("Cycle Primary Weapons: 1", 3000, 1100, 400);
+	this.game.ctx.fillText("Cycle Secondary Weapons: 2", 3000, 1140, 400);
+	this.game.ctx.fillText("There are 4 versions of each", 3000, 1300, 400);
+
+	//powerups
+	//When you kill them, enemies have a chance to drop a power up!
+	//put a new powerup of each type on the path w
+	this.game.ctx.fillText("Power Up tutorial coming soon!", 1200, 1000, 400);
+	this.game.ctx.fillText("Keep going to learn more about how to win!", 1200, 1030, 400);
+
+
+	//Allied Station - need to drop a layer
+	//this.station = new SpaceStation(this.game, 2000, 800, this.asteroid);
+	this.game.ctx.fillText("This is an allied space station.", 650, 1630, 400);
+	this.game.ctx.fillText("Stations mine asteroids for material.", 650, 1660, 400);
+	this.game.ctx.fillText("The gatherers collect the material.", 650, 1690, 400);
+	this.game.ctx.fillText("Destroying enemy ships will also drop material.", 650, 1720, 400);
+	this.game.ctx.fillText("The material is used to build allied fighters!", 650, 1750, 400);
+
+	//Enemy Station - need to drop a layer
+	this.game.ctx.fillText("This is an enemy space station.", 2200, 1700, 400);
+	this.game.ctx.fillText("They can build more enemy fighters!", 2200, 1730, 400);
+	this.game.ctx.fillText("Practice dodging (SPACE) and boosting (SHIFT).", 2200, 1760, 400);
+	this.game.ctx.fillText("The tide of enemies will stop when the station is destroyed.", 2200, 1790, 400);
+	this.game.ctx.fillText("Press ESC when you you're ready to return to the menu.", 2200, 1820, 400);
+
+	//horizontal
+	this.pathStartX += 50;
+	this.pathStartY = 1200;
+	this.pathStopX = this.pathStartX - 3200;
+	this.pathStopY = this.pathStartY;
+	this.game.ctx.beginPath();
+
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
+
+	//vertical
+	this.pathStartX = 400;
+	this.pathStartY = 1150;
+	this.pathStopX = this.pathStartX;
+	this.pathStopY = this.pathStartY + 800;
+	this.game.ctx.beginPath();
+
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
+
+	//horizontal
+	this.pathStartX = 350;
+	this.pathStartY =+ 2000;
+	this.pathStopX = this.pathStartX + 3200;
+	this.pathStopY = this.pathStartY;
+	this.game.ctx.beginPath();
+
+	this.game.ctx.moveTo(this.pathStartX, this.pathStartY);
+	this.game.ctx.lineTo(this.pathStopX, this.pathStopY);
+	this.game.ctx.lineWidth = 100;
+	this.game.ctx.strokeStyle = 'grey';
+	this.game.ctx.stroke();
+	this.game.ctx.lineWidth = 1;
 
 	Entity.prototype.draw.call(this);
 }
@@ -492,7 +668,6 @@ PrototypeLevel.prototype.update = function(){
 
 	if (this.game.ship.health < 1){
 		//console.log("dead");
-		//this.victory = false;
 		this.victory = false;
 		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(new SplashScene(this.game));
