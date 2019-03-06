@@ -471,10 +471,10 @@ function BackgroundLayer(game, spritesheet) {
 	this.xScrollRate = Number.parseFloat(this.ctx.canvas.width / spritesheet.naturalWidth).toFixed(4);
 	this.yScrollRate = Number.parseFloat(this.ctx.canvas.height / spritesheet.naturalHeight).toFixed(4);
 	if(this.xScrollRate < 1) {
-		this.xScrollRate = spritesheet.naturalWidth / this.ctx.canvas.width;
+		this.xScrollRate = Number.parseFloat(spritesheet.naturalWidth / this.ctx.canvas.width).toFixed(4);
 	}
 	if(this.yScrollRate < 1) {
-		this.yScrollRate = spritesheet.naturalHeight / this.ctx.canvas.Height;
+		this.yScrollRate = Number.parseFloat(spritesheet.naturalHeight / this.ctx.canvas.Height).toFixed(4);
 	}
 };
 
@@ -498,8 +498,8 @@ BackgroundLayer.prototype.update = function () {
 	//change image position.
 	this.dx += differenceX / this.xScrollRate;
 	this.dy += differenceY / this.yScrollRate;
-	//console.log(`${(differenceX / this.xScrollRate)} =(${differenceX} / ${this.xScrollRate})`);
-	//console.log(`${(differenceY / this.yScrollRate)} =(${differenceY} / ${this.yScrollRate})`);
+	console.log(`${this.dx + (differenceX / this.xScrollRate)} =(${differenceX} / ${this.xScrollRate}) and ${this.game.camera.x} camX`);
+	console.log(`${this.dy + (differenceY / this.yScrollRate)} =(${differenceY} / ${this.yScrollRate}) and ${this.game.camera.y} camY`);
 
 };
 /* ========================================================================================================== */
@@ -508,7 +508,8 @@ BackgroundLayer.prototype.update = function () {
 
 var AM = new AssetManager();
 //Background
-AM.queueDownload("./img/level1main.png");
+AM.queueDownload("./img/level1mainAlt.png");
+AM.queueDownload("./img/gasGiantsNebulaLayer.png");
 AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/PScroll1/space.png");
 AM.queueDownload("./img/PScroll1/cloud.png");
@@ -624,7 +625,7 @@ AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
 AM.queueDownload("./img/SPACEFIGHT.png");
-AM.queueDownload("./img/plutoSplash.png");
+AM.queueDownload("./img/plutoSplashPixel.png");
 //AM.queueDownload("./img/splash.png")
 AM.queueDownload("./img/splash.png");
 AM.queueDownload("./img/TutorialSceneLines.png");
