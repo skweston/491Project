@@ -97,36 +97,7 @@ SceneManager.prototype.changeScenes = function (newScene) {
 
 	this.currentScene = newScene;
 }
-function MiniMap(game){
-	this.stationaryObjects = [];
-	this.mobileObjects = [];
-	this.game = game;
-	for (var i = 0; i< this.game.terrain.length; i++){
-		this.stationaryObjects[i] = this.game.terrain[i];
-	}
-	//1/10th of screen
 
-}
-MiniMap.prototype.draw{
-	
-
-
-}
-MiniMap.prototype.update{
-	this.mobileObjects = [];
-	var j = 0;
-	for (var i = 0; i< this.game.enemies.length; i++){
-		if(this.game.enemies.asteroid){ //only bases have an asteroid field
-			this.mobileObjects[j] = this.game.enemies[i];
-			j++;
-		}
-		if(this.game.enemies[i].isBuilder){
-			this.mobileObjects[j] = this.game.enemies[i];
-			j++;
-		}
-		this.game.mobileObjects[j] = this.game.ship;
-	}
-}
 
 //Every playable level needs a hud.
 function HUD(game) {
