@@ -103,6 +103,7 @@ function HUD(game) {
 	this.name = "Element";
 
 	this.hudOverlay = new Animation(AM.getAsset("./img/hudOverlay.png"), 1200, 300, 1200, 1, 1, true, 1);
+	this.minimapBorder = new Animation(AM.getAsset("./img/hudMinimapBorder.png"), 272, 272, 272, 1, 1, true, 1);
 	this.rollIcon = new Animation(AM.getAsset("./img/hudRollIcon.png"), 128, 128, 1408, 0.15, 11, true, 0.5);
 	this.laserIcon = new Animation(AM.getAsset("./img/hudLaserIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 	this.waveIcon = new Animation(AM.getAsset("./img/hudWaveIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
@@ -174,8 +175,9 @@ HUD.prototype.draw = function() {
 
 	// HUD minimap
 	this.game.ctx.fillStyle = "rgba(176, 196, 222, 0.5)";
-	this.game.ctx.fillRect(this.game.camera.x + 934, this.game.camera.y + 534, 250, 250);
+	this.game.ctx.fillRect(this.game.camera.x + 944, this.game.camera.y + 544, 240, 240);
 
+	this.minimapBorder.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 928, this.game.camera.y + 528, 0);
 
 	// Player resource counter
 	// this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
