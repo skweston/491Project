@@ -235,8 +235,18 @@ HUD.prototype.draw = function() {
 			}
 		}
 	}
+	var oldLinewidth = this.game.ctx.lineWidth;
+	//camera Box
+	var mapX = (this.game.camera.x * 240)/this.game.ctx.canvas.width;
+	var mapY = (this.game.camera.y * 240)/this.game.ctx.canvas.height;
+	var mapWidth = (this.game.cameraCtx.canvas.width * 240)/this.game.ctx.canvas.width;
+	var mapHeight = (this.game.cameraCtx.canvas.height * 240)/this.game.ctx.canvas.height;
+	this.game.ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+	this.game.ctx.lineWidth = "2";
+	this.game.ctx.strokeRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
 
 
+	this.game.ctx.lineWidth = oldLinewidth;
 
 	// Player resource counter
 	// this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
