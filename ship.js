@@ -39,7 +39,8 @@ function TheShip(game) {
 	}
 
 	this.name = "Player";
-	this.health = 100;
+	this.healthMax = 100;
+	this.health = this.healthMax;
 	this.boostMax = 1000;
 	this.boost = this.boostMax;
 	this.speed = 0.5;
@@ -92,10 +93,6 @@ TheShip.prototype.constructor = TheShip;
 
 TheShip.prototype.update = function () {
 	if (!this.game.running) return;
-
-	var a = 1;
-	a = a / 2;
-	console.log("a? " + a);
 
 	if(this.health < 1){
 		this.removeFromWorld = true;
@@ -173,13 +170,13 @@ TheShip.prototype.update = function () {
 	}
 	if (xMove === 0) {
 		this.y += yMove;
-		if(this.game.camera.isScrolling) {
+		if(this.game.camera.isScrolling){
 			this.game.mouseY += yMove;
 		}
 	}
 	else if (yMove === 0) {
 		this.x += xMove;
-		if(this.game.camera.isScrolling) {
+		if(this.game.camera.isScrolling){
 			this.game.mouseX += xMove;
 		}
 	}

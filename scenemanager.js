@@ -98,10 +98,14 @@ SceneManager.prototype.changeScenes = function (newScene) {
 	this.currentScene = newScene;
 }
 
+
 //Every playable level needs a hud.
 function HUD(game) {
 	this.name = "Element";
 
+	this.hudOverlay = new Animation(AM.getAsset("./img/hudOverlay.png"), 1200, 300, 1200, 1, 1, true, 1);
+	this.minimapBorder = new Animation(AM.getAsset("./img/hudMinimapBorder.png"), 272, 272, 272, 1, 1, true, 1);
+	this.rollIcon = new Animation(AM.getAsset("./img/hudRollIcon.png"), 128, 128, 1408, 0.15, 11, true, 0.5);
 	this.laserIcon = new Animation(AM.getAsset("./img/hudLaserIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 	this.waveIcon = new Animation(AM.getAsset("./img/hudWaveIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 	this.bulletIcon = new Animation(AM.getAsset("./img/hudBulletIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
@@ -111,80 +115,192 @@ function HUD(game) {
 	this.chargeIcon = new Animation(AM.getAsset("./img/hudChargeIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 	this.orbiterIcon = new Animation(AM.getAsset("./img/hudOrbiterIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 
+
+	this.minimapObjects = [];
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
 }
 
 HUD.prototype.draw = function() {
-	// HUD top
-	this.game.ctx.fillStyle = "LightSteelBlue";
-	this.game.ctx.fillRect(this.game.camera.x, this.game.camera.y, 400, 128);
-	this.game.ctx.fillRect(this.game.camera.x + 400, this.game.camera.y, 400, 64);
-	this.game.ctx.fillRect(this.game.camera.x + 800, this.game.camera.y, 400, 128);
+	// HUD top back panel
+	// this.game.ctx.fillStyle = "Black";
+	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 16, 320, 32);
+	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 64, 320, 32);
+	this.game.ctx.fillStyle = "DarkRed";
+	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 16, 320 * this.game.ship.health / this.game.ship.healthMax, 32);
+	this.game.ctx.fillStyle = "DarkBlue";
+	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 64, 320 * this.game.ship.boost / this.game.ship.boostMax, 32);
+	this.hudOverlay.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x, this.game.camera.y, 0);
 
+	// HUD text fields
+	this.game.ctx.font = "16pt Impact";
+	this.game.ctx.fillStyle = "White";
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Hull Integrity", this.game.camera.x + 176, this.game.camera.y + 40);
+	this.game.ctx.fillText("Boost Fuel", this.game.camera.x + 176, this.game.camera.y + 88);
+	this.game.ctx.fillText("Score: " + (SCORE * 100), this.game.camera.x + 600, this.game.camera.y + 40);
+	this.game.ctx.fillStyle = "Black";
+	this.game.ctx.strokeText("Hull Integrity", this.game.camera.x + 176, this.game.camera.y + 40);
+	this.game.ctx.strokeText("Boost Fuel", this.game.camera.x + 176, this.game.camera.y + 88);
+	this.game.ctx.strokeText("Score: " + (SCORE * 100), this.game.camera.x + 600, this.game.camera.y + 40);
+
+	// Right Side HUD icons
 	if (this.game.ship.primaryType === 0) {
-		this.laserIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 832, this.game.camera.y + 32, 0);
+		this.laserIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 880, this.game.camera.y + 16, 0);
 	}
 	else if (this.game.ship.primaryType === 1) {
-		this.waveIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 832, this.game.camera.y + 32, 0);
+		this.waveIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 880, this.game.camera.y + 16, 0);
 	}
 	else if (this.game.ship.primaryType === 2) {
-		this.bulletIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 832, this.game.camera.y + 32, 0);
+		this.bulletIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 880, this.game.camera.y + 16, 0);
 	}
 	else {
-		this.burstIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 832, this.game.camera.y + 32, 0);
+		this.burstIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 880, this.game.camera.y + 16, 0);
 	}
 
 	if (this.game.ship.secondaryType === 0) {
-		this.missileIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 928, this.game.camera.y + 32, 0);
+		this.missileIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 992, this.game.camera.y + 16, 0);
 	}
 	else if (this.game.ship.secondaryType === 1) {
-		this.homingIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 928, this.game.camera.y + 32, 0);
+		this.homingIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 992, this.game.camera.y + 16, 0);
 	}
 	else if (this.game.ship.secondaryType === 2) {
-		this.chargeIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 928, this.game.camera.y + 32, 0);
+		this.chargeIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 992, this.game.camera.y + 16, 0);
 	}
 	else {
-		this.orbiterIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 928, this.game.camera.y + 32, 0);
+		this.orbiterIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 992, this.game.camera.y + 16, 0);
 	}
+
+	this.rollIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 1104, this.game.camera.y + 16, 0);
+	this.game.ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
+	this.game.ctx.fillRect(this.game.camera.x + 1101, this.game.camera.y + 16, 70 * this.game.ship.rollCooldown / 100 + 1, 64);
 
 	// HUD minimap
-	this.game.ctx.fillStyle = "rgba(176, 196, 222, 0.5)";
-	this.game.ctx.fillRect(this.game.camera.x + 950, this.game.camera.y + 550, 250, 250);
+	this.game.ctx.fillStyle = "rgba(176, 196, 222, 0.25)";
+	this.game.ctx.fillRect(this.game.camera.x + 944, this.game.camera.y + 544, 240, 240);
 
-	this.game.ctx.font = "24pt Impact";
-	this.game.ctx.fillStyle = "Red";
-	this.game.ctx.textAlign = "left";
-	this.game.ctx.fillText("Health: " + this.game.ship.health,  this.game.camera.x + 10, this.game.camera.y + 40);
-	this.game.ctx.fillText("Score: " + SCORE, this.game.camera.x + 10, this.game.camera.y + 70);
+	this.minimapBorder.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 928, this.game.camera.y + 528, 0);
 
-	//Boost meter
-	this.game.ctx.fillText("Boost Meter: ",this.game.camera.x + 10, this.game.camera.y + 100);
-	this.game.ctx.strokeRect(this.game.camera.x + 10, this.game.camera.y + 105, 200, 20);
-	this.game.ctx.fillRect(this.game.camera.x + 10, this.game.camera.y + 105, this.game.ship.boost/5, 20);
+	//minimap logic
+	for (var i = 0; i< this.minimapObjects.length; i++){
+		//parse what color to draw this dot
+		if (this.minimapObjects[i].name === "Enemy"){
+			//do math to convert world coordinates to map coordinates
+			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+			//draw the dude
+			this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+			this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
 
-	//Player resource counter
-	this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
+		} else if (this.minimapObjects[i].name === "Ally"){
+			//do math to convert world coordinates to map coordinates
+			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+			//draw the dude
+			this.game.ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+			this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+		} else if (this.minimapObjects[i].name === "Player"){
+			//do math to convert world coordinates to map coordinates
+			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+			//draw the dude
+			this.game.ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
+			this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+		} else if (this.minimapObjects[i].name === "Terrain"){
+			//do math to convert world coordinates to map coordinates
+			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+			//draw the dude
+			if(this.minimapObjects[i].hasbase){
+				if(this.minimapObjects[i].base.name === "Ally"){
+					this.game.ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+					this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+				}else {
+					this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+					this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
 
-	//Idea has not yet been discussed but should be tested for quick implementation
-	this.game.ctx.textAlign = "right";
-	this.game.ctx.font = "24pt Impact";
-	//Stays in bottom right corner of screen
-	//this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 1200, this.game.camera.y + 800, 650);
-	if (this.game.paused) {
-		this.game.ctx.textAlign = "center";
-		this.game.ctx.font = "12pt Impact";
-		this.game.ctx.fillText("Unpause: P", this.game.camera.x + (this.game.camera.width / 2), this.game.camera.y + (this.game.camera.height / 2) + 15, 200);
-		this.game.ctx.font = "50pt Impact";
-		this.game.ctx.fillText("PAUSED", this.game.camera.x + (this.game.camera.width / 2), this.game.camera.y + (this.game.camera.height / 2), 200);
+				}
+			}else {
+				this.game.ctx.fillStyle = "rgba(167, 167, 167, 0.5)";
+				this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+			}
+		}
 	}
+	var oldLinewidth = this.game.ctx.lineWidth;
+	//camera Box
+	var mapX = (this.game.camera.x * 240)/this.game.ctx.canvas.width;
+	var mapY = (this.game.camera.y * 240)/this.game.ctx.canvas.height;
+	var mapWidth = (this.game.cameraCtx.canvas.width * 240)/this.game.ctx.canvas.width;
+	var mapHeight = (this.game.cameraCtx.canvas.height * 240)/this.game.ctx.canvas.height;
+	this.game.ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+	this.game.ctx.lineWidth = "2";
+	this.game.ctx.strokeRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+
+
+	this.game.ctx.lineWidth = oldLinewidth;
+
+	// Player resource counter
+	// this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
+
+	// Return to main menu
+	this.game.ctx.font = "16pt Impact";
+	this.game.ctx.fillStyle = "White";
+	this.game.ctx.textAlign = "left";
+	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 16, this.game.camera.y + 784);
+	this.game.ctx.fillStyle = "Black";
+	this.game.ctx.strokeText("Main Menu: ESC", this.game.camera.x + 16, this.game.camera.y + 784);
+
+	// Pause
+	if (this.game.paused) {
+		this.game.ctx.font = "64pt Impact";
+		this.game.ctx.fillStyle = "Red";
+		this.game.ctx.textAlign = "center";
+		this.game.ctx.fillText("PAUSED", this.game.camera.x + 600, this.game.camera.y + 432);
+		this.game.ctx.fillStyle = "Black";
+		this.game.ctx.strokeText("PAUSED", this.game.camera.x + 600, this.game.camera.y + 432);
+		this.game.ctx.font = "16pt Impact";
+		this.game.ctx.fillStyle = "Red";
+		this.game.ctx.fillText("-Press P to unpause-", this.game.camera.x + 600, this.game.camera.y + 456);
+		this.game.ctx.fillStyle = "Black";
+		this.game.ctx.strokeText("-Press P to unpause-", this.game.camera.x + 600, this.game.camera.y + 456);
+	}
+
 	Entity.prototype.draw.call(this);
 }
 
 HUD.prototype.update = function () {
+	this.minimapObjects = [];
+	var j = 0;
+	for (j = 0; j<this.game.terrain.length; j++){
+		this.minimapObjects[j] = this.game.terrain[j];
+	}
+
+	for (var i = 0; i< this.game.enemies.length; i++){
+		// if(this.game.enemies[i].isBuilder){
+			this.minimapObjects[j] = this.game.enemies[i];
+			j++;
+		// }
+
+	}
+	for (var i = 0; i< this.game.allies.length; i++){
+		this.minimapObjects[j] = this.game.allies[i];
+		j++;
+	}
+
+	this.minimapObjects[j] = this.game.ship;
+
 	Entity.prototype.update.call(this);
 }
+
 
 //SPACEFIGHT title object for SplashScreen
 //Needs a pretty star
