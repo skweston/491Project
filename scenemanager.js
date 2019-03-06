@@ -102,6 +102,7 @@ SceneManager.prototype.changeScenes = function (newScene) {
 function HUD(game) {
 	this.name = "Element";
 
+	this.rollIcon = new Animation(AM.getAsset("./img/hudRollIcon.png"), 128, 128, 1408, 0.15, 11, true, 0.5);
 	this.laserIcon = new Animation(AM.getAsset("./img/hudLaserIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 	this.waveIcon = new Animation(AM.getAsset("./img/hudWaveIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 	this.bulletIcon = new Animation(AM.getAsset("./img/hudBulletIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
@@ -158,8 +159,12 @@ HUD.prototype.draw = function() {
 
 	// Weapon Display
 	this.game.ctx.fillStyle = "DimGrey";
+	this.game.ctx.fillRect(this.game.camera.x + 958, this.game.camera.y + 22, 68, 68);
 	this.game.ctx.fillRect(this.game.camera.x + 1038, this.game.camera.y + 22, 68, 68);
 	this.game.ctx.fillRect(this.game.camera.x + 1118, this.game.camera.y + 22, 68, 68);
+	this.game.ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
+	this.rollIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 960, this.game.camera.y + 24, 0);
+	this.game.ctx.fillRect(this.game.camera.x + 960, this.game.camera.y + 24, 64 * this.game.ship.rollCooldown / 100 , 64);
 
 	if (this.game.ship.primaryType === 0) {
 		this.laserIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 1040, this.game.camera.y + 24, 0);
