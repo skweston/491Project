@@ -115,6 +115,8 @@ function HUD(game) {
 	this.chargeIcon = new Animation(AM.getAsset("./img/hudChargeIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 	this.orbiterIcon = new Animation(AM.getAsset("./img/hudOrbiterIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 
+
+	this.minimapObjects = [];
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -130,7 +132,7 @@ HUD.prototype.draw = function() {
 	this.game.ctx.fillStyle = "DarkBlue";
 	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 64, 320 * this.game.ship.boost / this.game.ship.boostMax, 32);
 	this.hudOverlay.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x, this.game.camera.y, 0);
-	
+
 	// HUD text fields
 	this.game.ctx.font = "16pt Impact";
 	this.game.ctx.fillStyle = "White";
@@ -175,10 +177,66 @@ HUD.prototype.draw = function() {
 	this.game.ctx.fillRect(this.game.camera.x + 1101, this.game.camera.y + 16, 70 * this.game.ship.rollCooldown / 100 + 1, 64);
 
 	// HUD minimap
-	this.game.ctx.fillStyle = "rgba(176, 196, 222, 0.5)";
+	this.game.ctx.fillStyle = "rgba(176, 196, 222, 0.25)";
 	this.game.ctx.fillRect(this.game.camera.x + 944, this.game.camera.y + 544, 240, 240);
 
 	this.minimapBorder.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 928, this.game.camera.y + 528, 0);
+
+	//minimap logic
+	for (var i = 0; i< this.minimapObjects.length; i++){
+		//parse what color to draw this dot
+		if (this.minimapObjects[i].name === "Enemy"){
+			//do math to convert world coordinates to map coordinates
+			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+			//draw the dude
+			this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+			this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+
+		} else if (this.minimapObjects[i].name === "Ally"){
+			//do math to convert world coordinates to map coordinates
+			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+			//draw the dude
+			this.game.ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+			this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+		} else if (this.minimapObjects[i].name === "Player"){
+			//do math to convert world coordinates to map coordinates
+			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+			//draw the dude
+			this.game.ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
+			this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+		} else if (this.minimapObjects[i].name === "Terrain"){
+			//do math to convert world coordinates to map coordinates
+			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+			//draw the dude
+			if(this.minimapObjects[i].hasbase){
+				if(this.minimapObjects[i].base.name === "Ally"){
+					this.game.ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+					this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+				}else {
+					this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+					this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+
+				}
+			}else {
+				this.game.ctx.fillStyle = "rgba(167, 167, 167, 0.5)";
+				this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+			}
+		}
+	}
+
+
 
 	// Player resource counter
 	// this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
@@ -190,7 +248,7 @@ HUD.prototype.draw = function() {
 	this.game.ctx.fillText("Main Menu: ESC", this.game.camera.x + 16, this.game.camera.y + 784);
 	this.game.ctx.fillStyle = "Black";
 	this.game.ctx.strokeText("Main Menu: ESC", this.game.camera.x + 16, this.game.camera.y + 784);
-	
+
 	// Pause
 	if (this.game.paused) {
 		this.game.ctx.font = "64pt Impact";
@@ -210,12 +268,29 @@ HUD.prototype.draw = function() {
 }
 
 HUD.prototype.update = function () {
+	this.minimapObjects = [];
+	var j = 0;
+	for (j = 0; j<this.game.terrain.length; j++){
+		this.minimapObjects[j] = this.game.terrain[j];
+	}
+
+	for (var i = 0; i< this.game.enemies.length; i++){
+		// if(this.game.enemies[i].isBuilder){
+			this.minimapObjects[j] = this.game.enemies[i];
+			j++;
+		// }
+
+	}
+	for (var i = 0; i< this.game.allies.length; i++){
+		this.minimapObjects[j] = this.game.allies[i];
+		j++;
+	}
+
+	this.minimapObjects[j] = this.game.ship;
+
 	Entity.prototype.update.call(this);
 }
-function MiniMap(){
 
-
-}
 
 //SPACEFIGHT title object for SplashScreen
 //Needs a pretty star
