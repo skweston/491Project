@@ -62,6 +62,9 @@ AlienSpaceStation.prototype.update = function () {
     	this.generateItem(25);
     	this.generateScrap(15, 13);
     	this.hasBeenDestroyed = true;
+
+    	var explosion = new BloodyMess(this.game, this.x, this.y, (Math.random * 360) * Math.PI / 180, 5, this);
+		this.game.addEntity(explosion);
 	}
 	if(!this.removeFromWorld && this.health < this.maxHealth){
 		this.health += 0.5;
@@ -79,7 +82,6 @@ AlienSpaceStation.prototype.update = function () {
 			if(d < closest){
 				closest = d;
 				this.target = ent;
-
 			}
 		}
 	}
@@ -89,14 +91,14 @@ AlienSpaceStation.prototype.update = function () {
 	}
 
 	// update shootingangle
-	if(this.target){
+	if(this.target) {
 		var dx = this.target.xMid - this.xMid;
 		var dy = this.yMid - this.target.yMid;
 		this.shootAngle = Math.atan2(dy,dx);
 	}
 
-	if (this.target && 900 > distance(this, this.target) && this.shootCooldown < 1){
-		this.createProjectile("LaserBlast", 0, -Math.PI/2);
+	if (this.target && 900 > distance(this, this.target) && this.shootCooldown < 1) {
+		this.createEnemyProjectile("Spit", 0, 0, 0.6);
 		this.shootCooldown = this.shootCooldownReset;
 	}
 	this.shootCooldown--;
@@ -201,19 +203,20 @@ AlienSpaceStation.prototype.update = function () {
 
     Entity.prototype.update.call(this);
 }
-AlienSpaceStation.prototype.createProjectile = function(type, offset, adjustAngle) {
+
+AlienSpaceStation.prototype.createEnemyProjectile = function(type, offset, adjustAngle, scale) {
 	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
 							   {xMid: this.target.xMid, yMid: this.target.yMid});
 	var angle = this.shootAngle + adjustAngle;
-	if (type === "LaserBlast") {
-		var projectile = new LaserBlast(this.game, angle);
+	if (type === "Spit") {
+		var projectile = new Spit(this.game, scale);
 	}
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
 	var dir = direction(target, {x: this.xMid, y: this.yMid});
 
-	projectile.x = this.xMid;
-	projectile.y = this.yMid;
+	projectile.x = this.xMid - projectile.pWidth * projectile.scale / 2;
+	projectile.y = this.yMid - projectile.pHeight * projectile.scale / 2;
 	projectile.velocity.x = dir.x * projectile.maxSpeed;
 	projectile.velocity.y = dir.y * projectile.maxSpeed;
 	projectile.angle = angle;
@@ -265,7 +268,7 @@ function BiologicalResourceGatherer(game, spawner) {
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;
 	this.yMid = this.y + (this.pHeight * this.scale) / 2;
-	this.radius = 18 * this.scale;
+	this.radius = 30 * this.scale;
 
 //this is for movement
 	this.speed = .35;
@@ -420,7 +423,7 @@ function AlienBuilder(game, spawner) {
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;
 	this.yMid = this.y + (this.pHeight * this.scale) / 2;
-	this.radius = 180 * this.scale;
+	this.radius = 40 * this.scale;
 
 //this is for movement
 	this.speed = .135;
@@ -804,7 +807,7 @@ function Leech(game, xIn, yIn, spawner) {
 	this.y = yIn;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 20 * this.scale;
+	this.radius = 50 * this.scale;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -964,7 +967,7 @@ function Scourge(game, xIn, yIn, spawner) {
 	this.y = yIn;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 41 * this.scale;
+	this.radius = 50 * this.scale;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -1176,7 +1179,7 @@ function Stalker(game, xIn, yIn, spawner){
         this.spawner = spawner;
 		this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 		this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-		this.radius = 41 * this.scale;
+		this.radius = 24 * this.scale;
 		this.game = game;
 		this.ctx = game.ctx;
 		this.removeFromWorld = false;
@@ -1184,6 +1187,8 @@ function Stalker(game, xIn, yIn, spawner){
 		this.damage = 3;
 		this.shootCooldownReset = 40;
 		this.shootCooldown = this.shootCooldownReset;
+		this.shootAngle = 0;
+		this.target = null;
 
 		//console.log("starting health: " + this.health);
 		Entity.call(this, game, this.x, this.y);
@@ -1195,9 +1200,6 @@ Stalker.prototype = new Entity();
 Stalker.prototype.constructor = Stalker;
 
 Stalker.prototype.update = function () {
-
-
-
 	//if it hasn't found its target yet, or its target has become undefined
 	var closest = 100000000;
 	if (true){
@@ -1264,11 +1266,15 @@ Stalker.prototype.update = function () {
     }
 
     // this should be the angle in radians
-
+    if(this.target) {
+		var dx = this.target.xMid - this.xMid;
+		var dy = this.yMid - this.target.yMid;
+		this.shootAngle = -Math.atan2(dy,dx);
+	}
 
 	if (this.shootCooldown < 1){
 			this.shootCooldown = this.shootCooldownReset;
-			this.createProjectile("LaserBlast", 0, -Math.PI/2);
+			this.createEnemyProjectile("Spit", 0, 0, 0.3);
 	}
 
 	if (this.removeFromWorld) {
@@ -1280,19 +1286,19 @@ Stalker.prototype.update = function () {
 	Entity.prototype.update.call(this);
 }
 
-Stalker.prototype.createProjectile = function(type, offset, adjustAngle) {
+Stalker.prototype.createEnemyProjectile = function(type, offset, adjustAngle, scale) {
 	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
 							   {xMid: this.target.xMid, yMid: this.target.yMid});
-	var angle = this.angle + adjustAngle;
-	if (type === "LaserBlast") {
-		var projectile = new LaserBlast(this.game, this.angle);
+	var angle = this.shootAngle + adjustAngle;
+	if (type === "Spit") {
+		var projectile = new Spit(this.game, scale);
 	}
 	var target = {x: Math.cos(angle) * dist + this.xMid,
 				  y: Math.sin(angle) * dist + this.yMid};
-	var dir = direction(this.target, this);
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
 
-	projectile.x = this.xMid;
-	projectile.y = this.yMid;
+	projectile.x = this.xMid - projectile.pWidth * projectile.scale / 2;
+	projectile.y = this.yMid - projectile.pHeight * projectile.scale / 2;
 	projectile.velocity.x = dir.x * projectile.maxSpeed;
 	projectile.velocity.y = dir.y * projectile.maxSpeed;
 	projectile.angle = angle;

@@ -74,3 +74,72 @@ LaserBlast.prototype.draw = function () {
 
 	Entity.prototype.draw.call(this);
 }
+
+function Spit(game, adjustScale) {
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 1 * adjustScale;
+	this.animation = new Animation(AM.getAsset("./img/enemySpitProjectile.png"), this.pWidth, this.pHeight, 256, 0.15, 2, true, this.scale);
+
+	this.name = "EnemyProjectile";
+	this.x = 0;
+	this.y = 0;
+	this.xMid = 0;
+	this.yMid = 0;
+	this.radius = 36 * this.scale;
+	this.pierce = false;
+	this.angle = 0;
+	this.lifetime = 500;
+	this.damage = 20 * adjustScale;
+	this.maxSpeed = 250;
+	this.velocity = {x: 0, y: 0};
+	this.adjustScale = adjustScale;
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+}
+
+Spit.prototype = new Entity();
+Spit.prototype.constructor = ShipPrimary0;
+
+Spit.prototype.update = function () {
+	this.angle += 0.01;
+
+	this.x += this.velocity.x * this.game.clockTick;
+	this.y += this.velocity.y * this.game.clockTick;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
+	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
+
+	var ent = this.game.ship;
+	if(!ent.rolling && Collide(this, ent)) {
+		ent.takeDamage(this.damage);
+		this.removeFromWorld = true;
+		var effect = new SpitHit(this.game, this.xMid, this.yMid, Math.random() * 360 * Math.PI / 180, this.adjustScale);
+		this.game.addEntity(effect);
+	}
+
+	this.lifetime -= 1;
+	if (this.lifetime < 0) {
+		this.removeFromWorld = true;
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+Spit.prototype.draw = function () {
+	if (onCamera(this)) {
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+	Entity.prototype.draw.call(this);
+}

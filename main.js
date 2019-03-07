@@ -605,6 +605,8 @@ AM.queueDownload("./img/enemyDrone.png");
 AM.queueDownload("./img/enemyQueen.png");
 AM.queueDownload("./img/enemyQueenDeath.png");
 AM.queueDownload("./img/enemyBase.png");
+AM.queueDownload("./img/enemySpitProjectile.png");
+AM.queueDownload("./img/enemySpitProjectileHit.png");
 
 
 
