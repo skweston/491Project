@@ -29,6 +29,9 @@ SpaceExplosion.prototype.draw = function () {
 }
 
 SpaceExplosion.prototype.update = function () {
+	if (this.animation.isDone()){
+		this.removeFromWorld = true;
+	}
 	this.lifetime--;
 	if (this.lifetime < 1){
 		this.removeFromWorld = true;
@@ -59,9 +62,12 @@ GroundExplosion.prototype.draw = function () {
 }
 
 GroundExplosion.prototype.update = function () {
+	if (this.animation.isDone()){
+		this.removeFromWorld = true;
+	}
 	this.lifetime--;
 	if (this.lifetime < 1){
-	this.removeFromWorld = true;
+		this.removeFromWorld = true;
 	}
 
 }
@@ -77,6 +83,7 @@ function BloodSplatter(game, shipXMid, shipYMid, angle) {
   this.xMid = shipXMid;
   this.yMid = shipYMid;
   this.angle = angle;
+  this.lifetime = 100;
   this.x = this.xMid - ((this.pWidth * this.scale) / 2);
   this.y = this.yMid - ((this.pHeight * this.scale) / 2);
 
@@ -93,6 +100,10 @@ BloodSplatter.prototype.draw = function () {
 
 BloodSplatter.prototype.update = function () {
 	if (this.animation.isDone()){
+		this.removeFromWorld = true;
+	}
+	this.lifetime--;
+	if (this.lifetime < 1){
 		this.removeFromWorld = true;
 	}
 }
@@ -134,8 +145,10 @@ BossExplosion.prototype.draw = function () {
 
 BossExplosion.prototype.update = function () {
 	this.y -= this.game.clockTick * this.speed;
+	if (this.animation.isDone()){
+		this.removeFromWorld = true;
+	}
 	this.lifetime--;
-	this.angle += 0.05
 	if (this.lifetime < 1){
 		this.removeFromWorld = true;
 	}
@@ -164,11 +177,16 @@ function ScourgeDeath(game, xMid, yMid, angle) {
 	this.angle = angle;
 	this.x = this.xMid - ((this.pWidth * this.scale) / 2);
 	this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+	this.lifetime = 100;
 	this.removeFromWorld = false;
 }
 
 ScourgeDeath.prototype.update = function () {
-	if (this.animation.isDone()) {
+	if (this.animation.isDone()){
+		this.removeFromWorld = true;
+	}
+	this.lifetime--;
+	if (this.lifetime < 1){
 		this.removeFromWorld = true;
 	}
 
@@ -197,11 +215,16 @@ function GuardianDeath(game, xMid, yMid, angle) {
 	this.angle = angle;
 	this.x = this.xMid - ((this.pWidth * this.scale) / 2);
 	this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+	this.lifetime = 100;
 	this.removeFromWorld = false;
 }
 
 GuardianDeath.prototype.update = function () {
-	if (this.animation.isDone()) {
+	if (this.animation.isDone()){
+		this.removeFromWorld = true;
+	}
+	this.lifetime--;
+	if (this.lifetime < 1){
 		this.removeFromWorld = true;
 	}
 
@@ -230,11 +253,16 @@ function QueenDeath(game, xMid, yMid, angle) {
 	this.angle = angle;
 	this.x = this.xMid - ((this.pWidth * this.scale) / 2);
 	this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+	this.lifetime = 100;
 	this.removeFromWorld = false;
 }
 
 QueenDeath.prototype.update = function () {
-	if (this.animation.isDone()) {
+	if (this.animation.isDone()){
+		this.removeFromWorld = true;
+	}
+	this.lifetime--;
+	if (this.lifetime < 1){
 		this.removeFromWorld = true;
 	}
 
@@ -263,11 +291,16 @@ function SpitHit(game, xMid, yMid, angle, adjustScale) {
 	this.angle = angle;
 	this.x = this.xMid - ((this.pWidth * this.scale) / 2);
 	this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+	this.lifetime = 100;
 	this.removeFromWorld = false;
 }
 
 SpitHit.prototype.update = function () {
-	if (this.animation.isDone()) {
+	if (this.animation.isDone()){
+		this.removeFromWorld = true;
+	}
+	this.lifetime--;
+	if (this.lifetime < 1){
 		this.removeFromWorld = true;
 	}
 
@@ -299,6 +332,7 @@ function BloodyMess(game, x, y, angle, chain, creature) {
 	this.chain = chain;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2));
 	this.yMid = (this.y + (this.pHeight * this.scale / 2));
+	this.lifetime = 100;
 	this.removeFromWorld = false;
 }
 
@@ -314,7 +348,10 @@ BloodyMess.prototype.update = function () {
 	if (this.animation.isDone() && this.chain < 0) {
 		this.removeFromWorld = true;
 	}
-
+	this.lifetime--;
+	if (this.lifetime < 1){
+		this.removeFromWorld = true;
+	}
 	if (this.chain > 0) {
 		var explosion = new BloodyMess(this.game,
 									   this.creature.x + (Math.random() * this.creature.pWidth),
