@@ -498,8 +498,8 @@ BackgroundLayer.prototype.update = function () {
 	//change image position.
 	this.dx += differenceX / this.xScrollRate;
 	this.dy += differenceY / this.yScrollRate;
-	console.log(`${this.dx + (differenceX / this.xScrollRate)} =(${differenceX} / ${this.xScrollRate}) and ${this.game.camera.x} camX`);
-	console.log(`${this.dy + (differenceY / this.yScrollRate)} =(${differenceY} / ${this.yScrollRate}) and ${this.game.camera.y} camY`);
+	// console.log(`${this.dx + (differenceX / this.xScrollRate)} =(${differenceX} / ${this.xScrollRate}) and ${this.game.camera.x} camX`);
+	// console.log(`${this.dy + (differenceY / this.yScrollRate)} =(${differenceY} / ${this.yScrollRate}) and ${this.game.camera.y} camY`);
 
 };
 /* ========================================================================================================== */
@@ -588,14 +588,6 @@ AM.queueDownload("./img/PlayerBuilder.png");
 //Terrain
 AM.queueDownload("./img/Asteroid.png");
 
-//Allies
-AM.queueDownload("./img/GreenChroma.png");
-AM.queueDownload("./img/PurpleChroma.png");
-AM.queueDownload("./img/RedChroma.png");
-AM.queueDownload("./img/BlackWhiteChroma.png");
-AM.queueDownload("./img/MechanicalResourceGatherer.png");
-AM.queueDownload("./img/SpaceStation.png");
-
 //drops and powerups
 AM.queueDownload("./img/healthRefill.png");
 AM.queueDownload("./img/multishot.png");
@@ -605,10 +597,13 @@ AM.queueDownload("./img/scrap.png");
 
 // enemies
 AM.queueDownload("./img/enemyScourge.png");
+AM.queueDownload("./img/enemyScourgeDeath.png");
 AM.queueDownload("./img/enemyDefiler.png");
 AM.queueDownload("./img/enemyGuardian.png");
+AM.queueDownload("./img/enemyGuardianDeath.png");
 AM.queueDownload("./img/enemyDrone.png");
 AM.queueDownload("./img/enemyQueen.png");
+AM.queueDownload("./img/enemyQueenDeath.png");
 AM.queueDownload("./img/enemyBase.png");
 
 

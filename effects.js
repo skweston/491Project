@@ -21,9 +21,9 @@ function SpaceExplosion(game, shipXMid, shipYMid, angle) {
 }
 
 SpaceExplosion.prototype.draw = function () {
-	if(onCamera){
-  		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-  	}
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
   //console.log("explosion: " + this.x + ", " + this.y);
   Entity.prototype.draw.call(this);
 }
@@ -33,9 +33,6 @@ SpaceExplosion.prototype.update = function () {
 	if (this.lifetime < 1){
 		this.removeFromWorld = true;
 	}
-  /*if (this.animation.elapsedTime < this.animation.totalTime)
-	this.x += this.game.clockTick * this.speed;
-  if (this.x > 800) this.x = -230;*/
 }
 
 function GroundExplosion(game, spritesheet, shipX, shipY) {
@@ -55,9 +52,9 @@ function GroundExplosion(game, spritesheet, shipX, shipY) {
 }
 
 GroundExplosion.prototype.draw = function () {
-	if(onCamera){
-  		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-  	}
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
   Entity.prototype.draw.call(this);
 }
 
@@ -69,41 +66,35 @@ GroundExplosion.prototype.update = function () {
 
 }
 
-function BloodSplatter(game, shipXMid, shipYMid) {
+function BloodSplatter(game, shipXMid, shipYMid, angle) {
   this.pWidth = 32;
   this.pHeight = 32;
   this.scale = 2;
-  //spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale
-  this.animation = new Animation(AM.getAsset("./img/BloodSplatter.png"),
-								 this.pWidth, this.pHeight,
-								 7,  0.1, 7, false, this.scale);
+  this.animation = new Animation(AM.getAsset("./img/BloodSplatter.png"), this.pWidth, this.pHeight, 7,  0.1, 7, false, this.scale);
   this.game = game;
   this.ctx = game.ctx;
   this.name = "Effect";
   this.xMid = shipXMid;
   this.yMid = shipYMid;
-  this.lifetime = 25;
-  this.angle = 0;
-  //console.log("middle explosion: " + this.xMid + ", " + this.yMid);
+  this.angle = angle;
   this.x = this.xMid - ((this.pWidth * this.scale) / 2);
   this.y = this.yMid - ((this.pHeight * this.scale) / 2);
-  this.removeFromWorld = false; //need to remove from world when animation finishes.
+
+  this.removeFromWorld = false;
 }
 
 BloodSplatter.prototype.draw = function () {
-	if(onCamera){
-  		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
-  	}
-  //console.log("explosion: " + this.x + ", " + this.y);
-  Entity.prototype.draw.call(this);
+	if(onCamera(this)){
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+
+	Entity.prototype.draw.call(this);
 }
 
 BloodSplatter.prototype.update = function () {
-	this.lifetime--;
-	if (this.lifetime < 1){
+	if (this.animation.isDone()){
 		this.removeFromWorld = true;
 	}
-
 }
 
 
@@ -134,7 +125,7 @@ function BossExplosion(game, xIn, yIn, chain, boss) {
 }
 
 BossExplosion.prototype.draw = function () {
-	if(onCamera){
+	if(onCamera(this)){
 		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 	}
   //console.log("explosion: " + this.x + ", " + this.y);
@@ -157,4 +148,138 @@ BossExplosion.prototype.update = function () {
 		this.chain--;
 	}
 
+}
+
+/*
+function ScourgeDeath(game) {
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 1;
+	this.animation = new Animation(AM.getAsset("./img/enemyScourgeDeath.png")this.pWidth, this.pHeight, 1152, 0.15, 9, this.scale);
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Effect";
+
+	this.xMid = 0;
+	this.yMid = 0;
+	this.x = this.xMid - (this.pWidth * this.scale / 2);
+	this.y = this.yMid - (this.pHeight * this.scale / 2);
+	this.angle = 0;
+
+	this.removeFromWorld = false;
+}
+
+ScourgeDeath.prototype.update = function () {
+	if (this.animation.isDone()) {
+		this.removeFromWorld = true;
+	}
+
+	Entity.prototype.draw.call(this);
+}
+
+ScourgeDeath.prototype.draw = function () {
+	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, 0);
+
+	Entity.prototype.draw.call(this);
+}
+*/
+
+function ScourgeDeath(game, xMid, yMid, angle) {
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 1.3;
+	this.animation = new Animation(AM.getAsset("./img/enemyScourgeDeath.png"), this.pWidth, this.pHeight, 1152,  0.1, 9, false, this.scale);
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Effect";
+	this.xMid = xMid;
+	this.yMid = yMid;
+	this.angle = angle;
+	this.x = this.xMid - ((this.pWidth * this.scale) / 2);
+	this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+	this.removeFromWorld = false;
+}
+
+ScourgeDeath.prototype.update = function () {
+	if (this.animation.isDone()) {
+		this.removeFromWorld = true;
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+ScourgeDeath.prototype.draw = function () {
+	if (onCamera(this)) {
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+
+	Entity.prototype.draw.call(this);
+}
+
+function GuardianDeath(game, xMid, yMid, angle) {
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 1.2;
+	this.animation = new Animation(AM.getAsset("./img/enemyGuardianDeath.png"), this.pWidth, this.pHeight, 1152,  0.1, 9, false, this.scale);
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Effect";
+	this.xMid = xMid;
+	this.yMid = yMid;
+	this.angle = angle;
+	this.x = this.xMid - ((this.pWidth * this.scale) / 2);
+	this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+	this.removeFromWorld = false;
+}
+
+GuardianDeath.prototype.update = function () {
+	if (this.animation.isDone()) {
+		this.removeFromWorld = true;
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+GuardianDeath.prototype.draw = function () {
+	if (onCamera(this)) {
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+
+	Entity.prototype.draw.call(this);
+}
+
+function QueenDeath(game, xMid, yMid, angle) {
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 2;
+	this.animation = new Animation(AM.getAsset("./img/enemyQueenDeath.png"), this.pWidth, this.pHeight, 1152,  0.1, 9, false, this.scale);
+
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Effect";
+	this.xMid = xMid;
+	this.yMid = yMid;
+	this.angle = angle;
+	this.x = this.xMid - ((this.pWidth * this.scale) / 2);
+	this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+	this.removeFromWorld = false;
+}
+
+QueenDeath.prototype.update = function () {
+	if (this.animation.isDone()) {
+		this.removeFromWorld = true;
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+QueenDeath.prototype.draw = function () {
+	if (onCamera(this)) {
+		this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+
+	Entity.prototype.draw.call(this);
 }

@@ -67,6 +67,7 @@ Multishot.prototype.update = function () {
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.ship)) {
+		SCORE += 3;
 		this.game.ship.multishotTimer = 1000;
 		if (this.game.ship.multishotLevel < 2) {
 			this.game.ship.multishotLevel++;
@@ -129,6 +130,7 @@ SpeedUp.prototype.update = function () {
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.ship)) {
+		SCORE += 3;
 		this.game.ship.speedTimer = 1000;
 		if (this.game.ship.speedLevel < 2) {
 			this.game.ship.speedLevel++;
@@ -191,6 +193,7 @@ DamageUp.prototype.update = function () {
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.ship)) {
+		SCORE += 3;
 		this.game.ship.damageTimer = 1000;
 		if (this.game.ship.damageLevel < 2) {
 			this.game.ship.damageLevel++;
@@ -253,6 +256,7 @@ HealthRefill.prototype.update = function () {
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	if (Collide(this, this.game.ship)) {
+		SCORE += 3;
 		if(this.game.ship.health <= this.game.ship.healthMax - 10){
 			this.game.ship.health += 10;
 		}else {

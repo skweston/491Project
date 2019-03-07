@@ -55,13 +55,13 @@ AlienSpaceStation.prototype.constructor = AlienSpaceStation;
 AlienSpaceStation.prototype.update = function () {
 	// this.game.enemyResources++;
     if(this.health < 1){
-      console.log("destroyed");
-      this.removeFromWorld = true;
-	  this.asteroid.hasbase = false;
-	  this.asteroid.base = null;
-	  this.generateItem(25);
-	  this.generateScrap(15, 13);
-	  this.hasBeenDestroyed = true;
+    	SCORE += 10;
+    	this.removeFromWorld = true;
+    	this.asteroid.hasbase = false;
+    	this.asteroid.base = null;
+    	this.generateItem(25);
+    	this.generateScrap(15, 13);
+    	this.hasBeenDestroyed = true;
 	}
 	if(!this.removeFromWorld && this.health < this.maxHealth){
 		this.health += 0.5;
@@ -185,6 +185,11 @@ AlienSpaceStation.prototype.update = function () {
 		if(Collide(this, ent)){
 			this.takeDamage(ent.damage);
 			if (!ent.pierce) {
+				var splatter = new BloodSplatter(this.game,
+												 this.xMid - (this.pWidth * this.scale / 2) + Math.random() * this.pWidth,
+												 this.yMid - (this.pHeight * this.scale / 2) + Math.random() * this.pHeight,
+												 Math.random() * 360 * Math.PI / 180);
+				this.game.addEntity (splatter);
 				ent.removeFromWorld = true;
 			}
 		}
@@ -351,8 +356,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 			this.takeDamage(ent.damage);
 			if (!ent.pierce) {
 				ent.removeFromWorld = true;
-				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-				splatter.angle = this.angle;
+				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid, Math.random() * 360 * Math.PI / 180);
 				this.game.addEntity (splatter);
 			}
 			if (this.health < 1) {
@@ -366,7 +370,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 
 	// check health
 	if (this.health < 1) {
-		SCORE++; //how many points is it worth
+		SCORE += 1; //how many points is it worth
 		if(this.target){
 			this.target.isTargettedEnemy = false;
 		}
@@ -378,7 +382,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 
 	//does it blow up when it dies?
 	if (this.removeFromWorld) {
-		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		var explosion = new GuardianDeath(this.game, this.xMid, this.yMid, this.angle + (45 * Math.PI / 180));
 		this.game.addEntity(explosion);
 		this.spawner.gatherers--;
 	}
@@ -499,8 +503,7 @@ AlienBuilder.prototype.update = function () {
 			this.takeDamage(ent.damage);
 			if (!ent.pierce) {
 				ent.removeFromWorld = true;
-				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-				splatter.angle = this.angle;
+				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid, Math.random() * 360 * Math.PI / 180);
 				this.game.addEntity (splatter);
 			}
 
@@ -514,7 +517,7 @@ AlienBuilder.prototype.update = function () {
 
 	// check health
 	if (this.health < 1) {
-		//SCORE++; //how many points is it worth
+		SCORE += 5; //how many points is it worth
 		this.generateItem(0);
 		this.generateScrap(5, 7);
 
@@ -523,7 +526,7 @@ AlienBuilder.prototype.update = function () {
 
 	//does it blow up when it dies?
 	if (this.removeFromWorld) {
-		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
+		var explosion = new QueenDeath(this.game, this.xMid, this.yMid, this.angle + (45 * Math.PI / 180));
 		this.game.addEntity(explosion);
 		this.spawner.builders--;
 	}
@@ -862,8 +865,7 @@ Leech.prototype.update = function () {
 			this.takeDamage(ent.damage);
 			if (!ent.pierce) {
 				ent.removeFromWorld = true;
-				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-				splatter.angle = this.angle;
+				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid, Math.random() * 360 * Math.PI / 180);
 				this.game.addEntity (splatter);
 			}
 
@@ -912,7 +914,7 @@ Leech.prototype.update = function () {
 
 	// check health
 	if (this.health < 1) {
-		SCORE++;
+		SCORE += 3;
 
 		this.generateItem(0);
   	  	this.generateScrap(2, 6);
@@ -921,7 +923,7 @@ Leech.prototype.update = function () {
 	}
 
 	if (this.removeFromWorld) {
-		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+		var explosion = new ScourgeDeath(this.game, this.xMid, this.yMid, this.angle + (45 * Math.PI / 180));
 		this.game.addEntity(explosion);
 		this.spawner.spawns--;
 	}
@@ -1017,8 +1019,7 @@ Scourge.prototype.update = function () {
 			this.takeDamage(ent.damage);
 			if (!ent.pierce) {
 				ent.removeFromWorld = true;
-				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-				splatter.angle = this.angle;
+				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid, Math.random() * 360 * Math.PI / 180);
 				this.game.addEntity (splatter);
 			}
 			if (this.health < 1) {
@@ -1039,7 +1040,7 @@ Scourge.prototype.update = function () {
 
 	// check health
 	if (this.health < 1) {
-		SCORE++;
+		SCORE += 1;
 
 		this.generateItem(0);
 		this.generateScrap(1, 7);
@@ -1048,7 +1049,7 @@ Scourge.prototype.update = function () {
 	}
 
 	if (this.removeFromWorld) {
-		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+		var explosion = new ScourgeDeath(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
 		this.spawner.spawns--;
 	}
@@ -1243,8 +1244,7 @@ Stalker.prototype.update = function () {
 			this.takeDamage(ent.damage);
 			if (!ent.pierce) {
 				ent.removeFromWorld = true;
-				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-				splatter.angle = this.angle;
+				var splatter = new BloodSplatter(this.game, this.xMid, this.yMid, Math.random() * 360 * Math.PI / 180);
 				this.game.addEntity (splatter);
 			}
 					if (this.health < 1) {
@@ -1256,7 +1256,7 @@ Stalker.prototype.update = function () {
 	this.shootCooldown--;
 
 	if(this.health < 1) {
-		SCORE += 3;
+		SCORE += 2;
 		this.generateItem(0);
 		this.generateScrap(3, 7.5);
 
@@ -1272,7 +1272,7 @@ Stalker.prototype.update = function () {
 	}
 
 	if (this.removeFromWorld) {
-		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid);
+		var explosion = new GuardianDeath(this.game, this.xMid, this.yMid, this.angle + (45 * Math.PI / 180));
 		this.game.addEntity(explosion);
 		this.spawner.spawns--;
 	}

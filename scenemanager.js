@@ -775,7 +775,7 @@ PrototypeLevel.prototype.update = function(){
 	}
 
 	//if (this.removeFromWorld && !this.game.menu){
-	console.log("victory: " + this.victory);
+	// console.log("victory: " + this.victory);
 	if(this.victory) {
 		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
