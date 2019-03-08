@@ -226,12 +226,14 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y, angle, game) {
 	} else if ((this.frameWidth*this.scale) < (this.frameHeight * this.scale)) {
 	  xOffset = (this.frameHeight * this.scale) - (this.frameWidth * this.scale);
 	}
-
+	// console.log(`${this.window.width} ${this.window.height} offScreen check
+	// 			${this.size} = size`);
 	offscreenCanvas.width = size;
 	offscreenCanvas.height = size;
 	var offscreenCtx = offscreenCanvas.getContext('2d');
 
 	var thirdCanvas = document.createElement('canvas');
+
 	thirdCanvas.width = size;
 	thirdCanvas.height = size;
 	var thirdCtx = thirdCanvas.getContext('2d');
@@ -506,6 +508,7 @@ BackgroundLayer.prototype.update = function () {
 
 var AM = new AssetManager();
 //Background
+AM.queueDownload("./img/level1main.png");
 AM.queueDownload("./img/space1-1.png");
 AM.queueDownload("./img/PScroll1/space.png");
 AM.queueDownload("./img/PScroll1/cloud.png");
@@ -552,6 +555,20 @@ AM.queueDownload("./img/shipCharge3.png");
 AM.queueDownload("./img/shipSecondary3.png");
 AM.queueDownload("./img/shipDamage1.png");
 AM.queueDownload("./img/shipDamage2.png");
+
+// HUD
+AM.queueDownload("./img/hudOverlay.png");
+AM.queueDownload("./img/hudMinimapBorder.png");
+AM.queueDownload("./img/hudRollIcon.png");
+AM.queueDownload("./img/hudLaserIcon.png");
+AM.queueDownload("./img/hudWaveIcon.png");
+AM.queueDownload("./img/hudBulletIcon.png");
+AM.queueDownload("./img/hudBurstIcon.png");
+AM.queueDownload("./img/hudMissileIcon.png");
+AM.queueDownload("./img/hudHomingIcon.png");
+AM.queueDownload("./img/hudChargeIcon.png");
+AM.queueDownload("./img/hudOrbiterIcon.png");
+
 
 //Allies
 AM.queueDownload("./img/allyDrone.png");
@@ -610,6 +627,8 @@ AM.queueDownload("./img/SpawnDoor.png");
 
 AM.queueDownload("./img/SpaceExplosion.png");
 AM.queueDownload("./img/SPACEFIGHT.png");
+AM.queueDownload("./img/plutoSplash.png");
+//AM.queueDownload("./img/splash.png")
 AM.queueDownload("./img/splash.png");
 AM.queueDownload("./img/TutorialSceneLines.png");
 

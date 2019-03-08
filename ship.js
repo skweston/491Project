@@ -30,7 +30,7 @@ function TheShip(game) {
 	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipSecondary3.png"), this.pWidth, this.pHeight, 768, 0.15, 6, true, 0.3);
 	this.damage1Animation = new Animation(AM.getAsset("./img/shipDamage1.png"), this.pWidth, this.pHeight, 384, 0.1, 3, true, 2);
 	this.damage2Animation = new Animation(AM.getAsset("./img/shipDamage2.png"), this.pWidth, this.pHeight, 384, 0.1, 3, true, 2);
-
+	
 	if (DEBUG) {
 		this.invincible = true;
 	}
@@ -39,7 +39,8 @@ function TheShip(game) {
 	}
 
 	this.name = "Player";
-	this.health = 100;
+	this.healthMax = 100;
+	this.health = this.healthMax;
 	this.boostMax = 1000;
 	this.boost = this.boostMax;
 	this.speed = 0.5;
@@ -170,13 +171,13 @@ TheShip.prototype.update = function () {
 	}
 	if (xMove === 0) {
 		this.y += yMove;
-		if(this.game.camera.isScrolling) {
+		if(this.game.camera.isScrolling){
 			this.game.mouseY += yMove;
 		}
 	}
 	else if (yMove === 0) {
 		this.x += xMove;
-		if(this.game.camera.isScrolling) {
+		if(this.game.camera.isScrolling){
 			this.game.mouseX += xMove;
 		}
 	}
@@ -539,7 +540,7 @@ TheShip.prototype.createChargeShot = function(type, offset, adjustAngle, spreadN
 	}
 	if (type === "P2") {
 		var projectile = new ShipPrimary2(this.game, 1 * this.charge);
-		projectile.maxSpeed *= Math.random();
+		projectile.maxSpeed *= 0.5 + Math.random();
 	}
 	if (type === "P3") {
 		var projectile = new ShipPrimary3(this.game, 1 * this.charge);

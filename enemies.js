@@ -92,7 +92,7 @@ AlienSpaceStation.prototype.update = function () {
 	if(this.target){
 		var dx = this.target.xMid - this.xMid;
 		var dy = this.yMid - this.target.yMid;
-		this.shootAngle = -Math.atan2(dy,dx);
+		this.shootAngle = Math.atan2(dy,dx);
 	}
 
 	if (this.target && 900 > distance(this, this.target) && this.shootCooldown < 1){
@@ -391,7 +391,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 // AlienBase Builder
 /* ========================================================================================================== */
 function AlienBuilder(game, spawner) {
-
+	this.isBuilder = true;
 
 	this.pWidth = 128;
 	this.pHeight = 128;

@@ -183,6 +183,12 @@ GameEngine.prototype.startInput = function () {
 		that.wheel = e;
 	}, false);
 
+	this.cameraCtx.canvas.addEventListener("mouseout", function (e) {
+		if (that.running) {
+			that.paused = true;
+		}
+	}, false);
+
 	this.cameraCtx.canvas.addEventListener("keydown", function (e) {
 		//console.log("input: " + e.code);
 		e.preventDefault();
@@ -348,9 +354,6 @@ GameEngine.prototype.draw = function () {
 	for (var i = 0; i < this.allies.length; i++) {
 		this.allies[i].draw(this.ctx);
 	}
-
-
-
 
 	for (var i = 0; i < this.enemyProjectiles.length; i++) {
 		this.enemyProjectiles[i].draw(this.ctx);
@@ -559,18 +562,6 @@ if(this.paused === false) {
 			entity.update();
 		}
 	}
-	count = this.reticle.length;
-	for (var i = 0; i < count; i++) {
-		var entity = this.reticle[i];
-		if (entity.removeFromWorld) {
-			this.reticle.splice(i, 1);
-			count--;
-			i--;
-		}
-		else {
-			entity.update();
-		}
-	}
 	count = this.levels.length;
 	for (var i = 0; i < count; i++) {
 		var entity = this.levels[i];
@@ -592,6 +583,19 @@ if(this.paused === false) {
 	this.swapPrimary = false;
 	this.swapSecondary = false;
 	} //end of if
+	// always draw reticle
+	count = this.reticle.length;
+	for (var i = 0; i < count; i++) {
+		var entity = this.reticle[i];
+		if (entity.removeFromWorld) {
+			this.reticle.splice(i, 1);
+			count--;
+			i--;
+		}
+		else {
+			entity.update();
+		}
+	}
 }
 
 GameEngine.prototype.loop = function () {
