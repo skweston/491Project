@@ -56,7 +56,28 @@ SceneManager.prototype.update = function () {
 	}
 
 	//console.log("menu: " + this.game.menu);
+	if(this.game.clicked) {
+		this.game.clicked = false;
+		if(this.game.level === 1 && this.game.pointer === 1) {
+			this.changeScenes(new TutorialScene(this.game));
+		}
+		if(this.game.level === 1 && this.game.pointer === 2) {
+			this.changeScenes(new Level1(this.game));
+		}
+		if(this.game.level === 2 && this.game.pointer === 3) {
+			//this.changeScenes(new Level2(this.game));
+		}
+		if(this.game.level === 3 && this.game.pointer === 4) {
+			//this.changeScenes(new Level3(this.game));
+		}
+	}
 
+
+
+
+
+
+/*
 	if(this.game.menu === true) {
 		this.game.menu = false;
 		this.reset();
@@ -75,6 +96,7 @@ SceneManager.prototype.update = function () {
 		this.reset();
 		this.changeScenes(new StoryScrollScene(this.game));
 	}
+*/
 }
 
 SceneManager.prototype.loadPlayer = function () {
@@ -381,6 +403,7 @@ function ShipCursor(game) {
 	this.angle = 0;
 
 	this.name = "Player";
+	this.game.pointer = 1;
 
 	Entity.call(this, game, this.x, this.y);
 }
@@ -393,14 +416,16 @@ ShipCursor.prototype.update = function () {
 		this.game.moveDown = false;
 		if(this.y <= 705) {
 			this.y += 50;
-			//this.game.level++;
+			this.game.pointer++;
+			//console.log(this.game.pointer);
 		}
 	}
 	if(this.game.moveUp) {
 		this.game.moveUp = false;
 		if(this.y >= 607) {
 			this.y -= 50;
-			//this.game.level--;
+			this.game.pointer--;
+			//console.log(this.game.pointer);
 		}	
 	}
 
