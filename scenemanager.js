@@ -7,6 +7,7 @@ function SceneManager(game) {
 	//Always starts at title scene
 	console.log("Game Start");
 	this.currentScene = new SplashScene(this.game);
+	this.game.level = 1;
 }
 
 SceneManager.prototype.constructor = SceneManager;
@@ -338,16 +339,77 @@ TitleEffect.prototype.draw = function () {
 	this.game.ctx.textAlign = "center";
 	this.game.ctx.fillText("Super Plutonian Ace Command Earth Fighting Inter-Galactic Hero Team", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400, 500);
 
-	//This needs to flicker
-	this.game.ctx.fillText("Press V to Play Level 1", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
-	this.game.ctx.fillText("Press O to Play Tutorial", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 650, 500);
+	this.cursor = new Animation(AM.getAsset("./img/shipRollSpeed0.png"), 128, 128, 256, 0.03, 22, false, 0.5);
 
+	//This needs to flicker
+	this.game.ctx.fillText("Tutorial", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
+	this.game.ctx.fillText("Level 1", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 650, 500); 
+	if(this.game.level > 1) {
+		this.game.ctx.fillText("Level 2", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 700, 500);
+	} else {
+		this.game.ctx.fillStyle = "Grey";
+		this.game.ctx.fillText("Level 2", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 700, 500);
+	}
+	if(this.game.level > 2) {
+		this.game.ctx.fillText("Level 3", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 750, 500);
+	} else {
+		this.game.ctx.fillStyle = "Grey";
+		this.game.ctx.fillText("Level 3", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 750, 500);
+	}
+	
 	Entity.prototype.draw.call(this);
 }
 
 TitleEffect.prototype.update = function () {
 
 	Entity.prototype.update.call(this);
+}
+
+function ShipCursor(game) {
+	//ship roll animation
+	this.game = game;
+	this.ctx = game.ctx;
+	this.pWidth = 128;
+	this.pHeight = 128;
+	this.scale = 0.5;
+	this.animation = new Animation(AM.getAsset("./img/shipRollSpeed0.png"), this.pWidth, this.pHeight, 256, 0.03, 22, true, this.scale);
+	
+	//Start X/Y
+	this.x = 485;
+	this.y = 557;
+
+	this.angle = 0;
+
+	this.name = "Player";
+
+	Entity.call(this, game, this.x, this.y);
+}
+
+ShipCursor.prototype.update = function () {
+	//move up
+	//move down
+
+	if(this.game.moveDown) {
+		this.game.moveDown = false;
+		if(this.y <= 705) {
+			this.y += 50;
+			//this.game.level++;
+		}
+	}
+	if(this.game.moveUp) {
+		this.game.moveUp = false;
+		if(this.y >= 607) {
+			this.y -= 50;
+			//this.game.level--;
+		}	
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+ShipCursor.prototype.draw = function () {
+	this.animation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	Entity.prototype.draw.call(this);
 }
 
 function SplashScene(game) {
@@ -362,6 +424,13 @@ function SplashScene(game) {
 	this.title = new TitleEffect(game);
 	this.game.addEntity(this.title);
 	this.entities.push(this.title);
+
+	this.cursor = new ShipCursor(this.game);
+	this.game.addEntity(this.cursor);
+	this.entities.push(this.cursor);
+	//this.game.roll = true;
+	//this.game.ship.x = this.game.camera.x + this.game.cameraCtx.canvas.width/2 - 128;
+	//this.game.ship.y = this.game.camera.y + 600;
 
 	this.scroll = null;
 }
@@ -465,7 +534,7 @@ HowTo.prototype.draw = function() {
 	ctx.font = "22pt Impact";
 	var page = 0;
 	//this.game.ctx.fillText("Basic Controls", page, (this.offset * this.line++), 400);
-	this.game.ctx.fillText("To Move: W A S D", page + 400, (this.offset * (this.line + 6)), 400);
+	this.game.ctx.fillText("To Move: W A S D", 0, 270, 400);
 	this.game.ctx.fillText("Return to Menu at Anytime: ESC", 0, 300, 400);
 
 	//horizontal
