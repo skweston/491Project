@@ -70,33 +70,13 @@ SceneManager.prototype.update = function () {
 		if(this.game.level === 3 && this.game.pointer === 4) {
 			//this.changeScenes(new Level3(this.game));
 		}
-	}
+	} 
 
-
-
-
-
-
-/*
-	if(this.game.menu === true) {
+	if(this.game.menu) {
 		this.game.menu = false;
 		this.reset();
 		this.changeScenes(new SplashScene(this.game));
 	}
-
-	if(this.game.tutrl === true) {
-		this.game.tutrl = false;
-		this.reset();
-		this.changeScenes(new TutorialScene(this.game));
-	}
-
-	if(this.game.level === true) {
-		console.log("level");
-		this.game.level = false;
-		this.reset();
-		this.changeScenes(new StoryScrollScene(this.game));
-	}
-*/
 }
 
 SceneManager.prototype.loadPlayer = function () {
@@ -744,7 +724,7 @@ StoryScroll1.prototype.update = function () {
 		this.isDone = true;
 		//To test new level, swap level here.
 		this.removeFromWorld = true;
-		var level = new PrototypeLevel(this.game);
+		var level = new Level1(this.game);
 		this.game.sceneManager.changeScenes(level);
 		this.game.addEntity(level);
 	}
@@ -752,7 +732,7 @@ StoryScroll1.prototype.update = function () {
 	Entity.prototype.update.call(this);
 }
 
-function PrototypeLevel(game) {
+function Level1(game) {
 	console.log("prototype");
 	this.name = "Level";
 	this.game = game;
@@ -847,7 +827,7 @@ function PrototypeLevel(game) {
 	this.game.sceneManager.loadPlayer(); //mandatory
 }
 
-PrototypeLevel.prototype.update = function(){
+Level1.prototype.update = function(){
 	//this.removeFromWorld = true;
 	//console.log("health: " + this.game.ship.health);
 	this.victory = true;
@@ -876,20 +856,8 @@ PrototypeLevel.prototype.update = function(){
 	}
 }
 
-PrototypeLevel.prototype.draw = function () {}
-PrototypeLevel.prototype.constructor = PrototypeLevel;
-
-function LevelOne() {
-	this.bossTimer = 1000;
-	this.spawnTimer = 0;
-	this.spawnNum = 1;
-	this.counter = 0;
-
-	//background - or whatever background image we want
-	this.background = new MainBackground(this.game, AM.getAsset("./img/4kBackground1.png"));
-	this.hud = new HUD(this.game); //mandatory
-	this.game.sceneManager.loadPlayer(); //mandatory
-}
+Level1.prototype.draw = function () {}
+Level1.prototype.constructor = Level1;
 
 function VictoryScrollScene(game) {
 	this.name = "VictoryScroll";
