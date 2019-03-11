@@ -17,7 +17,7 @@ function SpaceStation(game, x, y, rock) {
 	this.asteroid = rock;
     this.xMid = this.x + (this.pWidth * this.scale) / 2;
     this.yMid = this.y + (this.pHeight * this.scale) / 2;
-    this.radius = 300 * this.scale;
+    this.radius = 100 * this.scale;
     this.speed = 0;
     this.angle = 0;
     this.game = game;
@@ -137,9 +137,9 @@ SpaceStation.prototype.update = function () {
 		if (Collide(this, ent)) {
 			this.takeDamage(ent.damage);
 			ent.removeFromWorld = true;
-			var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
-			splatter.angle = this.angle;
-			this.game.addEntity (splatter);
+			// var splatter = new BloodSplatter(this.game, this.xMid, this.yMid);
+			// splatter.angle = this.angle;
+			// this.game.addEntity (splatter);
 			if (this.health < 1) {
 				break;
 			}
@@ -180,10 +180,8 @@ SpaceStation.prototype.createProjectile = function(type, offset, adjustAngle) {
 				  y: Math.sin(angle) * dist + this.yMid};
 	var dir = direction(target, {x: this.xMid, y: this.yMid});
 	projectile.damage = projectile.damage + (projectile.damage * this.powerLevel / 2);
-	projectile.x = this.xMid - (projectile.pWidth * projectile.scale / 2) +
-				   ((projectile.pWidth * projectile.scale / 2) * Math.cos(angle + offset)) + this.radius / 2 * Math.cos(angle);
-	projectile.y = this.yMid - (projectile.pHeight * projectile.scale / 2) +
-				   ((projectile.pHeight * projectile.scale / 2) * Math.sin(angle + offset)) + this.radius / 2 *  Math.sin(angle);
+	projectile.x = this.xMid - projectile.pWidth * projectile.scale / 2;
+	projectile.y = this.yMid - projectile.pHeight * projectile.scale / 2;
 	projectile.velocity.x = dir.x * projectile.maxSpeed;
 	projectile.velocity.y = dir.y * projectile.maxSpeed;
 	projectile.angle = angle;
@@ -200,7 +198,7 @@ SpaceStation.prototype.draw = function () {
 		this.ctx.beginPath();
 		this.ctx.strokeStyle = "Red";
 		this.ctx.lineWidth = 1;
-		this.ctx.arc(this.xMid, this.yMid, this.radiusa, 0, Math.PI * 2, false);
+		this.ctx.arc(this.xMid, this.yMid, this.radius, 0, Math.PI * 2, false);
 		this.ctx.stroke();
 		this.ctx.closePath();
 	}
@@ -237,7 +235,7 @@ function MechanicalResourceGatherer(game, spawner) {
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;
 	this.yMid = this.y + (this.pHeight * this.scale) / 2;
-	this.radius = 18 * this.scale;
+	this.radius = 30 * this.scale;
 
 //this is for movement
 	this.speed = .35;
@@ -406,7 +404,7 @@ function PlayerBuilder(game, spawner) {
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;
 	this.yMid = this.y + (this.pHeight * this.scale) / 2;
-	this.radius = 180 * this.scale;
+	this.radius = 200 * this.scale;
 
 //this is for movement
 	this.speed = .135;
@@ -548,7 +546,7 @@ function PurpleChroma(game, spawner) {
 	this.y = 0;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 5.4 * this.scale;
+	this.radius = 36 * this.scale;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -720,7 +718,7 @@ function GreenChroma(game, spawner) {
 	this.y = 0;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 5.4 * this.scale;
+	this.radius = 48 * this.scale;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -889,7 +887,7 @@ function RedChroma(game, spawner) {
 	this.y = 0;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 5.4 * this.scale;
+	this.radius = 36 * this.scale;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -1059,7 +1057,7 @@ function BlackWhiteChroma(game, spawner) {
 	this.y = 0;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
-	this.radius = 5.4 * this.scale;
+	this.radius = 48 * this.scale;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
