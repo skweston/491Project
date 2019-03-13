@@ -664,6 +664,9 @@ Entity.prototype.takeDamage = function(damage) {
 	}
 }
 Entity.prototype.generateScrap = function (count, value){
+	if (LEVEL_THREE) {
+		return;
+	}
 	for(var i = 0; i < count; i++){
 		var scrap = new Scrap(this.game, value);
 		scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);

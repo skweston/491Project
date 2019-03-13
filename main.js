@@ -523,6 +523,9 @@ AM.queueDownload("./img/PScroll1/BackgroundVariant.png");
 AM.queueDownload("./img/PScroll1/Starfield1-1.png");
 AM.queueDownload("./img/PScroll1/Background3k.png");
 
+AM.queueDownload("./img/levelThreeBackground.png");
+AM.queueDownload("./img/levelThreeForeground.png");
+
 AM.queueDownload("./img/BloodSplatter.png");
 
 // ship stuff
@@ -607,8 +610,10 @@ AM.queueDownload("./img/enemyQueenDeath.png");
 AM.queueDownload("./img/enemyBase.png");
 AM.queueDownload("./img/enemySpitProjectile.png");
 AM.queueDownload("./img/enemySpitProjectileHit.png");
-
-
+AM.queueDownload("./img/bossWorm1.png");
+AM.queueDownload("./img/bossWorm2.png");
+AM.queueDownload("./img/bossWorm3.png");
+AM.queueDownload("./img/boss.png");
 
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
@@ -643,7 +648,7 @@ AM.downloadAll(function () {
 	gameEngine.init(ctx, cameraCtx);
 	gameEngine.running = false;
 
-	var ship = new TheShip(gameEngine);
+	var ship = new TheShip(gameEngine, 0, 0);
 	var reticle = new Reticle(gameEngine);
 	var sm = new SceneManager(gameEngine);
 

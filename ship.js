@@ -2,7 +2,7 @@
 // The Ship
 /* ========================================================================================================== */
 
-function TheShip(game) {
+function TheShip(game, xIn, yIn) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.pWidth = 128;
@@ -49,8 +49,8 @@ function TheShip(game) {
 	this.rollDuration = 0.03 * 22;
 	this.rollTime = 0;
 	this.rollCooldown = 0;
-	this.x = this.game.cameraCtx.canvas.width/2 - (this.pWidth * this.scale / 2);
-	this.y = this.game.cameraCtx.canvas.height/2 - (this.pHeight * this.scale / 2);
+	this.x = xIn;
+	this.y = yIn;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 	this.radius = 32 * this.scale;
@@ -101,7 +101,7 @@ TheShip.prototype.update = function () {
 	// boosting
 	this.speed = 0.5;
 	this.boosting = false;
-	if (this.game.boost && this.boost > 1) {
+	if (this.game.boost && this.boost > 0) {
 		this.cancelBoost = false;
 		this.boosting = true;
 		this.speed = 1;
@@ -170,20 +170,20 @@ TheShip.prototype.update = function () {
 	}
 	if (xMove === 0) {
 		this.y += yMove;
-		if(this.game.camera.isScrolling){
+		if(!LEVEL_THREE && this.game.camera.isScrolling){
 			this.game.mouseY += yMove;
 		}
 	}
 	else if (yMove === 0) {
 		this.x += xMove;
-		if(this.game.camera.isScrolling){
+		if(!LEVEL_THREE && this.game.camera.isScrolling){
 			this.game.mouseX += xMove;
 		}
 	}
 	else {
 		this.x += xMove * 0.7;
 		this.y += yMove * 0.7;
-		if(this.game.camera.isScrolling){
+		if(!LEVEL_THREE && this.game.camera.isScrolling){
 			this.game.mouseX += xMove * 0.7;
 	 		this.game.mouseY += yMove * 0.7;
 		}

@@ -1,3 +1,5 @@
+var LEVEL_THREE = false;
+
 /* ========================================================================================================== */
 // Level Manager stuff
 /* ========================================================================================================== */
@@ -76,9 +78,9 @@ SceneManager.prototype.update = function () {
 	}
 }
 
-SceneManager.prototype.loadPlayer = function () {
+SceneManager.prototype.loadPlayer = function (x, y) {
 	this.game.running = true;
-	var ship = new TheShip(this.game);
+	var ship = new TheShip(this.game, x, y);
 	var reticle = new Reticle(this.game);
 	this.game.addEntity(ship);
 	this.game.addEntity(reticle);
@@ -105,6 +107,7 @@ function HUD(game) {
 
 	this.hudOverlay = new Animation(AM.getAsset("./img/hudOverlay.png"), 1200, 300, 1200, 1, 1, true, 1);
 	this.minimapBorder = new Animation(AM.getAsset("./img/hudMinimapBorder.png"), 272, 272, 272, 1, 1, true, 1);
+	this.level3Overlay = new Animation(AM.getAsset("./img/levelThreeForeground.png"), 1359, 800, 1359, 1, 1, true, 1);
 	this.rollIcon = new Animation(AM.getAsset("./img/hudRollIcon.png"), 128, 128, 1408, 0.15, 11, true, 0.5);
 	this.laserIcon = new Animation(AM.getAsset("./img/hudLaserIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
 	this.waveIcon = new Animation(AM.getAsset("./img/hudWaveIcon.png"), 128, 128, 256, 0.15, 2, true, 0.5);
@@ -123,6 +126,9 @@ function HUD(game) {
 }
 
 HUD.prototype.draw = function() {
+	if (LEVEL_THREE) {
+		this.level3Overlay.drawFrame(game.clockTick, this.ctx, -139, 0, 0);
+	}
 	// HUD top back panel
 	// this.game.ctx.fillStyle = "Black";
 	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 16, 320, 32);
@@ -176,77 +182,76 @@ HUD.prototype.draw = function() {
 	this.game.ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
 	this.game.ctx.fillRect(this.game.camera.x + 1101, this.game.camera.y + 16, 70 * this.game.ship.rollCooldown / 100 + 1, 64);
 
-	// HUD minimap
-	this.game.ctx.fillStyle = "rgba(176, 196, 222, 0.25)";
-	this.game.ctx.fillRect(this.game.camera.x + 944, this.game.camera.y + 544, 240, 240);
-
-	this.minimapBorder.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 928, this.game.camera.y + 528, 0);
-
 	//minimap logic
-	for (var i = 0; i< this.minimapObjects.length; i++){
-		//parse what color to draw this dot
-		if (this.minimapObjects[i].name === "Enemy"){
-			//do math to convert world coordinates to map coordinates
-			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
-			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
-			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
-			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
-			//draw the dude
-			this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-			this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+	if (!LEVEL_THREE) {
+		// HUD minimap
+		this.game.ctx.fillStyle = "rgba(176, 196, 222, 0.25)";
+		this.game.ctx.fillRect(this.game.camera.x + 944, this.game.camera.y + 544, 240, 240);
 
-		} else if (this.minimapObjects[i].name === "Ally"){
-			//do math to convert world coordinates to map coordinates
-			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
-			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
-			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
-			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
-			//draw the dude
-			this.game.ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
-			this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
-		} else if (this.minimapObjects[i].name === "Player"){
-			//do math to convert world coordinates to map coordinates
-			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
-			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
-			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
-			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
-			//draw the dude
-			this.game.ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
-			this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
-		} else if (this.minimapObjects[i].name === "Terrain"){
-			//do math to convert world coordinates to map coordinates
-			var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
-			var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
-			var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
-			var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
-			//draw the dude
-			if(this.minimapObjects[i].hasbase){
-				if(this.minimapObjects[i].base.name === "Ally"){
-					this.game.ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
-					this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
-				}else {
-					this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-					this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
-
-				}
-			}else {
-				this.game.ctx.fillStyle = "rgba(167, 167, 167, 0.5)";
+		this.minimapBorder.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 928, this.game.camera.y + 528, 0);
+		for (var i = 0; i< this.minimapObjects.length; i++){
+			//parse what color to draw this dot
+			if (this.minimapObjects[i].name === "Enemy"){
+				//do math to convert world coordinates to map coordinates
+				var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+				var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+				var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+				var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+				//draw the dude
+				this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
 				this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+			} else if (this.minimapObjects[i].name === "Ally"){
+				//do math to convert world coordinates to map coordinates
+				var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+				var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+				var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+				var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+				//draw the dude
+				this.game.ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+				this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+			} else if (this.minimapObjects[i].name === "Player"){
+				//do math to convert world coordinates to map coordinates
+				var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+				var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+				var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+				var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+				//draw the dude
+				this.game.ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
+				this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+			} else if (this.minimapObjects[i].name === "Terrain"){
+				//do math to convert world coordinates to map coordinates
+				var mapX = (this.minimapObjects[i].xMid * 240)/this.game.ctx.canvas.width;
+				var mapY = (this.minimapObjects[i].yMid * 240)/this.game.ctx.canvas.height;
+				var mapWidth = (this.minimapObjects[i].pWidth * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.width;
+				var mapHeight = (this.minimapObjects[i].pHeight * 240 * this.minimapObjects[i].scale)/this.game.ctx.canvas.height;
+				//draw the dude
+				if(this.minimapObjects[i].hasbase){
+					if(this.minimapObjects[i].base.name === "Ally"){
+						this.game.ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+						this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+					}else {
+						this.game.ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+						this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+					}
+				}else {
+					this.game.ctx.fillStyle = "rgba(167, 167, 167, 0.5)";
+					this.game.ctx.fillRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+				}
 			}
 		}
+		var oldLinewidth = this.game.ctx.lineWidth;
+
+		//camera Box
+		var mapX = (this.game.camera.x * 240)/this.game.ctx.canvas.width;
+		var mapY = (this.game.camera.y * 240)/this.game.ctx.canvas.height;
+		var mapWidth = (this.game.cameraCtx.canvas.width * 240)/this.game.ctx.canvas.width;
+		var mapHeight = (this.game.cameraCtx.canvas.height * 240)/this.game.ctx.canvas.height;
+		this.game.ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+		this.game.ctx.lineWidth = "2";
+		this.game.ctx.strokeRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
+
+		this.game.ctx.lineWidth = oldLinewidth;
 	}
-	var oldLinewidth = this.game.ctx.lineWidth;
-	//camera Box
-	var mapX = (this.game.camera.x * 240)/this.game.ctx.canvas.width;
-	var mapY = (this.game.camera.y * 240)/this.game.ctx.canvas.height;
-	var mapWidth = (this.game.cameraCtx.canvas.width * 240)/this.game.ctx.canvas.width;
-	var mapHeight = (this.game.cameraCtx.canvas.height * 240)/this.game.ctx.canvas.height;
-	this.game.ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
-	this.game.ctx.lineWidth = "2";
-	this.game.ctx.strokeRect(this.game.camera.x + 944 + mapX, this.game.camera.y + 544 + mapY, mapWidth, mapHeight);
-
-
-	this.game.ctx.lineWidth = oldLinewidth;
 
 	// Player resource counter
 	// this.game.ctx.fillText("Player Faction Resources: " + this.game.playerResources,this.game.camera.x + 200, this.game.camera.y + 40);
@@ -273,6 +278,12 @@ HUD.prototype.draw = function() {
 		this.game.ctx.fillStyle = "Black";
 		this.game.ctx.strokeText("-Press P to unpause-", this.game.camera.x + 600, this.game.camera.y + 456);
 	}
+
+	this.game.ctx.strokeStyle = "Red";
+	this.game.ctx.lineWidth = 2;
+	this.game.ctx.strokeRect(350, 725, 700, 200);
+	this.game.ctx.strokeRect(875, 650, 700, 200);
+	this.game.ctx.strokeRect(1100, 0, 700, 800);
 
 	Entity.prototype.draw.call(this);
 }
@@ -388,7 +399,7 @@ function TutorialScene(game) {
 	this.hud = new HUD(this.game);
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
-	this.game.sceneManager.loadPlayer();
+	this.game.sceneManager.loadPlayer(500, 500);
 }
 
 function HowTo(game) {
@@ -649,12 +660,59 @@ StoryScroll1.prototype.update = function () {
 		this.isDone = true;
 		//To test new level, swap level here.
 		this.removeFromWorld = true;
-		var level = new PrototypeLevel(this.game);
+		var level = new LevelThree(this.game);
+		// var level = new PrototypeLevel(this.game);
 		this.game.sceneManager.changeScenes(level);
 		this.game.addEntity(level);
 	}
 	Entity.prototype.update.call(this);
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function LevelThree(game) {
+	this.name = "Level";
+	this.game = game;
+	this.entities = [];
+	this.background = new MainBackground(this.game, AM.getAsset("./img/levelThreeBackground.png"));
+	this.game.addEntity(this.background);
+	this.entities.push(this.background);
+	LEVEL_THREE = true;
+
+	this.boss = new BossWorm(this.game, 1200, 93);
+	this.game.addEntity(this.boss);
+	this.entities.push(this.boss);
+
+	this.hud = new HUD(this.game); //mandatory
+	this.game.addEntity(this.hud);
+	this.entities.push(this.hud);
+	this.game.sceneManager.loadPlayer(100, 400); //mandatory
+}
+
+LevelThree.prototype.constructor = LevelThree;
+LevelThree.prototype.draw = function () {}
+
+LevelThree.prototype.update = function() {
+	this.victory = false;
+
+	if (this.game.ship.health < 1) {
+		this.game.sceneManager.reset();
+		this.game.sceneManager.changeScenes(new SplashScene(this.game));
+		return;
+	}
+
+	if (this.game.enemies.length < 1) {
+		this.victory = true;
+	}
+
+	if (this.victory) {
+		LEVEL_THREE = false;
+		this.game.sceneManager.reset();
+		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function PrototypeLevel(game) {
 	console.log("prototype");
@@ -748,7 +806,7 @@ function PrototypeLevel(game) {
 	this.hud = new HUD(this.game); //mandatory
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
-	this.game.sceneManager.loadPlayer(); //mandatory
+	this.game.sceneManager.loadPlayer(500, 500); //mandatory
 }
 
 PrototypeLevel.prototype.update = function(){
@@ -794,7 +852,7 @@ function LevelOne() {
 	//background - or whatever background image we want
 	this.background = new MainBackground(this.game, AM.getAsset("./img/4kBackground1.png"));
 	this.hud = new HUD(this.game); //mandatory
-	this.game.sceneManager.loadPlayer(); //mandatory
+	this.game.sceneManager.loadPlayer(500, 500); //mandatory
 }
 
 function VictoryScrollScene(game) {

@@ -1322,3 +1322,138 @@ Stalker.prototype.draw = function () {
 
 	Entity.prototype.draw.call(this);
 }
+
+/* ========================================================================================================== */
+// Boss Worm
+/* ========================================================================================================== */
+
+function BossWorm(game, xIn, yIn) {
+
+	this.pWidth = 1024;
+	this.pHeight = 1024;
+	this.scale = 0.60;
+	this.animation1 = new Animation(AM.getAsset("./img/bossWorm1.png"), this.pWidth, this.pHeight, 9216, 0.15, 9, true, this.scale);
+	this.animation2 = new Animation(AM.getAsset("./img/bossWorm2.png"), this.pWidth, this.pHeight, 9216, 0.15, 9, true, this.scale);
+	this.animation3 = new Animation(AM.getAsset("./img/bossWorm3.png"), this.pWidth, this.pHeight, 9216, 0.15, 9, true, this.scale);
+
+	this.angle = 0;
+	this.name = "Enemy";
+	this.speed = 1;
+	this.x = xIn;
+	this.y = yIn;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2));
+	this.yMid = (this.y + (this.pHeight * this.scale / 2));
+	this.radius = 200 * this.scale;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+	this.health = 100;
+
+	// phase info
+	this.enter = false;
+	this.attack = false;
+	this.barrageTimer = 100 + Math.random() * 100;
+	this.barrage = false;
+	this.spawnTimer = 150 + Math.random() * 100;
+	this.spawn = false;
+
+	this.target1 = null;
+	this.target2 = null;
+	this.target3 = null;
+
+	Entity.call(this, game, this.x, this.y);
+}
+
+BossWorm.prototype = new Entity();
+BossWorm.prototype.constructor = BossWorm;
+
+BossWorm.prototype.update = function () {
+	// move
+	if (this.x > 650) {
+		this.x -= 10 * this.speed;
+		this.enter = true;
+	}
+	else {
+		this.enter = false;
+		this.attack = true;
+		this.barrageTimer--;
+		this.spawnTimer--;
+		if (this.barrageTimer < 1) {
+			this.barrageTimer = 100 + Math.random() * 100;
+			this.barragePhase = 100;
+			this.barrage = true;
+			this.attack = false;
+		}
+		else if (this.spawnTimer < 1) {
+			this.spawnTimer = 150 + Math.random() * 100;
+			this.spawnPhase = 100;
+			this.spawn = true;
+			this.attack = false;
+		}
+	}
+
+	// update mid
+	this.xMid = (this.x + (this.pWidth * this.scale / 2));
+	this.yMid = (this.y + (this.pHeight * this.scale / 2));
+
+	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
+		var ent = this.game.playerProjectiles[i];
+		if (Collide(this, ent)) {
+			this.takeDamage(ent.damage);
+			if (!ent.pierce) {
+				ent.removeFromWorld = true;
+				var splatter = new BloodSplatter(this.game,
+												 this.xMid - (this.pWidth * this.scale / 2) + Math.random() * this.pWidth,
+												 this.yMid - (this.pHeight * this.scale / 2) + Math.random() * this.pHeight,
+												 Math.random() * 360 * Math.PI / 180);
+				this.game.addEntity (splatter);
+			}
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+	if(this.health < 1) {
+		SCORE += 100;
+		this.removeFromWorld = true;
+		var explosion = new BloodyMess(this.game, this.x, this.y, (Math.random * 360) * Math.PI / 180, 7, this);
+		this.game.addEntity(explosion);
+
+		var count = 10;
+		for (var i = 0; i < count; i++) {
+			var ent = new Scourge(this.game, this.xMid - 100 + (Math.random() * 200), this.yMid - 100 + (Math.random() * 200), this);
+			this.game.addEntity(ent);
+
+			if (i % 2 === 0) {
+				ent = new Leech(this.game, this.xMid - 100 + (Math.random() * 200), this.yMid - 100 + (Math.random() * 200), this);
+				this.game.addEntity(ent);
+			}
+		}
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+BossWorm.prototype.draw = function () {
+	if (this.enter || this.spawn) {
+		this.animation1.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (this.attack) {
+		this.animation2.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	if (this.barrage) {
+		this.animation3.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+	Entity.prototype.draw.call(this);
+}
