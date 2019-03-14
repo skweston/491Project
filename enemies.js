@@ -684,6 +684,10 @@ BossTurret.prototype.constructor = Boss1;
 
 BossTurret.prototype.update = function () {
 
+	if (this.y < -100){
+		this.health--;
+	}
+
 	this.x = this.boss.x + this.xOffset;
 	this.y = this.boss.y + this.yOffset;
 
