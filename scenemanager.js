@@ -892,49 +892,64 @@ function Level2(game) {
 	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
 	this.game.addEntity(this.layer1);
 	this.entities.push(this.layer1);
-	// this.layer2 = new BackgroundLayer(this.game, AM.getAsset("./img/gasGiantsNebulaLayer.png"));
-	// this.game.addEntity(this.layer2);
-	// this.entities.push(this.layer2);
-	// this.layer2 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/BackgroundMedium.png"));
-	// this.game.addEntity(this.layer2);
-	// this.entities.push(this.layer2);
-	// this.layer3 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Starfield1-1.png"));
-	// this.game.addEntity(this.layer3);
-	// this.entities.push(this.layer3);
-	// this.layer4 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/BackgroundVariant.png"));
-	// this.game.addEntity(this.layer4);
-	// this.entities.push(this.layer4);
+
 
 	//this spawns and places the player base
-	this.rock1 = new Asteroid(this.game, 100, 100);
+	this.rock1 = new Asteroid(this.game, 1850, 1850);
 	this.game.addEntity(this.rock1);
 	this.entities.push(this.rock1);
 
-	this.playerSpaceStation = new SpaceStation(this.game, 100, 100, this.rock1);
+	this.playerSpaceStation = new SpaceStation(this.game, 1850, 1850, this.rock1);
 	this.game.addEntity(this.playerSpaceStation);
 	this.entities.push(this.playerSpaceStation);
-
+	this.playerSpaceStation.resourceIncr = .1;
 	this.rock1.hasbase = true;
 	this.rock1.base = this.playerSpaceStation;
 
+	this.rock8 = new Asteroid(this.game, 1242, 1265);
+	this.game.addEntity(this.rock8);
+	this.entities.push(this.rock8);
+
+	this.rock9 = new Asteroid(this.game, 1200, 1950);
+	this.game.addEntity(this.rock9);
+	this.entities.push(this.rock9);
+
+	this.rock10 = new Asteroid(this.game, 1989, 1157);
+	this.game.addEntity(this.rock10);
+	this.entities.push(this.rock10);
+
+	this.rock11 = new Asteroid(this.game, 150, 3350);
+	this.game.addEntity(this.rock11);
+	this.entities.push(this.rock11);
+
+	this.rock12 = new Asteroid(this.game, 3250, 350);
+	this.game.addEntity(this.rock12);
+	this.entities.push(this.rock12);
+
+	this.rock13 = new Asteroid(this.game, 2250, 3427);
+	this.game.addEntity(this.rock13);
+	this.entities.push(this.rock13);
+
+	this.rock13 = new Asteroid(this.game, 850, 2707);
+	this.game.addEntity(this.rock13);
+	this.entities.push(this.rock13);
+
+
+
 
 	//this spawns the enemy base
-	this.rock2 = new Asteroid(this.game, 3000, 3000);
+	this.rock2 = new Asteroid(this.game, 70, 70);
 	this.game.addEntity(this.rock2);
 	this.entities.push(this.rock2);
 
-	this.enemySpaceStation = new AlienSpaceStation(this.game, 3000, 3000, this.rock2);
+	this.enemySpaceStation = new AlienSpaceStation(this.game, 70, 70, this.rock2);
 	this.game.addEntity(this.enemySpaceStation);
 	this.entities.push(this.enemySpaceStation);
-
+	this.enemySpaceStation.resourceIncr = .5;
 	this.rock2.hasbase = true;
 	this.rock2.base = this.enemySpaceStation;
 
-	var abuilder = new AlienBuilder(this.game, this.enemySpaceStation);
-	this.enemySpaceStation.builders = 1;
-	abuilder.x = 3500;
-	abuilder.y = 3500;
-	game.addEntity(abuilder);
+
 
 	//Neutral rock
 	this.rock3 = new Asteroid(this.game, 1600, 300);
@@ -942,7 +957,7 @@ function Level2(game) {
 	this.entities.push(this.rock3);
 
 	//Neutral rock
-	this.rock4 = new Asteroid(this.game, 300, 1600);
+	this.rock4 = new Asteroid(this.game, 100, 1200);
 	this.game.addEntity(this.rock4);
 	this.entities.push(this.rock4);
 
@@ -951,10 +966,19 @@ function Level2(game) {
 	this.game.addEntity(this.rock5);
 	this.entities.push(this.rock5);
 
-	//Neutral rock
-	this.rock6 = new Asteroid(this.game, 2200, 3000);
+	//enemy base rock
+	this.rock6 = new Asteroid(this.game, 3500, 3300);
 	this.game.addEntity(this.rock6);
 	this.entities.push(this.rock6);
+
+	this.enemySpaceStation2 = new AlienSpaceStation(this.game, 3500,3300, this.rock6);
+	this.game.addEntity(this.enemySpaceStation2);
+	this.entities.push(this.enemySpaceStation2);
+	this.enemySpaceStation2.resourceIncr = .55;
+	this.rock6.hasbase = true;
+	this.rock6.base = this.enemySpaceStation2;
+
+
 
 	//Neutral rock
 	this.rock7 = new Asteroid(this.game, 2400, 600);
@@ -962,12 +986,15 @@ function Level2(game) {
 	this.entities.push(this.rock7);
 
 	this.game.playerResources = 700;
-	this.game.enemyResources = 1700;
+	this.game.enemyResources = 500;
+	this.game.numOfBosses = 2;
 
 	this.hud = new HUD(this.game); //mandatory
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
 	this.game.sceneManager.loadPlayer(); //mandatory
+	this.game.ship.x = 1850;
+	this.game.ship.y = 1850;
 }
 
 Level2.prototype.update = function() {
