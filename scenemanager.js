@@ -868,7 +868,7 @@ Level1.prototype.update = function(){
 	if(this.victory) {
 		this.game.level++;
 		this.game.sceneManager.reset();
-		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
+		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game), 1);
 
 	}
 }
@@ -1018,21 +1018,27 @@ Level2.prototype.update = function() {
 		this.game.level++;
 		this.game.sceneManager.reset();
 		//change to new victory scroll here
-		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
+		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game, 2));
 	}
 }
 
 Level2.prototype.draw = function () {}
 Level2.prototype.constructor = Level2;
 
-function VictoryScrollScene(game) {
+function VictoryScrollScene(game, num) {
 	this.name = "VictoryScroll";
 	this.game = game;
 	this.entities = [];
 	this.background = new MainBackground(this.game, AM.getAsset("./img/plutoSplashPixel.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
-	this.scroll = new VictoryStoryScroll1(this.game, this.leve);
+	if (num ===1){
+		this.scroll = new VictoryStoryScroll1(this.game, this.level);
+	}else if (num === 2){
+		this.scroll = new VictoryStoryScroll2(this.game, this.level);
+	}else if (num === 3){
+		this.scroll = new VictoryStoryScroll3(this.game, this.level);
+	}
 	this.entities.push(this.scroll);
 	this.game.addEntity(this.scroll);
 }
@@ -1067,22 +1073,148 @@ VictoryStoryScroll1.prototype.draw = function () {
 	this.game.ctx.fillText("Press Enter to Replay this level", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 100 + this.offset + this.lift, 650);
 	this.game.ctx.fillText("Victory", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
 	this.line++;
-	this.game.ctx.fillText("Victory in the Kuiper Belt over the space lice was not without losses.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
-	this.game.ctx.fillText("Many Plutonians died not only in the fighting but in the mines", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
-	this.game.ctx.fillText("as a great deal of resources were required for the war effort.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("Victory in the Kuiper Belt over the space lice was not without losses...", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("It seems the Depraved Humans of Earth have Enslaved the Space Lice Queen", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("Pluto will not be able to defeat the humans of earth until the Space Lice defeated", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
 	this.line++;
-	this.game.ctx.fillText("Plutonian's are used to the losses that come with a prolonged war,", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
-	this.game.ctx.fillText("Since 2006 they have become hardened. Ready to accept tremendous losses", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
-	this.game.ctx.fillText("their people are united under a singular and abiding message “Earth will pay.”", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Plutonian's are used to prolonged war, so first we must defeat the Human ally", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("The next step for you in Pluto's rise to solar power is to go to the asteroid belt.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("There lies the bulk of the Space Lice forces, and there we shall fine their Queen", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
 	this.line++;
-	this.game.ctx.fillText("Thanks for playing our game, and congrats on beating the first level", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
-	this.game.ctx.fillText("Come back soon to experience new and glorious content,", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
-	this.game.ctx.fillText("For now though, care for another go?", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Kill all the Space Lice you can in the asteroid belt", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Once this is done, the Queen of the Space Lice will show herself.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Kill her too!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
 
 	Entity.prototype.draw.call(this);
 }
 
 VictoryStoryScroll1.prototype.update = function () {
+	this.lift += -1; //negative makes it go up
+	//this.narrow *= 2; //adjust to allow for in-to-screen scroll
+	if(this.lift === -1400 || this.game.menu) {
+		console.log("ended the scroll");
+		this.game.select = false;
+		this.isDone = true;
+		this.game.menu = true;
+		this.removeFromWorld = true;
+		this.game.sceneManager.reset();
+		this.game.sceneManager.currentScene = new SplashScene(this.game);
+	}
+	Entity.prototype.update.call(this);
+}
+
+
+///////////////////////level 2 victory scroll/////////////////////////////////////////
+function VictoryStoryScroll2(game) {
+	//is an entity but doesn't contain an animation
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Element";
+
+	this.x = 0;
+	this.y = 0;
+	this.width = 650; //max pixel width printed per line
+	this.lift = 0; //vertical lift factor
+	this.narrow = -1; //width scaler to send text into screen later
+	this.start = 800; //text starts off the bottom of the screen
+	this.offset = 50; //line height
+	this.removeFromWorld = false;
+	this.isDone = false;
+
+	Entity.call(this, this.game, this.x, this.y);
+}
+
+VictoryStoryScroll2.prototype.draw = function () {
+	var ctx = this.game.ctx;
+	ctx.font = "24pt Impact";
+	this.game.ctx.fillStyle = "Yellow";
+	this.line = 0;
+
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Press Esc for Main Menu", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 50 + this.offset + this.lift, 650);
+	this.game.ctx.fillText("Press Enter to Replay this level", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 100 + this.offset + this.lift, 650);
+	this.game.ctx.fillText("Victory", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.line++;
+	this.game.ctx.fillText("The Space Lice forces in the Asteroid belt have been all but annihilated.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("The Space Lice Queen is bound to be hiding inside one of the larger asteroids", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("Soon our scanning ships will find her, and we will send our greatest Ship to destroy her", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.line++;
+	this.game.ctx.fillText("Legends say the great Space Lice Queen is immune to all but the most powerful weapons", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("You will prove those legends wrong by killing the Human's precious ally", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("You will destroy the Space Lice Queen without mercy!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.line++;
+	this.game.ctx.fillText("When the Queen is gone, the Human forces will be weakened enough to mount an attack", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Go now, we've detected the Queen burrowed inside and asteroid known as 4 Vesta", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Kill the Queen and we will be one step closer to Justice for Pluto!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+
+	Entity.prototype.draw.call(this);
+}
+
+VictoryStoryScroll2.prototype.update = function () {
+	this.lift += -1; //negative makes it go up
+	//this.narrow *= 2; //adjust to allow for in-to-screen scroll
+	if(this.lift === -1400 || this.game.menu) {
+		console.log("ended the scroll");
+		this.game.select = false;
+		this.isDone = true;
+		this.game.menu = true;
+		this.removeFromWorld = true;
+		this.game.sceneManager.reset();
+		this.game.sceneManager.currentScene = new SplashScene(this.game);
+	}
+	Entity.prototype.update.call(this);
+}
+
+
+///////////////////////level 3 victory scroll/////////////////////////////////////////
+function VictoryStoryScroll3(game) {
+	//is an entity but doesn't contain an animation
+	this.game = game;
+	this.ctx = game.ctx;
+	this.name = "Element";
+
+	this.x = 0;
+	this.y = 0;
+	this.width = 650; //max pixel width printed per line
+	this.lift = 0; //vertical lift factor
+	this.narrow = -1; //width scaler to send text into screen later
+	this.start = 800; //text starts off the bottom of the screen
+	this.offset = 50; //line height
+	this.removeFromWorld = false;
+	this.isDone = false;
+
+	Entity.call(this, this.game, this.x, this.y);
+}
+
+VictoryStoryScroll3.prototype.draw = function () {
+	var ctx = this.game.ctx;
+	ctx.font = "24pt Impact";
+	this.game.ctx.fillStyle = "Yellow";
+	this.line = 0;
+
+	this.game.ctx.textAlign = "center";
+	this.game.ctx.fillText("Press Esc for Main Menu", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 50 + this.offset + this.lift, 650);
+	this.game.ctx.fillText("Press Enter to Replay this level", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 100 + this.offset + this.lift, 650);
+	this.game.ctx.fillText("Victory", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.line++;
+	this.game.ctx.fillText("The Queen of the Space lice is Dead", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("Hopefully with the death of their Great Queen, the space lice will stop fighting.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.game.ctx.fillText("Our scientists say the Humans were Controlling the Queen with evil Technology", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
+	this.line++;
+	this.game.ctx.fillText("Its typical earthling behavior to eslave and demote others.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Our forces have taken a beating while you were away from the front lines Killing the Queen", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("With your Return to the front lines however we are confident earth will Fall", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.line++;
+	this.game.ctx.fillText("The Humans are now without Allies in the Sol system", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Earth is weak, and it is time for them to pay for what they did to Pluto.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.game.ctx.fillText("Remember our rallying Cry: Earth Will Pay!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+	this.line++;
+	this.game.ctx.fillText("Thanks for playing, come back later for more content!", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650);
+
+	Entity.prototype.draw.call(this);
+}
+
+VictoryStoryScroll3.prototype.update = function () {
 	this.lift += -1; //negative makes it go up
 	//this.narrow *= 2; //adjust to allow for in-to-screen scroll
 	if(this.lift === -1400 || this.game.menu) {
