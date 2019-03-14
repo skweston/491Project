@@ -34,26 +34,29 @@ function SpaceStation(game, x, y, rock) {
 	this.powerLevel = -1;
 
 	//the spawns that the spawner 'owns'
-	this.chromaTimerReset = 500;
+	this.chromaTimerReset = 275;
 	this.chromaTimer = this.chromaTimerReset;
 	this.spawns = 0;
 	this.maxGatherers = 5;
 	this.gatherers = 0;
 	this.maxBuilders = 1;
 	this.builders = 0;
+
+	this.resourceIncr = 0;
 }
 SpaceStation.prototype = new Entity();
 SpaceStation.prototype.constructor = SpaceStation;
 
 SpaceStation.prototype.update = function () {
-
+	this.game.playerResources += this.resourceIncr;
     if(this.health < 1){
       this.removeFromWorld = true;
 	  this.asteroid.hasbase = false;
 	  this.asteroid.base = null;
+	  return;
 	}
 	if(this.health < this.maxHealth){
-		this.health += 0.5;
+		this.health += 1;
 	}
 
 //Shooting
@@ -126,6 +129,7 @@ SpaceStation.prototype.update = function () {
 
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
+		ent.resourceIncr = this.resourceIncr;
 		this.game.addEntity(ent);
 		this.builders++;
 		this.game.playerResources -=500;
@@ -340,25 +344,8 @@ MechanicalResourceGatherer.prototype.update = function () {
 		if(this.target){
 			this.target.isTargettedAlly = false;
 		}
-		for(var i = 0; i< 3; i++){
-			var scrap = new Scrap(this.game, 3);
-			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-			scrap.xMid = this.xMid;
-			scrap.yMid = this.yMid;
+		this.generateScrap(3,3);
 
-			this.game.addEntity(scrap);
-		}
-		//does it drop a powerup?
-		// if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
-		// 	var multishot = new Multishot(this.game);
-		// 	multishot.x = this.xMid - (multishot.pWidth * multishot.scale / 2);
-		// 	multishot.y = this.yMid - (multishot.pHeight * multishot.scale / 2);
-		// 	multishot.xMid = this.xMid;
-		// 	multishot.yMid = this.yMid;
-		//
-		// 	this.game.addEntity(multishot);
-		// }
 
 		this.removeFromWorld = true;
 	}
@@ -411,7 +398,7 @@ function PlayerBuilder(game, spawner) {
 
 
 	this.target = null;
-
+	this.resourceIncr = 0;
 
 }
 
@@ -473,6 +460,7 @@ PlayerBuilder.prototype.update = function () {
 	if (this.target && Collide(this, this.target) && !this.target.hasbase){
 		this.target.hasbase = true;
 		var base = new SpaceStation(this.game, this.target.x, this.target.y, this.target);
+		base.resourceIncr = this.resourceIncr;
 		this.target.base = base;
 		this.game.addEntity(base);
 
@@ -516,6 +504,7 @@ PlayerBuilder.prototype.update = function () {
 
 	//does it blow up when it dies?
 	if (this.removeFromWorld) {
+
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
 		this.spawner.builders--;
