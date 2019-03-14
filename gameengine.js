@@ -681,11 +681,23 @@ Entity.prototype.generateScrap = function (count, value){
 Entity.prototype.generateItem = function(bonusChance) {
 	var dice = Math.random() * 100 - bonusChance;
 
-	if (dice < 20) {
+	if (dice < 20 || LEVEL_THREE) {
 		dice = Math.random() * 100;
 
 		if (dice < 20) {
 			var powerUp = new HealthRefill(this.game);
+			if (this.game.ship.health === this.game.ship.healthMax) {
+				dice = Math.random() * 100;
+				if (dice < 30) {
+					var powerUp = new SpeedUp(this.game);
+				}
+				else if (dice < 60) {
+					var powerUp = new Multishot(this.game);
+				}
+				else {
+					var powerUp = new DamageUp(this.game);
+				}
+			}
 		}
 		else if (dice < 45) {
 			var powerUp = new SpeedUp(this.game);

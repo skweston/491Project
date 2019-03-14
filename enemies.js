@@ -1347,19 +1347,23 @@ function BossWorm(game, xIn, yIn) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
-	this.health = 100;
+	this.healthMax = 1000;
+	this.health = 1000;
 
 	// phase info
 	this.enter = false;
 	this.attack = false;
-	this.barrageTimer = 100 + Math.random() * 100;
+	this.attackMax = 20;
+	this.attackCooldown = 0;
 	this.barrage = false;
-	this.spawnTimer = 150 + Math.random() * 100;
 	this.spawn = false;
+	this.phase = 0;
 
-	this.target1 = null;
-	this.target2 = null;
-	this.target3 = null;
+	this.target1 = {xMid: this.game.ship.xMid, yMid: this.game.ship.yMid};
+	this.target2 = {xMid: 400, yMid: 0};
+	this.target2Dir = 1;
+	this.target3 = {xMid: 400, yMid: 800};
+	this.target3Dir = -1;
 
 	Entity.call(this, game, this.x, this.y);
 }
@@ -1376,19 +1380,36 @@ BossWorm.prototype.update = function () {
 	else {
 		this.enter = false;
 		this.attack = true;
-		this.barrageTimer--;
-		this.spawnTimer--;
-		if (this.barrageTimer < 1) {
-			this.barrageTimer = 100 + Math.random() * 100;
-			this.barragePhase = 100;
-			this.barrage = true;
-			this.attack = false;
-		}
-		else if (this.spawnTimer < 1) {
-			this.spawnTimer = 150 + Math.random() * 100;
-			this.spawnPhase = 100;
-			this.spawn = true;
-			this.attack = false;
+	}
+
+	// update targets
+	this.target1 = {xMid: this.game.ship.xMid, yMid: this.game.ship.yMid};
+	if (this.target2.yMid <= 0) {
+		this.target2Dir = 1;	// down
+	}
+	else if (this.target2.yMid >= 800) {
+		this.target2Dir = -1;	// up
+	}
+	if (this.target3.yMid <= 0) {
+		this.target3Dir = 1;
+	}
+	else if (this.target3.yMid >= 800) {
+		this.target3Dir = -1;
+	}
+
+	this.target2.yMid += 3 * this.target2Dir;
+	this.target3.yMid += 3 * this.target3Dir;
+
+	if (this.attack) {
+		this.attackCooldown--;
+		if (this.attackCooldown < 1) {
+			if (this.health <= this.healthMax / 2) {
+				this.attackMax = 10;
+			}
+			this.attackCooldown = this.attackMax;
+			this.createEnemyProjectile("Spit", this.target1, 0.5);
+			this.createEnemyProjectile("Spit", this.target2, 0.5);
+			this.createEnemyProjectile("Spit", this.target3, 0.5);
 		}
 	}
 
@@ -1422,11 +1443,11 @@ BossWorm.prototype.update = function () {
 
 		var count = 10;
 		for (var i = 0; i < count; i++) {
-			var ent = new Scourge(this.game, this.xMid - 100 + (Math.random() * 200), this.yMid - 100 + (Math.random() * 200), this);
+			var ent = new Scourge(this.game, this.xMid - 200 + (Math.random() * 400), this.yMid - 200 + (Math.random() * 400), this);
 			this.game.addEntity(ent);
 
 			if (i % 2 === 0) {
-				ent = new Leech(this.game, this.xMid - 100 + (Math.random() * 200), this.yMid - 100 + (Math.random() * 200), this);
+				ent = new Leech(this.game, this.xMid - 200 + (Math.random() * 400), this.yMid - 200 + (Math.random() * 400), this);
 				this.game.addEntity(ent);
 			}
 		}
@@ -1456,4 +1477,27 @@ BossWorm.prototype.draw = function () {
 	}
 
 	Entity.prototype.draw.call(this);
+}
+
+BossWorm.prototype.createEnemyProjectile = function(type, target, scale) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: target.xMid, yMid: target.yMid});
+	if (type === "Spit") {
+		var projectile = new Spit(this.game, scale);
+	}
+	var dx = target.xMid - this.xMid;
+	var dy = this.yMid - target.yMid;
+	var angle = -Math.atan2(dy,dx);
+
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+
+	projectile.x = this.xMid - projectile.pWidth * projectile.scale / 2;
+	projectile.y = this.yMid - projectile.pHeight * projectile.scale / 2;
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = Math.random() * 2 * Math.PI;
+
+	this.game.addEntity(projectile);
 }
