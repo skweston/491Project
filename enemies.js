@@ -809,7 +809,7 @@ function Leech(game, xIn, yIn, spawner) {
 	this.angle = 0;
 	this.spawner = spawner;
 	this.name = "Enemy";
-	this.speed = 0.2;
+	this.speed = 0.4;
 	this.maxSpeed = 0.1; // For resetting after ship rolls
 	this.x = xIn;
 	this.y = yIn;
@@ -819,8 +819,8 @@ function Leech(game, xIn, yIn, spawner) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
-	this.health = 40;
-	this.damage = 5;
+	this.health = 45;
+	this.damage = 15;
 	this.target = null;
 	this.scrapValue =
 
@@ -980,7 +980,7 @@ function Scourge(game, xIn, yIn, spawner) {
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
 	this.health = 20;
-	this.damage = 20;
+	this.damage = 15;
 	this.target = null;
 	//console.log("starting health: " + this.health);
 	Entity.call(this, game, this.x, this.y);
