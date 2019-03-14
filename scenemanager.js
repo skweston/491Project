@@ -355,6 +355,7 @@ TitleEffect.prototype.draw = function () {
 
 	this.game.ctx.textAlign = "center";
 	this.game.ctx.fillText("Super Plutonian Ace Command Earth Fighting Inter-Galactic Hero Team", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 400, 500);
+	this.game.ctx.fillText("W and S to move cursor: Enter to Select level", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 500, 400);
 
 	this.cursor = new Animation(AM.getAsset("./img/shipRollSpeed0.png"), 128, 128, 256, 0.03, 22, false, 0.5);
 
