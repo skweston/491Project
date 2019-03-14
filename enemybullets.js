@@ -91,7 +91,7 @@ function Spit(game, adjustScale) {
 	this.angle = 0;
 	this.lifetime = 500;
 	this.damage = 20 * adjustScale;
-	this.maxSpeed = 250;
+	this.maxSpeed = 200;
 	this.velocity = {x: 0, y: 0};
 	this.adjustScale = adjustScale;
 

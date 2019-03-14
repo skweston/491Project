@@ -1343,21 +1343,23 @@ function BossWorm(game, xIn, yIn) {
 	this.y = yIn;
 	this.xMid = (this.x + (this.pWidth * this.scale / 2));
 	this.yMid = (this.y + (this.pHeight * this.scale / 2));
-	this.radius = 200 * this.scale;
+	this.bodyXMid = (this.x + (150 * this.scale) + (this.pWidth * this.scale / 2));
+	this.bodyYMid = (this.y + (this.pHeight * this.scale / 2));
+	this.radius = 225 * this.scale;
+	this.bodyRad = 250 * this.scale;
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
-	this.healthMax = 1000;
-	this.health = 1000;
+	this.healthMax = 2000;
+	this.health = 2000;
 
 	// phase info
 	this.enter = false;
 	this.attack = false;
 	this.attackMax = 20;
 	this.attackCooldown = 0;
-	this.barrage = false;
-	this.spawn = false;
-	this.phase = 0;
+	this.spawnMax = 120;
+	this.spawnCooldown = 0;
 
 	this.target1 = {xMid: this.game.ship.xMid, yMid: this.game.ship.yMid};
 	this.target2 = {xMid: 400, yMid: 0};
@@ -1382,6 +1384,18 @@ BossWorm.prototype.update = function () {
 		this.attack = true;
 	}
 
+	// vertical movement to follow the ship
+	if (this.yMid < this.game.ship.yMid) {
+		if (this.game.ship.yMid - this.yMid > 10) {
+			this.y += 3;
+		}
+	}
+	else if (this.yMid > this.game.ship.yMid) {
+		if (this.yMid - this.game.ship.yMid > 10) {
+			this.y -= 3;
+		}
+	}
+
 	// update targets
 	this.target1 = {xMid: this.game.ship.xMid, yMid: this.game.ship.yMid};
 	if (this.target2.yMid <= 0) {
@@ -1400,22 +1414,41 @@ BossWorm.prototype.update = function () {
 	this.target2.yMid += 3 * this.target2Dir;
 	this.target3.yMid += 3 * this.target3Dir;
 
+	// update attacks based on health
+	if (this.health <= this.healthMax / 2) {
+		this.attackMax = 10;
+	}
+	if (this.health <= this.healthMax / 4) {
+		this.spawnMax = 60;
+	}
+
 	if (this.attack) {
 		this.attackCooldown--;
+		this.spawnCooldown--;
+
 		if (this.attackCooldown < 1) {
-			if (this.health <= this.healthMax / 2) {
-				this.attackMax = 10;
-			}
 			this.attackCooldown = this.attackMax;
-			this.createEnemyProjectile("Spit", this.target1, 0.5);
-			this.createEnemyProjectile("Spit", this.target2, 0.5);
-			this.createEnemyProjectile("Spit", this.target3, 0.5);
+			this.createEnemyProjectile("Spit", this.target1, 0.35);
+			this.createEnemyProjectile("Spit", this.target2, 0.35);
+			this.createEnemyProjectile("Spit", this.target3, 0.35);
+		}
+
+		if (this.spawnCooldown < 1) {
+			if (this.health <= this.healthMax * 3 / 4) {
+				this.spawnCooldown = this.spawnMax;
+				var ent = new Scourge(this.game, 1100,  150 + Math.random() * 500, this);
+				this.game.addEntity(ent);
+				ent = new Leech(this.game, 1100,  150 + Math.random() * 500, this);
+				this.game.addEntity(ent);
+			}
 		}
 	}
 
 	// update mid
 	this.xMid = (this.x + (this.pWidth * this.scale / 2));
 	this.yMid = (this.y + (this.pHeight * this.scale / 2));
+	this.bodyXMid = (this.x + (150 * this.scale) + (this.pWidth * this.scale / 2));
+	this.bodyYMid = (this.y + (this.pHeight * this.scale / 2));
 
 	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
 		var ent = this.game.playerProjectiles[i];
@@ -1433,6 +1466,12 @@ BossWorm.prototype.update = function () {
 				break;
 			}
 		}
+	}
+
+	var ent = this.game.ship;
+	if(Collide(this, ent) || Collide({radius: this.bodyRad, xMid: this.bodyXMid, yMid: this.bodyYMid}, ent)) {
+		ent.takeDamage(20);
+		this.takeDamage(20);
 	}
 
 	if(this.health < 1) {
@@ -1457,13 +1496,13 @@ BossWorm.prototype.update = function () {
 }
 
 BossWorm.prototype.draw = function () {
-	if (this.enter || this.spawn) {
+	if (this.enter) {
 		this.animation1.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 	}
-	if (this.attack) {
+	else if (this.health > this.healthMax / 2) {
 		this.animation2.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 	}
-	if (this.barrage) {
+	else {
 		this.animation3.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
 	}
 
@@ -1472,6 +1511,11 @@ BossWorm.prototype.draw = function () {
 		this.ctx.strokeStyle = "Red";
 		this.ctx.lineWidth = 1;
 		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+
+		this.ctx.beginPath();
+		this.ctx.arc(this.bodyXMid, this.bodyYMid, this.bodyRad * this.scale, 0, Math.PI * 2, false);
 		this.ctx.stroke();
 		this.ctx.closePath();
 	}

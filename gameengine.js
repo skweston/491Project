@@ -680,8 +680,11 @@ Entity.prototype.generateScrap = function (count, value){
 
 Entity.prototype.generateItem = function(bonusChance) {
 	var dice = Math.random() * 100 - bonusChance;
-
-	if (dice < 20 || LEVEL_THREE) {
+	if (LEVEL_THREE) {
+		dice -= 20;
+	}
+	
+	if (dice < 20) {
 		dice = Math.random() * 100;
 
 		if (dice < 20) {
