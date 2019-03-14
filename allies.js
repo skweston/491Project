@@ -53,9 +53,10 @@ SpaceStation.prototype.update = function () {
       this.removeFromWorld = true;
 	  this.asteroid.hasbase = false;
 	  this.asteroid.base = null;
+	  return;
 	}
 	if(this.health < this.maxHealth){
-		this.health += 0.5;
+		this.health += 1;
 	}
 
 //Shooting
@@ -503,7 +504,7 @@ PlayerBuilder.prototype.update = function () {
 
 	//does it blow up when it dies?
 	if (this.removeFromWorld) {
-		
+
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
 		this.spawner.builders--;
