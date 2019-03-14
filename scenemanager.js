@@ -705,6 +705,7 @@ function PrototypeLevel(game) {
 	this.entities.push(this.rock2);
 
 	this.enemySpaceStation = new AlienSpaceStation(this.game, 3000, 3000, this.rock2);
+	this.enemySpaceStation.resourceIncr = 1;
 	this.game.addEntity(this.enemySpaceStation);
 	this.entities.push(this.enemySpaceStation);
 

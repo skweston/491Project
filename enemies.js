@@ -48,12 +48,15 @@ function AlienSpaceStation(game, x, y, rock) {
 	this.gatherers = 0;
 	this.maxBuilders = 1;
 	this.builders = 0;
+
+	//
+	this.resourceIncr = 0;
 }
 AlienSpaceStation.prototype = new Entity();
 AlienSpaceStation.prototype.constructor = AlienSpaceStation;
 
 AlienSpaceStation.prototype.update = function () {
-	// this.game.enemyResources++;
+	this.game.enemyResources += this.resourceIncr;
     if(this.health < 1){
     	SCORE += 10;
     	this.removeFromWorld = true;
@@ -418,7 +421,7 @@ function AlienBuilder(game, spawner) {
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 ///////////Above this is MANDATORY for all entities////////////////////////
 //If it's killable
-	this.health = 100;
+	this.health = 150;
 
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;
@@ -662,7 +665,7 @@ function BossTurret(game, boss, xOffset, yOffset){
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
-    this.health = 150;
+    this.health = 100;
 	this.shootCooldown = 30;
 	this.missleCooldown = 1500;
 	this.shotCount = 0;
@@ -801,7 +804,7 @@ function Leech(game, xIn, yIn, spawner) {
 	this.angle = 0;
 	this.spawner = spawner;
 	this.name = "Enemy";
-	this.speed = 0.1;
+	this.speed = 0.2;
 	this.maxSpeed = 0.1; // For resetting after ship rolls
 	this.x = xIn;
 	this.y = yIn;
@@ -811,7 +814,7 @@ function Leech(game, xIn, yIn, spawner) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
-	this.health = 50;
+	this.health = 40;
 	this.damage = 5;
 	this.target = null;
 	this.scrapValue =
@@ -1173,7 +1176,7 @@ function Stalker(game, xIn, yIn, spawner){
 										//976, 0.1, 5, true, this.scale);
 		this.angle = 0;
 		this.name = "Enemy";
-		this.speed = 0.5;
+		this.speed = 0.45;
 		this.x = xIn;
 		this.y = yIn;
         this.spawner = spawner;
@@ -1183,7 +1186,7 @@ function Stalker(game, xIn, yIn, spawner){
 		this.game = game;
 		this.ctx = game.ctx;
 		this.removeFromWorld = false;
-		this.health = 100;
+		this.health = 70;
 		this.damage = 3;
 		this.shootCooldownReset = 40;
 		this.shootCooldown = this.shootCooldownReset;
