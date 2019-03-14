@@ -7,14 +7,15 @@ function SceneManager(game) {
 	//Always starts at title scene
 	console.log("Game Start");
 	this.currentScene = new SplashScene(this.game);
-	this.game.level = 1;
+	//to disable higher levels set this.game.level = 1
+	this.game.level = 3;
+	this.game.numOfBosses = 1;
 }
 
 SceneManager.prototype.constructor = SceneManager;
 
 SceneManager.prototype.reset = function () {
 	this.game.running = false;
-	//this.game.clicked = false;
 	this.game.playerResources = 0;
 	this.game.enemyResources = 0;
 	this.game.ship.health = 100;
@@ -56,18 +57,22 @@ SceneManager.prototype.update = function () {
 	}
 
 	//console.log("menu: " + this.game.menu);
-	if(this.game.clicked) {
-		this.game.clicked = false;
-		if(this.game.level === 1 && this.game.pointer === 1) {
+	if(this.game.select && this.currentScene.name != "Level") {
+		this.game.select = false;
+		if((this.game.level >= 1) && (this.game.pointer === 1)) {
+			console.log("tutorial");
 			this.changeScenes(new TutorialScene(this.game));
 		}
-		if(this.game.level === 1 && this.game.pointer === 2) {
+		if((this.game.level >= 1) && (this.game.pointer === 2)) {
+			console.log("level 1");
+			//this.changeScenes(new StoryScrollScene(this.game));
 			this.changeScenes(new Level1(this.game));
 		}
-		if(this.game.level === 2 && this.game.pointer === 3) {
-			//this.changeScenes(new Level2(this.game));
+		if(this.game.level >= 2 && this.game.pointer === 3) {
+			console.log("level 2");
+			this.changeScenes(new Level2(this.game));
 		}
-		if(this.game.level === 3 && this.game.pointer === 4) {
+		if(this.game.level >= 3 && this.game.pointer === 4) {
 			//this.changeScenes(new Level3(this.game));
 		}
 	} 
@@ -80,6 +85,7 @@ SceneManager.prototype.update = function () {
 }
 
 SceneManager.prototype.loadPlayer = function () {
+	this.game.ship.removeFromWorld = true;
 	this.game.running = true;
 	var ship = new TheShip(this.game);
 	var reticle = new Reticle(this.game);
@@ -93,12 +99,15 @@ SceneManager.prototype.loadPlayer = function () {
 SceneManager.prototype.changeScenes = function (newScene) {
 	//console.log("current: " + this.currentScene.name);
 	//console.log("new: " + newScene.name);
+	this.game.select = false;
 
 	for(var i = 0; i < this.currentScene.entities.length; i++) {
 		this.currentScene.entities[i].removeFromWorld = true;
+		this.currentScene.removeFromWorld = true;
 	}
 
 	this.currentScene = newScene;
+	this.game.addEntity(this.currentScene);
 }
 
 
@@ -660,7 +669,7 @@ HowTo.prototype.draw = function() {
 
 function StoryScrollScene(game) {
 	console.log("scroll");
-	this.name = "Scroll";
+	this.name = "Level";
 	this.game = game;
 	this.entities = [];
 	this.background = new MainBackground(this.game, AM.getAsset("./img/plutoSplashPixel.png"));
@@ -670,6 +679,10 @@ function StoryScrollScene(game) {
 	this.entities.push(this.scroll);
 	this.game.addEntity(this.scroll);
 }
+
+StoryScrollScene.prototype.draw = function () {}
+StoryScrollScene.prototype.update = function () {}
+
 
 function StoryScroll1(game) {
 	//is an entity but doesn't contain an animation
@@ -719,14 +732,16 @@ StoryScroll1.prototype.update = function () {
 	console.log("scroll update");
 	this.lift += -1; //negative makes it go up
 	//this.narrow *= 2; //adjust to allow for in-to-screen scroll
-	if(this.lift === -1400 || this.game.clicked) {
-		this.game.clicked = false;
+	if(this.lift === -1400 || this.game.select) {
+		this.game.select = false;
 		this.isDone = true;
 		//To test new level, swap level here.
 		this.removeFromWorld = true;
 		var level = new Level1(this.game);
+		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(level);
-		this.game.addEntity(level);
+		//this.game.addEntity(level);
+		//this.game.menu = true;
 	}
 
 	Entity.prototype.update.call(this);
@@ -828,6 +843,147 @@ function Level1(game) {
 }
 
 Level1.prototype.update = function(){
+	console.log("update");
+	//this.removeFromWorld = true;
+	//console.log("health: " + this.game.ship.health);
+	this.victory = false;
+
+	if (this.game.ship.health < 1){
+		console.log("dead");
+		this.victory = false;
+		this.game.sceneManager.reset();
+		this.game.sceneManager.changeScenes(new SplashScene(this.game));
+		return;
+	}
+
+	for(var i = 0; i < this.game.terrain.length; i++){
+		/*if(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy") {
+			//this.removeFromWorld = false;
+			console.log("I win!!");
+			this.victory = false;
+		}*/
+
+		//console.log("hasbase: " + this.game.terrain[i].hasbase);
+		//console.log("name: " + this.game.terrain[i].base.name);
+		//console.log("bosses: " + this.game.numOfBosses);
+
+
+		/*if((this.game.numOfBosses <= 0) || !(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy")) {
+			//this.removeFromWorld = false;
+			console.log("I win!!");
+			this.victory = true;
+		}*/
+	}
+
+	//if (this.removeFromWorld && !this.game.menu){
+	console.log("victory: " + this.victory);
+	if(this.victory) {
+		//this.game.level++;
+		this.game.sceneManager.reset();
+		//this.game.menu = true;
+		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
+	}
+}
+
+Level1.prototype.draw = function () {}
+Level1.prototype.constructor = Level1;
+
+function Level2(game) {
+	console.log("prototype");
+	this.name = "Level";
+	this.game = game;
+	this.bossTimerStart = 1000;
+	this.bossTimer = 0;
+	this.spawnNum = 1;
+	this.spawnTimerStart = 100;
+	this.counter = 0;
+
+	this.entities = [];
+	this.background = new MainBackground(this.game, AM.getAsset("./img/level1mainAlt.png"));
+	this.game.addEntity(this.background);
+	this.entities.push(this.background);
+	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));
+	this.game.addEntity(this.layer1);
+	this.entities.push(this.layer1);
+	// this.layer2 = new BackgroundLayer(this.game, AM.getAsset("./img/gasGiantsNebulaLayer.png"));
+	// this.game.addEntity(this.layer2);
+	// this.entities.push(this.layer2);
+	// this.layer2 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/BackgroundMedium.png"));
+	// this.game.addEntity(this.layer2);
+	// this.entities.push(this.layer2);
+	// this.layer3 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Starfield1-1.png"));
+	// this.game.addEntity(this.layer3);
+	// this.entities.push(this.layer3);
+	// this.layer4 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/BackgroundVariant.png"));
+	// this.game.addEntity(this.layer4);
+	// this.entities.push(this.layer4);
+
+	//this spawns and places the player base
+	this.rock1 = new Asteroid(this.game, 100, 100);
+	this.game.addEntity(this.rock1);
+	this.entities.push(this.rock1);
+
+	this.playerSpaceStation = new SpaceStation(this.game, 100, 100, this.rock1);
+	this.game.addEntity(this.playerSpaceStation);
+	this.entities.push(this.playerSpaceStation);
+
+	this.rock1.hasbase = true;
+	this.rock1.base = this.playerSpaceStation;
+
+
+	//this spawns the enemy base
+	this.rock2 = new Asteroid(this.game, 3000, 3000);
+	this.game.addEntity(this.rock2);
+	this.entities.push(this.rock2);
+
+	this.enemySpaceStation = new AlienSpaceStation(this.game, 3000, 3000, this.rock2);
+	this.game.addEntity(this.enemySpaceStation);
+	this.entities.push(this.enemySpaceStation);
+
+	this.rock2.hasbase = true;
+	this.rock2.base = this.enemySpaceStation;
+
+	var abuilder = new AlienBuilder(this.game, this.enemySpaceStation);
+	this.enemySpaceStation.builders = 1;
+	abuilder.x = 3500;
+	abuilder.y = 3500;
+	game.addEntity(abuilder);
+
+	//Neutral rock
+	this.rock3 = new Asteroid(this.game, 1600, 300);
+	this.game.addEntity(this.rock3);
+	this.entities.push(this.rock3);
+
+	//Neutral rock
+	this.rock4 = new Asteroid(this.game, 300, 1600);
+	this.game.addEntity(this.rock4);
+	this.entities.push(this.rock4);
+
+	//Neutral rock
+	this.rock5 = new Asteroid(this.game, 2700, 2300);
+	this.game.addEntity(this.rock5);
+	this.entities.push(this.rock5);
+
+	//Neutral rock
+	this.rock6 = new Asteroid(this.game, 2200, 3000);
+	this.game.addEntity(this.rock6);
+	this.entities.push(this.rock6);
+
+	//Neutral rock
+	this.rock7 = new Asteroid(this.game, 2400, 600);
+	this.game.addEntity(this.rock7);
+	this.entities.push(this.rock7);
+
+	this.game.playerResources = 700;
+	this.game.enemyResources = 1700;
+
+	this.hud = new HUD(this.game); //mandatory
+	this.game.addEntity(this.hud);
+	this.entities.push(this.hud);
+	this.game.sceneManager.loadPlayer(); //mandatory
+}
+
+Level2.prototype.update = function(){
 	//this.removeFromWorld = true;
 	//console.log("health: " + this.game.ship.health);
 	this.victory = true;
@@ -849,15 +1005,16 @@ Level1.prototype.update = function(){
 	}
 
 	//if (this.removeFromWorld && !this.game.menu){
-	// console.log("victory: " + this.victory);
-	if(this.victory) {
+	console.log("victory: " + this.victory);
+	/*if(this.victory) {
+		this.game.level++;
 		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
-	}
+	}*/
 }
 
-Level1.prototype.draw = function () {}
-Level1.prototype.constructor = Level1;
+Level2.prototype.draw = function () {}
+Level2.prototype.constructor = Level2;
 
 function VictoryScrollScene(game) {
 	this.name = "VictoryScroll";
@@ -870,9 +1027,9 @@ function VictoryScrollScene(game) {
 	this.entities.push(this.scroll);
 	this.game.addEntity(this.scroll);
 
-	for (var i = 0; i < this.game.levels.length; i++) {
+	/*for (var i = 0; i < this.game.levels.length; i++) {
 		this.game.levels[i].removeFromWorld = true;
-	}
+	}*/
 }
 
 function VictoryStoryScroll1(game) {
@@ -922,14 +1079,15 @@ VictoryStoryScroll1.prototype.draw = function () {
 VictoryStoryScroll1.prototype.update = function () {
 	this.lift += -1; //negative makes it go up
 	//this.narrow *= 2; //adjust to allow for in-to-screen scroll
-	if(this.lift === -1400 || this.game.clicked) {
-		this.game.clicked = false;
+	if(this.lift === -1400 || this.game.select) {
+		this.game.select = false;
 		this.isDone = true;
 		//To test new level, swap level here.
 		//this.removeFromWorld = true;
-		var level = new SplashScene(this.game);
+		/*var level = new SplashScene(this.game);
 		this.game.sceneManager.changeScenes(level);
-		this.game.addEntity(level);
+		this.game.addEntity(level);*/
+		this.game.menu = true;
 	}
 	Entity.prototype.update.call(this);
 }

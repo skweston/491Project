@@ -113,7 +113,7 @@ GameEngine.prototype.startInput = function () {
 		that.mouseX = (e.x - 7 + that.camera.x);
 		that.mouseY = (e.y - 7 + that.camera.y);
 		that.wasclicked = true;
-		// console.log(e);
+		console.log(e);
 		// console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
 	}, false);
 
@@ -215,7 +215,9 @@ GameEngine.prototype.startInput = function () {
 			that.roll = true;
 		}
 		if (e.code === "Enter") {
-			that.clicked = true;
+			that.select = true;
+			//that.clicked = true;
+			console.log(e);
 		}
 		if(e.code === "KeyP") {
 			if(that.paused === true) {

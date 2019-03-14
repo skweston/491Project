@@ -494,6 +494,7 @@ AlienBuilder.prototype.update = function () {
 		var base = new AlienSpaceStation(this.game, this.target.x, this.target.y, this.target);
 		this.target.base = base;
 		this.game.addEntity(base);
+		this.game.numOfBosses++;
 
 		this.removeFromWorld = true;
 

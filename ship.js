@@ -3,6 +3,7 @@
 /* ========================================================================================================== */
 
 function TheShip(game) {
+	//console.log("new ship");
 	this.game = game;
 	this.ctx = game.ctx;
 	this.pWidth = 128;
