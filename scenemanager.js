@@ -129,6 +129,7 @@ HUD.prototype.draw = function() {
 	if (LEVEL_THREE) {
 		this.level3Overlay.drawFrame(game.clockTick, this.ctx, -139, 0, 0);
 	}
+
 	// HUD top back panel
 	// this.game.ctx.fillStyle = "Black";
 	this.game.ctx.fillRect(this.game.camera.x + 16, this.game.camera.y + 16, 320, 32);
@@ -181,6 +182,20 @@ HUD.prototype.draw = function() {
 	this.rollIcon.drawFrame(this.game.clockTick, this.ctx, this.game.camera.x + 1104, this.game.camera.y + 16, 0);
 	this.game.ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
 	this.game.ctx.fillRect(this.game.camera.x + 1101, this.game.camera.y + 16, 70 * this.game.ship.rollCooldown / 100 + 1, 64);
+
+	if (LEVEL_THREE) {
+		this.game.ctx.fillStyle = "Black";
+		this.game.ctx.fillRect(this.game.camera.x + 300, this.game.camera.y + 736, 600, 48);
+		this.game.ctx.fillStyle = "DarkRed";
+		this.game.ctx.fillRect(this.game.camera.x + 302, this.game.camera.y + 738,
+							   596 * this.game.boss.health / this.game.boss.healthMax, 44);
+		this.game.ctx.font = "24pt Impact";
+		this.game.ctx.fillStyle = "White";
+		this.game.ctx.textAlign = "center";
+		this.game.ctx.fillText("BOSS NAME HERE LINE 195", this.game.camera.x + 600, this.game.camera.y + 773);
+		this.game.ctx.fillStyle = "Black";
+		this.game.ctx.strokeText("BOSS NAME HERE LINE 195", this.game.camera.x + 600, this.game.camera.y + 773);
+	}
 
 	//minimap logic
 	if (!LEVEL_THREE) {
@@ -279,11 +294,11 @@ HUD.prototype.draw = function() {
 		this.game.ctx.strokeText("-Press P to unpause-", this.game.camera.x + 600, this.game.camera.y + 456);
 	}
 
-	this.game.ctx.strokeStyle = "Red";
-	this.game.ctx.lineWidth = 2;
-	this.game.ctx.strokeRect(350, 725, 700, 200);
-	this.game.ctx.strokeRect(875, 650, 700, 200);
-	this.game.ctx.strokeRect(1100, 0, 700, 800);
+	// this.game.ctx.strokeStyle = "Red";
+	// this.game.ctx.lineWidth = 2;
+	// this.game.ctx.strokeRect(350, 725, 700, 200);
+	// this.game.ctx.strokeRect(875, 650, 700, 200);
+	// this.game.ctx.strokeRect(1100, 0, 700, 800);
 
 	Entity.prototype.draw.call(this);
 }
@@ -682,6 +697,7 @@ function LevelThree(game) {
 	this.boss = new BossWorm(this.game, 1200, 93);
 	this.game.addEntity(this.boss);
 	this.entities.push(this.boss);
+	this.game.boss = this.boss;
 
 	this.hud = new HUD(this.game); //mandatory
 	this.game.addEntity(this.hud);

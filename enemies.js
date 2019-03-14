@@ -1328,7 +1328,6 @@ Stalker.prototype.draw = function () {
 /* ========================================================================================================== */
 
 function BossWorm(game, xIn, yIn) {
-
 	this.pWidth = 1024;
 	this.pHeight = 1024;
 	this.scale = 0.60;
@@ -1350,8 +1349,8 @@ function BossWorm(game, xIn, yIn) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
-	this.healthMax = 2000;
-	this.health = 2000;
+	this.healthMax = 1500;
+	this.health = 1500;
 
 	// phase info
 	this.enter = false;
