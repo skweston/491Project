@@ -638,14 +638,18 @@ AM.downloadAll(function () {
 	var canvas = document.createElement('canvas');
 	var ctx = canvas.getContext("2d");
 
+
 	var gameEngine = new GameEngine();
 	gameEngine.ctx = ctx;
 	gameEngine.init(ctx, cameraCtx);
 	gameEngine.running = false;
 
+	
+	var sm = new SceneManager(gameEngine);
 	var ship = new TheShip(gameEngine);
 	var reticle = new Reticle(gameEngine);
-	var sm = new SceneManager(gameEngine);
+	
+
 
 	gameEngine.addEntity(ship);
 	gameEngine.addEntity(reticle);

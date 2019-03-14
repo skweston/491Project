@@ -65,8 +65,8 @@ SceneManager.prototype.update = function () {
 		}
 		if((this.game.level >= 1) && (this.game.pointer === 2)) {
 			console.log("level 1");
-			//this.changeScenes(new StoryScrollScene(this.game));
-			this.changeScenes(new Level1(this.game));
+			this.changeScenes(new StoryScrollScene(this.game));
+			//this.changeScenes(new Level1(this.game));
 		}
 		if(this.game.level >= 2 && this.game.pointer === 3) {
 			console.log("level 2");
@@ -85,6 +85,7 @@ SceneManager.prototype.update = function () {
 }
 
 SceneManager.prototype.loadPlayer = function () {
+	console.log("load player");
 	this.game.ship.removeFromWorld = true;
 	this.game.running = true;
 	var ship = new TheShip(this.game);
@@ -729,16 +730,17 @@ StoryScroll1.prototype.draw = function () {
 }
 
 StoryScroll1.prototype.update = function () {
-	console.log("scroll update");
+	//console.log("scroll update");
 	this.lift += -1; //negative makes it go up
 	//this.narrow *= 2; //adjust to allow for in-to-screen scroll
 	if(this.lift === -1400 || this.game.select) {
+		console.log("scroll 1 ended");
 		this.game.select = false;
 		this.isDone = true;
 		//To test new level, swap level here.
 		this.removeFromWorld = true;
-		var level = new Level1(this.game);
 		this.game.sceneManager.reset();
+		var level = new Level1(this.game);
 		this.game.sceneManager.changeScenes(level);
 		//this.game.addEntity(level);
 		//this.game.menu = true;
@@ -840,47 +842,28 @@ function Level1(game) {
 	this.game.addEntity(this.hud);
 	this.entities.push(this.hud);
 	this.game.sceneManager.loadPlayer(); //mandatory
+	console.log("level 1 created");
 }
 
 Level1.prototype.update = function(){
-	console.log("update");
-	//this.removeFromWorld = true;
-	//console.log("health: " + this.game.ship.health);
 	this.victory = false;
 
 	if (this.game.ship.health < 1){
-		console.log("dead");
+		//console.log("dead");
 		this.victory = false;
 		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(new SplashScene(this.game));
 		return;
 	}
 
-	for(var i = 0; i < this.game.terrain.length; i++){
-		/*if(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy") {
-			//this.removeFromWorld = false;
-			console.log("I win!!");
-			this.victory = false;
-		}*/
-
-		//console.log("hasbase: " + this.game.terrain[i].hasbase);
-		//console.log("name: " + this.game.terrain[i].base.name);
-		//console.log("bosses: " + this.game.numOfBosses);
-
-
-		/*if((this.game.numOfBosses <= 0) || !(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy")) {
-			//this.removeFromWorld = false;
-			console.log("I win!!");
-			this.victory = true;
-		}*/
+	if(this.game.numOfBosses <= 0) {
+		//console.log("All Bosses Defeated!");
+		this.victory = true;
 	}
 
-	//if (this.removeFromWorld && !this.game.menu){
-	console.log("victory: " + this.victory);
 	if(this.victory) {
-		//this.game.level++;
+		this.game.level++;
 		this.game.sceneManager.reset();
-		//this.game.menu = true;
 		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
 	}
 }
@@ -983,10 +966,8 @@ function Level2(game) {
 	this.game.sceneManager.loadPlayer(); //mandatory
 }
 
-Level2.prototype.update = function(){
-	//this.removeFromWorld = true;
-	//console.log("health: " + this.game.ship.health);
-	this.victory = true;
+Level2.prototype.update = function() {
+	this.victory = false;
 
 	if (this.game.ship.health < 1){
 		//console.log("dead");
@@ -996,21 +977,17 @@ Level2.prototype.update = function(){
 		return;
 	}
 
-	for(var i = 0; i < this.game.terrain.length; i++){
-
-		if(this.game.terrain[i].hasbase && this.game.terrain[i].base.name === "Enemy") {
-			//this.removeFromWorld = false;
-			this.victory = false;
-		}
+	if(this.game.numOfBosses <= 0) {
+		//console.log("All Bosses Defeated!");
+		this.victory = true;
 	}
 
-	//if (this.removeFromWorld && !this.game.menu){
-	console.log("victory: " + this.victory);
-	/*if(this.victory) {
+	if(this.victory) {
 		this.game.level++;
 		this.game.sceneManager.reset();
-		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
-	}*/
+		//change to new victory scroll here
+		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game)); 
+	}
 }
 
 Level2.prototype.draw = function () {}
@@ -1026,10 +1003,6 @@ function VictoryScrollScene(game) {
 	this.scroll = new VictoryStoryScroll1(this.game, this.leve);
 	this.entities.push(this.scroll);
 	this.game.addEntity(this.scroll);
-
-	/*for (var i = 0; i < this.game.levels.length; i++) {
-		this.game.levels[i].removeFromWorld = true;
-	}*/
 }
 
 function VictoryStoryScroll1(game) {
@@ -1082,12 +1055,8 @@ VictoryStoryScroll1.prototype.update = function () {
 	if(this.lift === -1400 || this.game.select) {
 		this.game.select = false;
 		this.isDone = true;
-		//To test new level, swap level here.
-		//this.removeFromWorld = true;
-		/*var level = new SplashScene(this.game);
-		this.game.sceneManager.changeScenes(level);
-		this.game.addEntity(level);*/
 		this.game.menu = true;
+		this.game.SceneManager.update();
 	}
 	Entity.prototype.update.call(this);
 }

@@ -217,7 +217,8 @@ GameEngine.prototype.startInput = function () {
 		if (e.code === "Enter") {
 			that.select = true;
 			//that.clicked = true;
-			console.log(e);
+			//console.log(e);
+			that.sceneManager.update();
 		}
 		if(e.code === "KeyP") {
 			if(that.paused === true) {
@@ -233,6 +234,7 @@ GameEngine.prototype.startInput = function () {
 		if(e.code === "Escape") {
 			//console.log("menu");
 			that.menu = true;
+			that.sceneManager.update();
 		}
 	}, false);
 
@@ -407,7 +409,7 @@ if(this.paused === false) {
 	// 	}
 	// }
 
-	this.sceneManager.update();
+	//this.sceneManager.update();
 
 	this.camera.update();
 	var count = this.background.length;

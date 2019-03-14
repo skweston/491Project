@@ -62,6 +62,7 @@ AlienSpaceStation.prototype.update = function () {
     	this.generateItem(25);
     	this.generateScrap(15, 13);
     	this.hasBeenDestroyed = true;
+    	this.game.numOfBosses--;
 
     	var explosion = new BloodyMess(this.game, this.x, this.y, (Math.random * 360) * Math.PI / 180, 5, this);
 		this.game.addEntity(explosion);
