@@ -170,6 +170,7 @@ AlienSpaceStation.prototype.update = function () {
 		var ent = new AlienBuilder(this.game, this);
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
+		ent.resourceIncr = this.resourceIncr;
 		this.game.addEntity(ent);
 		this.builders++;
 		this.game.enemyResources -=500;
@@ -436,7 +437,7 @@ function AlienBuilder(game, spawner) {
 
 
 	this.target = null;
-
+	this.resourceIncr = 0;
 
 }
 
@@ -498,6 +499,7 @@ AlienBuilder.prototype.update = function () {
 	if (this.target && Collide(this, this.target) && !this.target.hasbase){
 		this.target.hasbase = true;
 		var base = new AlienSpaceStation(this.game, this.target.x, this.target.y, this.target);
+		base.resourceIncr = this.resourceIncr;
 		this.target.base = base;
 		this.game.addEntity(base);
 

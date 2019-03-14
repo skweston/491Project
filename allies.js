@@ -34,7 +34,7 @@ function SpaceStation(game, x, y, rock) {
 	this.powerLevel = -1;
 
 	//the spawns that the spawner 'owns'
-	this.chromaTimerReset = 175;
+	this.chromaTimerReset = 275;
 	this.chromaTimer = this.chromaTimerReset;
 	this.spawns = 0;
 	this.maxGatherers = 5;
@@ -128,6 +128,7 @@ SpaceStation.prototype.update = function () {
 
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
+		ent.resourceIncr = this.resourceIncr;
 		this.game.addEntity(ent);
 		this.builders++;
 		this.game.playerResources -=500;
@@ -396,7 +397,7 @@ function PlayerBuilder(game, spawner) {
 
 
 	this.target = null;
-
+	this.resourceIncr = 0;
 
 }
 
@@ -458,6 +459,7 @@ PlayerBuilder.prototype.update = function () {
 	if (this.target && Collide(this, this.target) && !this.target.hasbase){
 		this.target.hasbase = true;
 		var base = new SpaceStation(this.game, this.target.x, this.target.y, this.target);
+		base.resourceIncr = this.resourceIncr;
 		this.target.base = base;
 		this.game.addEntity(base);
 

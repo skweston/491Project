@@ -694,7 +694,7 @@ function PrototypeLevel(game) {
 	this.playerSpaceStation = new SpaceStation(this.game, 300, 300, this.rock1);
 	this.game.addEntity(this.playerSpaceStation);
 	this.entities.push(this.playerSpaceStation);
-	this.playerSpaceStation.resourceIncr = .5;
+	this.playerSpaceStation.resourceIncr = .05;
 
 	this.rock1.hasbase = true;
 	this.rock1.base = this.playerSpaceStation;
@@ -706,7 +706,7 @@ function PrototypeLevel(game) {
 	this.entities.push(this.rock2);
 
 	this.enemySpaceStation = new AlienSpaceStation(this.game, 3000, 3000, this.rock2);
-	this.enemySpaceStation.resourceIncr = .5;
+	this.enemySpaceStation.resourceIncr = .35;
 	this.game.addEntity(this.enemySpaceStation);
 	this.entities.push(this.enemySpaceStation);
 
