@@ -31,18 +31,20 @@ function AlienSpaceStation(game, x, y, rock) {
 
 
 	//Specific to spawners:
-	this.gathererTimerReset = 200;
+	this.gathererTimerReset = 100;
 	this.generateGatherer = this.gathererTimerReset;
-	this.scourgeTimerReset = 75;
-	this.leechTimerReset = 100;
-	this.stalkerTimerReset = 125;
+	this.scourgeTimerReset = 175;
+	this.leechTimerReset = 200;
+	this.stalkerTimerReset = 305;
+	this.bossTimerReset = 1350;
 	this.scourgeTimer = 0;
 	this.leechTimer = 0;
 	this.stalkerTimer = 0;
+	this.bossTimer = 700;
 
 
 	//the spawns that the spawner 'owns'
-	this.maxSpawn = 25; // maybe make this a difficulty variable.
+	this.maxSpawn = 20; // maybe make this a difficulty variable.
 	this.spawns = 0;
 	this.maxGatherers = 5;
 	this.gatherers = 0;
@@ -151,10 +153,11 @@ AlienSpaceStation.prototype.update = function () {
 
 
     }
-	if (this.game.enemyResources > 750){
+	if (this.bossTimer < 0 && this.game.enemyResources > 650){
 		var ent = new Boss1(this.game);
 		this.game.addEntity(ent);
 		this.game.enemyResources -= 700;
+		this.bossTimer = this.bossTimerReset;
 	}
 	var asteroidfree = false;
 	for (var i = 0; i < this.game.terrain.length; i++){
@@ -163,7 +166,7 @@ AlienSpaceStation.prototype.update = function () {
 
 		}
 	}
-	if (asteroidfree && this.builders < this.maxBuilders && this.game.enemyResources > 500){
+	if (asteroidfree && this.builders < this.maxBuilders && this.game.enemyResources > 650){
 		var ent = new AlienBuilder(this.game, this);
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
@@ -266,7 +269,7 @@ function BiologicalResourceGatherer(game, spawner) {
 	this.removeFromWorld = false; //there needs to be SOME way to make this true;
 ///////////Above this is MANDATORY for all entities////////////////////////
 //If it's killable
-	this.health = 25;
+	this.health = 5;
 
 //this is for collision
 	this.xMid = this.x + (this.pWidth * this.scale) / 2;

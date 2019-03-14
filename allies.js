@@ -34,19 +34,21 @@ function SpaceStation(game, x, y, rock) {
 	this.powerLevel = -1;
 
 	//the spawns that the spawner 'owns'
-	this.chromaTimerReset = 500;
+	this.chromaTimerReset = 175;
 	this.chromaTimer = this.chromaTimerReset;
 	this.spawns = 0;
 	this.maxGatherers = 5;
 	this.gatherers = 0;
 	this.maxBuilders = 1;
 	this.builders = 0;
+
+	this.resourceIncr = 0;
 }
 SpaceStation.prototype = new Entity();
 SpaceStation.prototype.constructor = SpaceStation;
 
 SpaceStation.prototype.update = function () {
-
+	this.game.playerResources += this.resourceIncr;
     if(this.health < 1){
       this.removeFromWorld = true;
 	  this.asteroid.hasbase = false;
@@ -340,25 +342,8 @@ MechanicalResourceGatherer.prototype.update = function () {
 		if(this.target){
 			this.target.isTargettedAlly = false;
 		}
-		for(var i = 0; i< 3; i++){
-			var scrap = new Scrap(this.game, 3);
-			scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
-			scrap.y = this.yMid - (scrap.pHeight*scrap.scale /2);
-			scrap.xMid = this.xMid;
-			scrap.yMid = this.yMid;
+		this.generateScrap(3,3);
 
-			this.game.addEntity(scrap);
-		}
-		//does it drop a powerup?
-		// if (Math.random() * 100 < 20) { //the 20 here is the % chance it drops
-		// 	var multishot = new Multishot(this.game);
-		// 	multishot.x = this.xMid - (multishot.pWidth * multishot.scale / 2);
-		// 	multishot.y = this.yMid - (multishot.pHeight * multishot.scale / 2);
-		// 	multishot.xMid = this.xMid;
-		// 	multishot.yMid = this.yMid;
-		//
-		// 	this.game.addEntity(multishot);
-		// }
 
 		this.removeFromWorld = true;
 	}
