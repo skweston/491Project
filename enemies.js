@@ -20,7 +20,7 @@ function AlienSpaceStation(game, x, y, rock) {
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
-	this.maxHealth = 1000;
+	this.maxHealth = 750;
 	this.health = this.maxHealth;
 	this.hasBeenDestroyed = false;
 
@@ -33,10 +33,10 @@ function AlienSpaceStation(game, x, y, rock) {
 	//Specific to spawners:
 	this.gathererTimerReset = 100;
 	this.generateGatherer = this.gathererTimerReset;
-	this.scourgeTimerReset = 175;
-	this.leechTimerReset = 200;
-	this.stalkerTimerReset = 305;
-	this.bossTimerReset = 1350;
+	this.scourgeTimerReset = 275;
+	this.leechTimerReset = 300;
+	this.stalkerTimerReset = 435;
+	this.bossTimerReset = 2350;
 	this.scourgeTimer = 0;
 	this.leechTimer = 0;
 	this.stalkerTimer = 0;
@@ -67,6 +67,7 @@ AlienSpaceStation.prototype.update = function () {
     	this.generateItem(25);
     	this.generateScrap(15, 13);
     	this.hasBeenDestroyed = true;
+
 
     	var explosion = new BloodyMess(this.game, this.x, this.y, (Math.random * 360) * Math.PI / 180, 5, this);
 		this.game.addEntity(explosion);
@@ -128,7 +129,7 @@ AlienSpaceStation.prototype.update = function () {
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
 		this.spawns++;
-		this.game.enemyResources -=10;
+		this.game.enemyResources -=70;
 		this.scourgeTimer = this.scourgeTimerReset;
 	}
 	if (this.spawns < this.maxSpawn && this.leechTimer < 1 && this.game.enemyResources >= 20){
@@ -138,7 +139,7 @@ AlienSpaceStation.prototype.update = function () {
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
 		this.spawns++;
-		this.game.enemyResources -=20;
+		this.game.enemyResources -=15;
 		this.leechTimer = this.leechTimerReset;
 	}
     if (this.spawns < this.maxSpawn && this.stalkerTimer < 0 && this.game.enemyResources >= 50 ){
@@ -148,15 +149,16 @@ AlienSpaceStation.prototype.update = function () {
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		this.game.addEntity(ent);
 		this.spawns++;
-		this.game.enemyResources -=50;
+		this.game.enemyResources -=20;
 		this.stalkerTimer = this.stalkerTimerReset;
 
 
     }
-	if (this.bossTimer < 0 && this.game.enemyResources > 650){
+	if (this.bossTimer < 0 && this.game.enemyResources > 550){
 		var ent = new Boss1(this.game);
 		this.game.addEntity(ent);
-		this.game.enemyResources -= 700;
+		this.game.enemyResources -= 600;
+		this.bossTimerReset *=2;
 		this.bossTimer = this.bossTimerReset;
 	}
 	var asteroidfree = false;
@@ -166,27 +168,23 @@ AlienSpaceStation.prototype.update = function () {
 
 		}
 	}
-	if (asteroidfree && this.builders < this.maxBuilders && this.game.enemyResources > 650){
+	if (asteroidfree && this.builders < this.maxBuilders && this.game.enemyResources > 600){
 		var ent = new AlienBuilder(this.game, this);
 		ent.x = this.x + (this.pWidth * this.scale) / 2;
 		ent.y = this.y + (this.pHeight * this.scale) / 2;
 		ent.resourceIncr = this.resourceIncr;
 		this.game.addEntity(ent);
 		this.builders++;
-		this.game.enemyResources -=500;
+		this.bossTimerReset = this.bossTimerReset/2
+		this.game.enemyResources -=400;
 
 	}
 
-	if(this.game.enemyResources > 700){
-		var ent = new Boss1(this.game);
-		ent.x = this.x;
-		this.game.addEntity(ent);
-		this.game.enemyResources -=700;
-	}
 	this.generateGatherer -= 1;
 	this.scourgeTimer--;
 	this.leechTimer--;
 	this.stalkerTimer--;
+	this.bossTimer--;
 	this.angle += 0.000125;
 
 	for (var i = 0; i<this.game.playerProjectiles.length; i++){
@@ -204,6 +202,7 @@ AlienSpaceStation.prototype.update = function () {
 		}
 	}
 	if (this.removeFromWorld) {
+		this.game.enemyResources += 1000;
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
 	}
@@ -314,6 +313,7 @@ BiologicalResourceGatherer.prototype.update = function () {
 	//something likethis for an Effect
 	//this.lifetime--;
 	if (this.health < 1){
+		this.game.enemyResources += 10;
 		this.removeFromWorld = true;
 		return;
 	}
@@ -502,7 +502,7 @@ AlienBuilder.prototype.update = function () {
 		base.resourceIncr = this.resourceIncr;
 		this.target.base = base;
 		this.game.addEntity(base);
-
+		this.spawner.builders--;
 		this.removeFromWorld = true;
 
 	}
@@ -823,7 +823,7 @@ function Leech(game, xIn, yIn, spawner) {
 	this.game = game;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
-	this.health = 45;
+	this.health = 35;
 	this.damage = 15;
 	this.target = null;
 	this.scrapValue =
@@ -1195,7 +1195,7 @@ function Stalker(game, xIn, yIn, spawner){
 		this.game = game;
 		this.ctx = game.ctx;
 		this.removeFromWorld = false;
-		this.health = 70;
+		this.health = 55;
 		this.damage = 3;
 		this.shootCooldownReset = 40;
 		this.shootCooldown = this.shootCooldownReset;

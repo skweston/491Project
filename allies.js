@@ -503,6 +503,7 @@ PlayerBuilder.prototype.update = function () {
 
 	//does it blow up when it dies?
 	if (this.removeFromWorld) {
+		
 		var explosion = new SpaceExplosion(this.game, this.xMid, this.yMid, this.angle);
 		this.game.addEntity(explosion);
 		this.spawner.builders--;
