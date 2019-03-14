@@ -20,7 +20,7 @@ function AlienSpaceStation(game, x, y, rock) {
     this.game = game;
     this.ctx = game.ctx;
     this.removeFromWorld = false;
-	this.maxHealth = 1000;
+	this.maxHealth = 10;
 	this.health = this.maxHealth;
 	this.hasBeenDestroyed = false;
 

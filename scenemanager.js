@@ -19,6 +19,8 @@ SceneManager.prototype.reset = function () {
 	this.game.playerResources = 0;
 	this.game.enemyResources = 0;
 	this.game.ship.health = 100;
+	this.game.numOfBosses = 1;
+
 
 	for (var i = 0; i < this.game.player.length; i++) {
 		this.game.player[i].removeFromWorld = true;
@@ -46,6 +48,9 @@ SceneManager.prototype.reset = function () {
 	}
 	for (var i = 0; i < this.game.effects.length; i++) {
 		this.game.effects[i].removeFromWorld = true;
+	}
+	for (var i = 0; i < this.game.levels.length; i++) {
+		this.game.levels[i].removeFromWorld = true;
 	}
 }
 
@@ -75,7 +80,7 @@ SceneManager.prototype.update = function () {
 		if(this.game.level >= 3 && this.game.pointer === 4) {
 			//this.changeScenes(new Level3(this.game));
 		}
-	} 
+	}
 
 	if(this.game.menu) {
 		this.game.menu = false;
@@ -355,7 +360,7 @@ TitleEffect.prototype.draw = function () {
 
 	//This needs to flicker
 	this.game.ctx.fillText("Tutorial", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 600, 500);
-	this.game.ctx.fillText("Level 1", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 650, 500); 
+	this.game.ctx.fillText("Level 1", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 650, 500);
 	if(this.game.level > 1) {
 		this.game.ctx.fillText("Level 2", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 700, 500);
 	} else {
@@ -368,7 +373,7 @@ TitleEffect.prototype.draw = function () {
 		this.game.ctx.fillStyle = "Grey";
 		this.game.ctx.fillText("Level 3", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 750, 500);
 	}
-	
+
 	Entity.prototype.draw.call(this);
 }
 
@@ -385,7 +390,7 @@ function ShipCursor(game) {
 	this.pHeight = 128;
 	this.scale = 0.5;
 	this.animation = new Animation(AM.getAsset("./img/shipRollSpeed0.png"), this.pWidth, this.pHeight, 256, 0.03, 22, true, this.scale);
-	
+
 	//Start X/Y
 	this.x = 485;
 	this.y = 557;
@@ -416,7 +421,7 @@ ShipCursor.prototype.update = function () {
 			this.y -= 50;
 			this.game.pointer--;
 			//console.log(this.game.pointer);
-		}	
+		}
 	}
 
 	Entity.prototype.update.call(this);
@@ -676,7 +681,7 @@ function StoryScrollScene(game) {
 	this.background = new MainBackground(this.game, AM.getAsset("./img/plutoSplashPixel.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
-	this.scroll = new StoryScroll1(this.game, this.leve);
+	this.scroll = new StoryScroll1(this.game, this.level);
 	this.entities.push(this.scroll);
 	this.game.addEntity(this.scroll);
 }
@@ -758,6 +763,7 @@ function Level1(game) {
 	this.spawnNum = 1;
 	this.spawnTimerStart = 100;
 	this.counter = 0;
+	this.victory = false;
 
 	this.entities = [];
 	this.background = new MainBackground(this.game, AM.getAsset("./img/level1mainAlt.png"));
@@ -865,6 +871,7 @@ Level1.prototype.update = function(){
 		this.game.level++;
 		this.game.sceneManager.reset();
 		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
+
 	}
 }
 
@@ -986,7 +993,7 @@ Level2.prototype.update = function() {
 		this.game.level++;
 		this.game.sceneManager.reset();
 		//change to new victory scroll here
-		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game)); 
+		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game));
 	}
 }
 
@@ -1031,7 +1038,8 @@ VictoryStoryScroll1.prototype.draw = function () {
 	this.line = 0;
 
 	this.game.ctx.textAlign = "center";
-	this.game.ctx.fillText("Press Enter to Skip", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 50 + this.offset + this.lift, 650);
+	this.game.ctx.fillText("Press Esc for Main Menu", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 50 + this.offset + this.lift, 650);
+	this.game.ctx.fillText("Press Enter to Replay this level", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + 100 + this.offset + this.lift, 650);
 	this.game.ctx.fillText("Victory", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
 	this.line++;
 	this.game.ctx.fillText("Victory in the Kuiper Belt over the space lice was not without losses.", this.game.camera.x + this.game.cameraCtx.canvas.width/2, this.game.camera.y + this.start + (this.offset * this.line++) + this.lift, 650 + this.narrow);
@@ -1052,11 +1060,14 @@ VictoryStoryScroll1.prototype.draw = function () {
 VictoryStoryScroll1.prototype.update = function () {
 	this.lift += -1; //negative makes it go up
 	//this.narrow *= 2; //adjust to allow for in-to-screen scroll
-	if(this.lift === -1400 || this.game.select) {
+	if(this.lift === -1400 || this.game.menu) {
+		console.log("ended the scroll");
 		this.game.select = false;
 		this.isDone = true;
 		this.game.menu = true;
-		this.game.SceneManager.update();
+		this.removeFromWorld = true;
+		this.game.sceneManager.reset();
+		this.game.sceneManager.currentScene = new SplashScene(this.game);
 	}
 	Entity.prototype.update.call(this);
 }
