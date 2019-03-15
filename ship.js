@@ -2,7 +2,8 @@
 // The Ship
 /* ========================================================================================================== */
 
-function TheShip(game, xIn, yIn) {
+function TheShip(game) {
+	//console.log("new ship");
 	this.game = game;
 	this.ctx = game.ctx;
 	this.pWidth = 128;
@@ -30,7 +31,7 @@ function TheShip(game, xIn, yIn) {
 	this.orbiterAnimation = new Animation(AM.getAsset("./img/shipSecondary3.png"), this.pWidth, this.pHeight, 768, 0.15, 6, true, 0.3);
 	this.damage1Animation = new Animation(AM.getAsset("./img/shipDamage1.png"), this.pWidth, this.pHeight, 384, 0.1, 3, true, 2);
 	this.damage2Animation = new Animation(AM.getAsset("./img/shipDamage2.png"), this.pWidth, this.pHeight, 384, 0.1, 3, true, 2);
-	
+
 	if (DEBUG) {
 		this.invincible = true;
 	}
@@ -49,8 +50,8 @@ function TheShip(game, xIn, yIn) {
 	this.rollDuration = 0.03 * 22;
 	this.rollTime = 0;
 	this.rollCooldown = 0;
-	this.x = xIn;
-	this.y = yIn;
+	this.x = this.game.cameraCtx.canvas.width/2 - (this.pWidth * this.scale / 2);
+	this.y = this.game.cameraCtx.canvas.height/2 - (this.pHeight * this.scale / 2);
 	this.xMid = (this.x + (this.pWidth * this.scale / 2)) - 1;
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 	this.radius = 32 * this.scale;
@@ -81,6 +82,7 @@ function TheShip(game, xIn, yIn) {
 
 	// miscellaneous
 	this.boostGainRate = 1;
+	//this.boostConsumeRate = 2;
 	this.boostConsumeRate = 2;
 	this.bombAmmo = 0;
 
@@ -101,7 +103,7 @@ TheShip.prototype.update = function () {
 	// boosting
 	this.speed = 0.5;
 	this.boosting = false;
-	if (this.game.boost && this.boost > 0) {
+	if (this.game.boost && this.boost > 1) {
 		this.cancelBoost = false;
 		this.boosting = true;
 		this.speed = 1;
@@ -170,20 +172,20 @@ TheShip.prototype.update = function () {
 	}
 	if (xMove === 0) {
 		this.y += yMove;
-		if(!LEVEL_THREE && this.game.camera.isScrolling){
+		if(!BOSS_LEVEL && this.game.camera.isScrolling){
 			this.game.mouseY += yMove;
 		}
 	}
 	else if (yMove === 0) {
 		this.x += xMove;
-		if(!LEVEL_THREE && this.game.camera.isScrolling){
+		if(!BOSS_LEVEL && this.game.camera.isScrolling){
 			this.game.mouseX += xMove;
 		}
 	}
 	else {
 		this.x += xMove * 0.7;
 		this.y += yMove * 0.7;
-		if(!LEVEL_THREE && this.game.camera.isScrolling){
+		if(!BOSS_LEVEL && this.game.camera.isScrolling){
 			this.game.mouseX += xMove * 0.7;
 	 		this.game.mouseY += yMove * 0.7;
 		}

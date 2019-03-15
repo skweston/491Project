@@ -113,7 +113,7 @@ GameEngine.prototype.startInput = function () {
 		that.mouseX = (e.x - 7 + that.camera.x);
 		that.mouseY = (e.y - 7 + that.camera.y);
 		that.wasclicked = true;
-		// console.log(e);
+		console.log(e);
 		// console.log("Left Click Event - X,Y " + e.clientX + ", " + e.clientY);
 	}, false);
 
@@ -215,7 +215,10 @@ GameEngine.prototype.startInput = function () {
 			that.roll = true;
 		}
 		if (e.code === "Enter") {
-			that.clicked = true;
+			that.select = true;
+			//that.clicked = true;
+			//console.log(e);
+			that.sceneManager.update();
 		}
 		if(e.code === "KeyP") {
 			if(that.paused === true) {
@@ -231,6 +234,7 @@ GameEngine.prototype.startInput = function () {
 		if(e.code === "Escape") {
 			//console.log("menu");
 			that.menu = true;
+			that.sceneManager.update();
 		}
 	}, false);
 
@@ -405,7 +409,7 @@ if(this.paused === false) {
 	// 	}
 	// }
 
-	this.sceneManager.update();
+	//this.sceneManager.update();
 
 	this.camera.update();
 	var count = this.background.length;
@@ -664,7 +668,7 @@ Entity.prototype.takeDamage = function(damage) {
 	}
 }
 Entity.prototype.generateScrap = function (count, value){
-	if (LEVEL_THREE) {
+	if (BOSS_LEVEL) {
 		return;
 	}
 	for(var i = 0; i < count; i++){
@@ -680,15 +684,17 @@ Entity.prototype.generateScrap = function (count, value){
 
 Entity.prototype.generateItem = function(bonusChance) {
 	var dice = Math.random() * 100 - bonusChance;
-	if (LEVEL_THREE) {
-		dice -= 20;
+
+	if (BOSS_LEVEL) {
+		dice -= 40;
 	}
-	
+
 	if (dice < 20) {
 		dice = Math.random() * 100;
 
 		if (dice < 20) {
 			var powerUp = new HealthRefill(this.game);
+
 			if (this.game.ship.health === this.game.ship.healthMax) {
 				dice = Math.random() * 100;
 				if (dice < 30) {

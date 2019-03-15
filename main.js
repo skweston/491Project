@@ -573,7 +573,6 @@ AM.queueDownload("./img/hudHomingIcon.png");
 AM.queueDownload("./img/hudChargeIcon.png");
 AM.queueDownload("./img/hudOrbiterIcon.png");
 
-
 //Allies
 AM.queueDownload("./img/allyDrone.png");
 AM.queueDownload("./img/allyShip1.png");
@@ -613,7 +612,6 @@ AM.queueDownload("./img/enemySpitProjectileHit.png");
 AM.queueDownload("./img/bossWorm1.png");
 AM.queueDownload("./img/bossWorm2.png");
 AM.queueDownload("./img/bossWorm3.png");
-AM.queueDownload("./img/boss.png");
 
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");
@@ -643,14 +641,18 @@ AM.downloadAll(function () {
 	var canvas = document.createElement('canvas');
 	var ctx = canvas.getContext("2d");
 
+
 	var gameEngine = new GameEngine();
 	gameEngine.ctx = ctx;
 	gameEngine.init(ctx, cameraCtx);
 	gameEngine.running = false;
 
-	var ship = new TheShip(gameEngine, 0, 0);
-	var reticle = new Reticle(gameEngine);
+	
 	var sm = new SceneManager(gameEngine);
+	var ship = new TheShip(gameEngine);
+	var reticle = new Reticle(gameEngine);
+	
+
 
 	gameEngine.addEntity(ship);
 	gameEngine.addEntity(reticle);
