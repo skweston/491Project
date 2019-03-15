@@ -285,16 +285,16 @@ GameEngine.prototype.addEntity = function (entity) {
 	// console.log('added entity');
 	// this.entities.push(entity);
 
-	if(entity.name == "Element") {
+	if(entity.name === "Element") {
 		this.elements.push(entity);
 	}
-	if(entity.name == "Ally") {
+	if(entity.name === "Ally") {
 		this.allies.push(entity);
 	}
-	if(entity.name == "Terrain") {
+	if(entity.name === "Terrain") {
 		this.terrain.push(entity);
 	}
-	if(entity.name == "Reticle") {
+	if(entity.name === "Reticle") {
 		this.reticle.push(entity);
 	}
 	if (entity.name === "Level") {
