@@ -914,7 +914,7 @@ function Level2(game) {
 	BOSS_LEVEL = false;
 
 	this.entities = [];
-	this.background = new MainBackground(this.game, AM.getAsset("./img/level1mainAlt.png"));
+	this.background = new MainBackground(this.game, AM.getAsset("./img/asteroidNebula.png"));
 	this.game.addEntity(this.background);
 	this.entities.push(this.background);
 	this.layer1 = new BackgroundLayer(this.game, AM.getAsset("./img/PScroll1/Background3k.png"));

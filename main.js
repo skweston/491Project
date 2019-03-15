@@ -632,7 +632,7 @@ AM.queueDownload("./img/plutoSplashPixel.png");
 //AM.queueDownload("./img/splash.png")
 AM.queueDownload("./img/splash.png");
 AM.queueDownload("./img/TutorialSceneLines.png");
-
+AM.queueDownload("./img/asteroidNebula.png");
 
 AM.downloadAll(function () {
 	console.log("starting up da sheild");
@@ -647,11 +647,11 @@ AM.downloadAll(function () {
 	gameEngine.init(ctx, cameraCtx);
 	gameEngine.running = false;
 
-	
+
 	var sm = new SceneManager(gameEngine);
 	var ship = new TheShip(gameEngine);
 	var reticle = new Reticle(gameEngine);
-	
+
 
 
 	gameEngine.addEntity(ship);
