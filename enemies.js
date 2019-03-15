@@ -1337,3 +1337,225 @@ Stalker.prototype.draw = function () {
 
 	Entity.prototype.draw.call(this);
 }
+
+/* ========================================================================================================== */
+// Boss Worm
+/* ========================================================================================================== */
+
+function BossWorm(game, xIn, yIn) {
+	this.pWidth = 1024;
+	this.pHeight = 1024;
+	this.scale = 0.60;
+	this.animation1 = new Animation(AM.getAsset("./img/bossWorm1.png"), this.pWidth, this.pHeight, 9216, 0.15, 9, true, this.scale);
+	this.animation2 = new Animation(AM.getAsset("./img/bossWorm2.png"), this.pWidth, this.pHeight, 9216, 0.15, 9, true, this.scale);
+	this.animation3 = new Animation(AM.getAsset("./img/bossWorm3.png"), this.pWidth, this.pHeight, 9216, 0.15, 9, true, this.scale);
+
+	this.angle = 0;
+	this.name = "Enemy";
+	this.speed = 1;
+	this.x = xIn;
+	this.y = yIn;
+	this.xMid = (this.x + (this.pWidth * this.scale / 2));
+	this.yMid = (this.y + (this.pHeight * this.scale / 2));
+	this.bodyXMid = (this.x + (150 * this.scale) + (this.pWidth * this.scale / 2));
+	this.bodyYMid = (this.y + (this.pHeight * this.scale / 2));
+	this.radius = 225 * this.scale;
+	this.bodyRad = 250 * this.scale;
+	this.game = game;
+	this.ctx = game.ctx;
+	this.removeFromWorld = false;
+	this.healthMax = 1500;
+	this.health = 1500;
+
+	// phase info
+	this.enter = false;
+	this.attack = false;
+	this.attackMax = 20;
+	this.attackCooldown = 0;
+	this.spawnMax = 120;
+	this.spawnCooldown = 0;
+
+	this.target1 = {xMid: this.game.ship.xMid, yMid: this.game.ship.yMid};
+	this.target2 = {xMid: 600, yMid: 0};
+	this.target2Dir = 1;
+	this.target3 = {xMid: 600, yMid: 800};
+	this.target3Dir = -1;
+
+	Entity.call(this, game, this.x, this.y);
+}
+
+BossWorm.prototype = new Entity();
+BossWorm.prototype.constructor = BossWorm;
+
+BossWorm.prototype.update = function () {
+	// move
+	if (this.x > 650) {
+		this.x -= 10 * this.speed;
+		this.enter = true;
+	}
+	else {
+		this.enter = false;
+		this.attack = true;
+	}
+
+	// vertical movement to follow the ship
+	if (this.yMid < this.game.ship.yMid) {
+		if (this.game.ship.yMid - this.yMid > 10) {
+			this.y += 3;
+		}
+	}
+	else if (this.yMid > this.game.ship.yMid) {
+		if (this.yMid - this.game.ship.yMid > 10) {
+			this.y -= 3;
+		}
+	}
+
+	// update targets
+	this.target1 = {xMid: this.game.ship.xMid, yMid: this.game.ship.yMid};
+	if (this.target2.yMid <= 0) {
+		this.target2Dir = 1;	// down
+	}
+	else if (this.target2.yMid >= 800) {
+		this.target2Dir = -1;	// up
+	}
+	if (this.target3.yMid <= 0) {
+		this.target3Dir = 1;
+	}
+	else if (this.target3.yMid >= 800) {
+		this.target3Dir = -1;
+	}
+
+	this.target2.yMid += 3 * this.target2Dir;
+	this.target3.yMid += 3 * this.target3Dir;
+
+	// update attacks based on health
+	if (this.health <= this.healthMax / 2) {
+		this.attackMax = 10;
+	}
+	if (this.health <= this.healthMax / 4) {
+		this.spawnMax = 60;
+	}
+
+	if (this.attack) {
+		this.attackCooldown--;
+		this.spawnCooldown--;
+
+		if (this.attackCooldown < 1) {
+			this.attackCooldown = this.attackMax;
+			this.createEnemyProjectile("Spit", this.target1, 0.35);
+			this.createEnemyProjectile("Spit", this.target2, 0.35);
+			this.createEnemyProjectile("Spit", this.target3, 0.35);
+		}
+
+		if (this.spawnCooldown < 1) {
+			if (this.health <= this.healthMax * 3 / 4) {
+				this.spawnCooldown = this.spawnMax;
+				var ent = new Scourge(this.game, 1100,  150 + Math.random() * 500, this);
+				this.game.addEntity(ent);
+				ent = new Leech(this.game, 1100,  150 + Math.random() * 500, this);
+				this.game.addEntity(ent);
+			}
+		}
+	}
+
+	// update mid
+	this.xMid = (this.x + (this.pWidth * this.scale / 2));
+	this.yMid = (this.y + (this.pHeight * this.scale / 2));
+	this.bodyXMid = (this.x + (150 * this.scale) + (this.pWidth * this.scale / 2));
+	this.bodyYMid = (this.y + (this.pHeight * this.scale / 2));
+
+	for (var i = 0; i < this.game.playerProjectiles.length; i++ ) {
+		var ent = this.game.playerProjectiles[i];
+		if (Collide(this, ent)) {
+			this.takeDamage(ent.damage);
+			if (!ent.pierce) {
+				ent.removeFromWorld = true;
+				var splatter = new BloodSplatter(this.game,
+												 this.xMid - (this.pWidth * this.scale / 2) + Math.random() * this.pWidth,
+												 this.yMid - (this.pHeight * this.scale / 2) + Math.random() * this.pHeight,
+												 Math.random() * 360 * Math.PI / 180);
+				this.game.addEntity (splatter);
+			}
+			if (this.health < 1) {
+				break;
+			}
+		}
+	}
+
+	var ent = this.game.ship;
+	if(Collide(this, ent) || Collide({radius: this.bodyRad, xMid: this.bodyXMid, yMid: this.bodyYMid}, ent)) {
+		ent.takeDamage(20);
+		this.takeDamage(20);
+	}
+
+	if(this.health < 1) {
+		SCORE += 100;
+		this.removeFromWorld = true;
+		var explosion = new BloodyMess(this.game, this.x, this.y, (Math.random * 360) * Math.PI / 180, 7, this);
+		this.game.addEntity(explosion);
+
+		var count = 10;
+		for (var i = 0; i < count; i++) {
+			var ent = new Scourge(this.game, this.xMid - 200 + (Math.random() * 400), this.yMid - 200 + (Math.random() * 400), this);
+			this.game.addEntity(ent);
+
+			if (i % 2 === 0) {
+				ent = new Leech(this.game, this.xMid - 200 + (Math.random() * 400), this.yMid - 200 + (Math.random() * 400), this);
+				this.game.addEntity(ent);
+			}
+		}
+	}
+
+	Entity.prototype.update.call(this);
+}
+
+BossWorm.prototype.draw = function () {
+	if (this.enter) {
+		this.animation1.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	else if (this.health > this.healthMax / 2) {
+		this.animation2.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+	else {
+		this.animation3.drawFrame(this.game.clockTick, this.ctx, this.x, this.y, this.angle);
+	}
+
+	if (SHOW_HITBOX) {
+		this.ctx.beginPath();
+		this.ctx.strokeStyle = "Red";
+		this.ctx.lineWidth = 1;
+		this.ctx.arc(this.xMid, this.yMid, this.radius * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+
+		this.ctx.beginPath();
+		this.ctx.arc(this.bodyXMid, this.bodyYMid, this.bodyRad * this.scale, 0, Math.PI * 2, false);
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
+
+	Entity.prototype.draw.call(this);
+}
+
+BossWorm.prototype.createEnemyProjectile = function(type, target, scale) {
+	var dist = 1000 * distance({xMid: this.xMid, yMid: this.yMid},
+							   {xMid: target.xMid, yMid: target.yMid});
+	if (type === "Spit") {
+		var projectile = new Spit(this.game, scale);
+	}
+	var dx = target.xMid - this.xMid;
+	var dy = this.yMid - target.yMid;
+	var angle = -Math.atan2(dy,dx);
+
+	var target = {x: Math.cos(angle) * dist + this.xMid,
+				  y: Math.sin(angle) * dist + this.yMid};
+	var dir = direction(target, {x: this.xMid, y: this.yMid});
+
+	projectile.x = this.xMid - projectile.pWidth * projectile.scale / 2;
+	projectile.y = this.yMid - projectile.pHeight * projectile.scale / 2;
+	projectile.velocity.x = dir.x * projectile.maxSpeed;
+	projectile.velocity.y = dir.y * projectile.maxSpeed;
+	projectile.angle = Math.random() * 2 * Math.PI;
+
+	this.game.addEntity(projectile);
+}

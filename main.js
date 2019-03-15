@@ -523,6 +523,9 @@ AM.queueDownload("./img/PScroll1/BackgroundVariant.png");
 AM.queueDownload("./img/PScroll1/Starfield1-1.png");
 AM.queueDownload("./img/PScroll1/Background3k.png");
 
+AM.queueDownload("./img/levelThreeBackground.png");
+AM.queueDownload("./img/levelThreeForeground.png");
+
 AM.queueDownload("./img/BloodSplatter.png");
 
 // ship stuff
@@ -570,7 +573,6 @@ AM.queueDownload("./img/hudHomingIcon.png");
 AM.queueDownload("./img/hudChargeIcon.png");
 AM.queueDownload("./img/hudOrbiterIcon.png");
 
-
 //Allies
 AM.queueDownload("./img/allyDrone.png");
 AM.queueDownload("./img/allyShip1.png");
@@ -607,8 +609,9 @@ AM.queueDownload("./img/enemyQueenDeath.png");
 AM.queueDownload("./img/enemyBase.png");
 AM.queueDownload("./img/enemySpitProjectile.png");
 AM.queueDownload("./img/enemySpitProjectileHit.png");
-
-
+AM.queueDownload("./img/bossWorm1.png");
+AM.queueDownload("./img/bossWorm2.png");
+AM.queueDownload("./img/bossWorm3.png");
 
 AM.queueDownload("./img/Boss1.png");
 AM.queueDownload("./img/BossTurret.png");

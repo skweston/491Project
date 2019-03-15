@@ -172,20 +172,20 @@ TheShip.prototype.update = function () {
 	}
 	if (xMove === 0) {
 		this.y += yMove;
-		if(this.game.camera.isScrolling){
+		if(!BOSS_LEVEL && this.game.camera.isScrolling){
 			this.game.mouseY += yMove;
 		}
 	}
 	else if (yMove === 0) {
 		this.x += xMove;
-		if(this.game.camera.isScrolling){
+		if(!BOSS_LEVEL && this.game.camera.isScrolling){
 			this.game.mouseX += xMove;
 		}
 	}
 	else {
 		this.x += xMove * 0.7;
 		this.y += yMove * 0.7;
-		if(this.game.camera.isScrolling){
+		if(!BOSS_LEVEL && this.game.camera.isScrolling){
 			this.game.mouseX += xMove * 0.7;
 	 		this.game.mouseY += yMove * 0.7;
 		}

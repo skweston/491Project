@@ -668,6 +668,9 @@ Entity.prototype.takeDamage = function(damage) {
 	}
 }
 Entity.prototype.generateScrap = function (count, value){
+	if (BOSS_LEVEL) {
+		return;
+	}
 	for(var i = 0; i < count; i++){
 		var scrap = new Scrap(this.game, value);
 		scrap.x = this.xMid - (scrap.pWidth*scrap.scale /2);
@@ -682,11 +685,28 @@ Entity.prototype.generateScrap = function (count, value){
 Entity.prototype.generateItem = function(bonusChance) {
 	var dice = Math.random() * 100 - bonusChance;
 
+	if (BOSS_LEVEL) {
+		dice -= 40;
+	}
+
 	if (dice < 20) {
 		dice = Math.random() * 100;
 
 		if (dice < 20) {
 			var powerUp = new HealthRefill(this.game);
+
+			if (this.game.ship.health === this.game.ship.healthMax) {
+				dice = Math.random() * 100;
+				if (dice < 30) {
+					var powerUp = new SpeedUp(this.game);
+				}
+				else if (dice < 60) {
+					var powerUp = new Multishot(this.game);
+				}
+				else {
+					var powerUp = new DamageUp(this.game);
+				}
+			}
 		}
 		else if (dice < 45) {
 			var powerUp = new SpeedUp(this.game);
