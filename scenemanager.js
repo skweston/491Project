@@ -892,7 +892,7 @@ Level1.prototype.update = function(){
 	if(this.victory) {
 		this.game.level++;
 		this.game.sceneManager.reset();
-		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game), 1);
+		this.game.sceneManager.changeScenes(new VictoryScrollScene(this.game, 1));
 
 	}
 }

@@ -380,16 +380,16 @@ TheShip.prototype.update = function () {
 	if (!this.game.fireSecondary && this.secondaryType === 2 && this.charge > 0.5) {
 		if (this.charge > 1) {
 			if (this.primaryType === 0) {	// laser
-				for (var i = 0; i < 10; i++) {
+				for (var i = 0; i < 5; i++) {
 					this.createChargeShot("P0", Math.random() * Math.pow(-1, i) / 4, 0, 0);
 				}
 				if (this.multishotLevel > 0) {
-					for (var i = 0; i < 10; i++) {
+					for (var i = 0; i < 5; i++) {
 						this.createChargeShot("P0", Math.random() * Math.pow(-1, i) / 4, 0, 0);
 					}
 				}
 				if (this.multishotLevel > 1) {
-					for (var i = 0; i < 10; i++) {
+					for (var i = 0; i < 5; i++) {
 						this.createChargeShot("P0", Math.random() * Math.pow(-1, i) / 4, 0, 0);
 					}
 				}
@@ -942,7 +942,7 @@ ShipPrimary3.prototype.update = function () {
 	this.yMid = (this.y + (this.pHeight * this.scale / 2)) - 1;
 
 	this.lifetime -= 1;
-	if (this.lifetime < 0) {
+	if (this.lifetime < 1) {
 		this.removeFromWorld = true;
 
 		var projectile = new ShipPrimary3Blast(this.game, this.scale);

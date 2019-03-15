@@ -79,6 +79,7 @@ function BloodSplatter(game, shipXMid, shipYMid, angle) {
   this.angle = angle;
   this.x = this.xMid - ((this.pWidth * this.scale) / 2);
   this.y = this.yMid - ((this.pHeight * this.scale) / 2);
+  this.lifetime = 100;
 
   this.removeFromWorld = false;
 }
@@ -92,7 +93,8 @@ BloodSplatter.prototype.draw = function () {
 }
 
 BloodSplatter.prototype.update = function () {
-	if (this.animation.isDone()){
+	this.lifetime--;
+	if (this.animation.isDone() || this.lifetime < 1) {
 		this.removeFromWorld = true;
 	}
 }
