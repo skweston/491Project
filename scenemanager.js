@@ -538,6 +538,31 @@ function HowTo(game) {
 	this.entities.push(this.enemyStation);
 	this.entities.push(this.testEnemy);
 
+	//Powerups
+	//multishot
+	//speedup
+	//damageup
+	//healthrefill	
+	this.healthrefill = new HealthRefill(this.game);
+	this.healthrefill.lifetime = 100000;
+	this.multishot = new Multishot(this.game);
+	this.multishot.lifetime = 100000;
+	this.damageup = new DamageUp(this.game);
+	this.damageup.lifetime = 100000;
+	this.speedup = new SpeedUp(this.game);
+	this.speedup.lifetime = 100000;
+
+	this.game.addEntity(this.healthrefill);
+	this.game.addEntity(this.multishot);
+	this.game.addEntity(this.damageup);
+	this.game.addEntity(this.speedup);
+
+	this.entities.push(this.healthrefill);
+	this.entities.push(this.multishot);
+	this.entities.push(this.damageup);
+	this.entities.push(this.speedup);
+
+
 	Entity.call(this, this.game, this.x, this.y);
 }
 
@@ -635,8 +660,30 @@ HowTo.prototype.draw = function() {
 	//powerups
 	//When you kill them, enemies have a chance to drop a power up!
 	//put a new powerup of each type on the path w
-	this.game.ctx.fillText("Power Up tutorial coming soon!", 1200, 1000, 400);
-	this.game.ctx.fillText("Keep going to learn more about how to win!", 1200, 1030, 400);
+	//this.game.ctx.fillText("Power Up tutorial coming soon!", 1200, 1000, 400);
+	//this.game.ctx.fillText("Keep going to learn more about how to win!", 1200, 1030, 400);
+	//multishot
+	//speedup
+	//damageup
+	//healthrefill
+
+	this.game.ctx.fillText("MultiShot! Try to Shoot!", 1740, 1000, 400);
+	this.multishot.x = 1700;
+	this.multishot.y = 1000;
+
+
+	this.game.ctx.fillText("DamageUp! Hits do more damage!", 1340, 1000, 400);
+	this.damageup.x = 1300;
+	this.damageup.y = 1000;
+
+	this.game.ctx.fillText("Health Refill! Regain life!", 940, 1000, 400);
+	this.healthrefill.x = 900;
+	this.healthrefill.y = 1000;
+
+	this.game.ctx.fillText("SpeedUp! Fly Fast!", 540, 1000, 400);
+	this.speedup.x = 500;
+	this.speedup.y = 1000;
+
 
 
 	//Allied Station - need to drop a layer
