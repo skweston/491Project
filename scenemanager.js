@@ -684,8 +684,6 @@ HowTo.prototype.draw = function() {
 	this.speedup.x = 500;
 	this.speedup.y = 1000;
 
-
-
 	//Allied Station - need to drop a layer
 	//this.station = new SpaceStation(this.game, 2000, 800, this.asteroid);
 	this.game.ctx.fillText("This is an allied space station.", 650, 1630, 400);
